@@ -17,7 +17,7 @@ module conserved_to_primitive_vector_mod
 !		
 !			
 			point%prim(1,k) = U(1)
-			temp = 1.0d0/U(1)	
+			temp = 1.00/U(1)	
 !
 !
 			U2_rot = U(2)
@@ -36,7 +36,7 @@ module conserved_to_primitive_vector_mod
 !		
 			temp = 	point%prim(2,k)*point%prim(2,k) + point%prim(3,k)*point%prim(3,k) + point%prim(4,k)*point%prim(4,k)
 
-			point%prim(5,k) = 0.4d0*(U(5) - 0.5d0*point%prim(1,k)*temp)
+			point%prim(5,k) = 0.40*(U(5) - 0.50*point%prim(1,k)*temp)
 !
 !	
 		end subroutine

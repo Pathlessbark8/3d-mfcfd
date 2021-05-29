@@ -69,37 +69,37 @@ module generate_connectivity_mod
 				delt = delx*point%tan2(1,i) + dely*point%tan2(2,i) + delz*point%tan2(3,i)
 				deln = delx*point%nor(1,i) + dely*point%nor(2,i) + delz*point%nor(3,i)
 !				
-				if(dels .le. 0.0d0) then
+				if(dels .le. 0.00) then
 					point%xpos_nbhs(i) = point%xpos_nbhs(i) + 1
 					count = point%xpos_nbhs(i)
 					point%xpos_conn(count,i) = k
 				endif
 !
-				if(dels .gt. 0.0d0) then
+				if(dels .gt. 0.00) then
 					point%xneg_nbhs(i) = point%xneg_nbhs(i) + 1
 					count = point%xneg_nbhs(i)
 					point%xneg_conn(count,i) = k
 				endif
 !
-				if(delt .le. 0.0d0) then
+				if(delt .le. 0.00) then
 					point%ypos_nbhs(i) = point%ypos_nbhs(i) + 1
 					count = point%ypos_nbhs(i)
 					point%ypos_conn(count,i) = k
 				endif
 !
-				if(delt .gt. 0.0d0) then
+				if(delt .gt. 0.00) then
 					point%yneg_nbhs(i) = point%yneg_nbhs(i) + 1
 					count = point%yneg_nbhs(i)
 					point%yneg_conn(count,i) = k
 				endif
 !
-				if(deln .le. 0.0d0) then
+				if(deln .le. 0.00) then
 					point%zpos_nbhs(i) = point%zpos_nbhs(i) + 1
 					count = point%zpos_nbhs(i)
 					point%zpos_conn(count,i) = k
 				endif
 !
-				if(deln .gt. 0.0d0) then
+				if(deln .gt. 0.00) then
 					point%zneg_nbhs(i) = point%zneg_nbhs(i) + 1
 					count = point%zneg_nbhs(i)
 					point%zneg_conn(count,i) = k
@@ -145,25 +145,25 @@ module generate_connectivity_mod
 				delt = delx*point%tan2(1,i) + dely*point%tan2(2,i) + delz*point%tan2(3,i)
 				deln = delx*point%nor(1,i) + dely*point%nor(2,i) + delz*point%nor(3,i)
 !
-				if(dels .le. 0.0d0) then
+				if(dels .le. 0.00) then
 					point%xpos_nbhs(i) = point%xpos_nbhs(i) + 1
 					count = point%xpos_nbhs(i)
 					point%xpos_conn(count,i) = k
 				endif
 !
-				if(dels .ge. 0.0d0) then
+				if(dels .ge. 0.00) then
 					point%xneg_nbhs(i) = point%xneg_nbhs(i) + 1
 					count = point%xneg_nbhs(i)
 					point%xneg_conn(count,i) = k
 				endif
 !
-				if(delt .le. 0.0d0) then
+				if(delt .le. 0.00) then
 					point%ypos_nbhs(i) = point%ypos_nbhs(i) + 1
 					count = point%ypos_nbhs(i)
 					point%ypos_conn(count,i) = k
 				endif
 !
-				if(delt .ge. 0.0d0) then
+				if(delt .ge. 0.00) then
 					point%yneg_nbhs(i) = point%yneg_nbhs(i) + 1
 					count = point%yneg_nbhs(i)
 					point%yneg_conn(count,i) = k
@@ -213,25 +213,25 @@ module generate_connectivity_mod
 				delt = delx*point%tan2(1,i) + dely*point%tan2(2,i) + delz*point%tan2(3,i)
 				deln = delx*point%nor(1,i) + dely*point%nor(2,i) + delz*point%nor(3,i)
 !
-				if(dels .le. 0.0d0) then
+				if(dels .le. 0.00) then
 					point%xpos_nbhs(i) = point%xpos_nbhs(i) + 1
 					count = point%xpos_nbhs(i)
 					point%xpos_conn(count,i) = k
 				endif
 !
-				if(dels .ge. 0.0d0) then
+				if(dels .ge. 0.00) then
 					point%xneg_nbhs(i) = point%xneg_nbhs(i) + 1
 					count = point%xneg_nbhs(i)
 					point%xneg_conn(count,i) = k
 				endif
 !
-				if(delt .le. 0.0d0) then
+				if(delt .le. 0.00) then
 					point%ypos_nbhs(i) = point%ypos_nbhs(i) + 1
 					count = point%ypos_nbhs(i)
 					point%ypos_conn(count,i) = k
 				endif
 !
-				if(delt .ge. 0.0d0) then
+				if(delt .ge. 0.00) then
 					point%yneg_nbhs(i) = point%yneg_nbhs(i) + 1
 					count = point%yneg_nbhs(i)
 					point%yneg_conn(count,i) = k

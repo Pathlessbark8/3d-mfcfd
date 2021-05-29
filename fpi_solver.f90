@@ -28,7 +28,7 @@ contains
 				call eval_q_variables()
 				call eval_q_derivatives()
 !					do i = 1, max_points
-!						point%dq(:,:,i)	= 0.0d0
+!						point%dq(:,:,i)	= 0.00
 !					enddo	
 				call timestep_delt()
 				call eval_flux_residual()
@@ -37,7 +37,7 @@ contains
 !
 				if(t .le. 2) then
 					res_old = res_new
-					residue = 0.0d0
+					residue = 0.00
 				else 
 					residue = dlog10(res_new/res_old)					
 				endif	

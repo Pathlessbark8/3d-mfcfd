@@ -27,7 +27,7 @@ module implicit_forward_and_reverse_sweeps_mod
 			k = wall_points_index(i)
 			call implicit_D_inv_wall(k, D_inv)
 			call implicit_LdelU_forward_sweep_wall(k, LdelU)
-!			LdelU = 0.0d0
+!			LdelU = 0.00
 			point%delUp(:,k) = - D_inv*(point%flux_res(:,k) + LdelU)
 		enddo	
 !
@@ -46,7 +46,7 @@ module implicit_forward_and_reverse_sweeps_mod
 			k = wall_points_index(i)
 			call implicit_D_inv_wall(k, D_inv)
 			call implicit_UdelU_backward_sweep_wall(k, UdelU)
-!			UdelU = 0.0d0
+!			UdelU = 0.00
 			point%delUn(:,k) = point%delUp(:,k) - D_inv*UdelU
 		enddo	
 !

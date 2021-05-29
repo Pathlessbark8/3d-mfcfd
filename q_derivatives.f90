@@ -28,17 +28,17 @@ contains
 				y_i = point%y(i)
 				z_i = point%z(i)
 !			
-				sum_delx_sqr = 0.d0
-        	    sum_dely_sqr = 0.d0
-            	sum_delz_sqr = 0.d0
+				sum_delx_sqr = 0.0
+        	    sum_dely_sqr = 0.0
+            	sum_delz_sqr = 0.0
 !            
-	            sum_delx_dely = 0.d0
-    	        sum_dely_delz = 0.d0
-        	    sum_delz_delx = 0.d0           
+	            sum_delx_dely = 0.0
+    	        sum_dely_delz = 0.0
+        	    sum_delz_delx = 0.0           
 !
-	 			sum_delx_delq = 0.d0
-    	        sum_dely_delq = 0.d0
-        	    sum_delz_delq = 0.d0
+	 			sum_delx_delq = 0.0
+    	        sum_dely_delq = 0.0
+        	    sum_delz_delq = 0.0
 !
 	 			point%qm(1, :, i) = point%q(:, i)	! q_maximum ..
     	        point%qm(2, :, i) = point%q(:, i)	! q_minimum ..
@@ -64,8 +64,8 @@ contains
 					dely = y_k - y_i
 					delz = z_k - z_i
 !			
-					dist = dsqrt(delx*delx + dely*dely + delz*delz)
-					weights = 1.0d0/(dist**power)
+					dist = sqrt(delx*delx + dely*dely + delz*delz)
+					weights = 1.00/(dist**power)
 !
 					sum_delx_sqr = sum_delx_sqr + delx*delx*weights
 					sum_dely_sqr = sum_dely_sqr + dely*dely*weights
@@ -86,7 +86,7 @@ contains
 					- sum_delx_dely*(sum_delx_dely*sum_delz_sqr - sum_dely_delz*sum_delz_delx) &
 					+ sum_delz_delx*(sum_delx_dely*sum_dely_delz - sum_dely_sqr*sum_delz_delx)					
 !				
-				one_by_det = 1.0d0/det
+				one_by_det = 1.00/det
 !
 				temp = sum_delx_delq*(sum_dely_sqr*sum_delz_sqr - sum_dely_delz*sum_dely_delz) &
 					 - sum_dely_delq*(sum_delx_dely*sum_delz_sqr - sum_delz_delx*sum_dely_delz) &
@@ -121,17 +121,17 @@ contains
 					y_i = point%y(i)
 					z_i = point%z(i)
 !			
-					sum_delx_sqr = 0.d0
-					sum_dely_sqr = 0.d0
-					sum_delz_sqr = 0.d0
+					sum_delx_sqr = 0.0
+					sum_dely_sqr = 0.0
+					sum_delz_sqr = 0.0
 !            
-					sum_delx_dely = 0.d0
-					sum_dely_delz = 0.d0
-					sum_delz_delx = 0.d0           
+					sum_delx_dely = 0.0
+					sum_dely_delz = 0.0
+					sum_delz_delx = 0.0           
 !
-					sum_delx_delq = 0.d0
-					sum_dely_delq = 0.d0
-					sum_delz_delq = 0.d0
+					sum_delx_delq = 0.0
+					sum_dely_delq = 0.0
+					sum_delz_delq = 0.0
 !
 					do k = 1, point%nbhs(i)
 !
@@ -145,8 +145,8 @@ contains
 						dely = y_k - y_i
 						delz = z_k - z_i
 !		
-						dist = dsqrt(delx*delx + dely*dely + delz*delz)
-						weights = 1.0d0/(dist**power)
+						dist = sqrt(delx*delx + dely*dely + delz*delz)
+						weights = 1.00/(dist**power)
 !
 						sum_delx_sqr = sum_delx_sqr + delx*delx*weights
 						sum_dely_sqr = sum_dely_sqr + dely*dely*weights
@@ -156,8 +156,8 @@ contains
 						sum_dely_delz = sum_dely_delz + dely*delz*weights
 						sum_delz_delx = sum_delz_delx + delz*delx*weights
 !			
-						qtilde_i = point%q(:,i) - 0.5d0*(delx*point%dq(1,:,i) + dely*point%dq(2,:,i) + delz*point%dq(3,:,i))
-						qtilde_nbh = point%q(:,nbh) - 0.5d0*(delx*point%dq(1,:,nbh) + dely*point%dq(2,:,nbh) + delz*point%dq(3,:,nbh)) 						
+						qtilde_i = point%q(:,i) - 0.50*(delx*point%dq(1,:,i) + dely*point%dq(2,:,i) + delz*point%dq(3,:,i))
+						qtilde_nbh = point%q(:,nbh) - 0.50*(delx*point%dq(1,:,nbh) + dely*point%dq(2,:,nbh) + delz*point%dq(3,:,nbh)) 						
 						temp = qtilde_nbh - qtilde_i
 !						
 						sum_delx_delq = sum_delx_delq + weights*delx*temp
@@ -170,7 +170,7 @@ contains
 						- sum_delx_dely*(sum_delx_dely*sum_delz_sqr - sum_dely_delz*sum_delz_delx) &
 						+ sum_delz_delx*(sum_delx_dely*sum_dely_delz - sum_dely_sqr*sum_delz_delx)					
 !				
-					one_by_det = 1.0d0/det
+					one_by_det = 1.00/det
 !
 					temp = sum_delx_delq*(sum_dely_sqr*sum_delz_sqr - sum_dely_delz*sum_dely_delz) &
 						- sum_dely_delq*(sum_delx_dely*sum_delz_sqr - sum_delz_delx*sum_dely_delz) &

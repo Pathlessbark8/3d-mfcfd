@@ -23,11 +23,11 @@ module conserved_vector_Ubar_mod
 			u2_inf_rot = u1_inf*point%tan2(1,k) + u2_inf*point%tan2(2,k) + u3_inf*point%tan2(3,k)
 			u3_inf_rot = u1_inf*point%nor(1,k) + u2_inf*point%nor(2,k) + u3_inf*point%nor(3,k)
 !			
-			rho_e_inf = pr_inf*2.5d0 + 0.5*rho_inf*(u1_inf_rot*u1_inf_rot + u2_inf_rot*u2_inf_rot + u3_inf_rot*u3_inf_rot)
+			rho_e_inf = pr_inf*2.50 + 0.5*rho_inf*(u1_inf_rot*u1_inf_rot + u2_inf_rot*u2_inf_rot + u3_inf_rot*u3_inf_rot)
 !
 			beta = (0.5*rho_inf)/pr_inf
-			S3 = u3_inf_rot*dsqrt(beta)
-			B3_inf = exp(-S3*S3)/(2*dsqrt(pi*beta))
+			S3 = u3_inf_rot*sqrt(beta)
+			B3_inf = exp(-S3*S3)/(2*sqrt(pi*beta))
 			A3n_inf = 0.5*(1-derf(S3))
 !	
 			rho = point%prim(1,k)
@@ -40,7 +40,7 @@ module conserved_vector_Ubar_mod
 			u2_rot = u1*point%tan2(1,k) + u2*point%tan2(2,k) + u3*point%tan2(3,k)
 			u3_rot = u1*point%nor(1,k) + u2*point%nor(2,k) + u3*point%nor(3,k)
 !
-			rho_e = pr*2.5d0 + 0.5*rho*(u1_rot*u1_rot + u2_rot*u2_rot + u3_rot*u3_rot)
+			rho_e = pr*2.50 + 0.5*rho*(u1_rot*u1_rot + u2_rot*u2_rot + u3_rot*u3_rot)
 !
 			beta = (0.5*rho)/pr
 			S3 = u3_rot*sqrt(beta)

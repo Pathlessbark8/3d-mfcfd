@@ -40,17 +40,17 @@ contains
 		real*8 :: maxi(5), mini(5)
 
 
-		sum_delx_sqr = 0.0d0
-		sum_dely_sqr = 0.0d0
-		sum_delz_sqr = 0.0d0
+		sum_delx_sqr = 0.00
+		sum_dely_sqr = 0.00
+		sum_delz_sqr = 0.00
 !
-		sum_delx_dely = 0.0d0
-		sum_dely_delz = 0.0d0
-		sum_delz_delx = 0.0d0
+		sum_delx_dely = 0.00
+		sum_dely_delz = 0.00
+		sum_delz_delx = 0.00
 !
-		sum_delx_delf = 0.0d0
-		sum_dely_delf = 0.0d0
-		sum_delz_delf = 0.0d0
+		sum_delx_delf = 0.00
+		sum_dely_delf = 0.00
+		sum_delz_delf = 0.00
 !
 		x_i = point%x(i)
 		y_i = point%y(i)
@@ -76,7 +76,7 @@ contains
 			delt = delx*tan2(1) + dely*tan2(2) + delz*tan2(3)
 			deln = delx*nor(1) + dely*nor(2) + delz*nor(3)
 !
-			dist = dsqrt(dels*dels + delt*delt + deln*deln)
+			dist = sqrt(dels*dels + delt*delt + deln*deln)
 			weights = dist**power
 !
 			dels_weights = dels*weights
@@ -92,16 +92,16 @@ contains
 			sum_delz_delx = sum_delz_delx + deln*dels_weights
 !
 			temp = delx*point%dq(1,:,i) + dely*point%dq(2,:,i) + delz*point%dq(3,:,i)  
-			qtilde = point%q(:,i) - 0.5d0*temp
+			qtilde = point%q(:,i) - 0.50*temp
 			call venkat_limiter(qtilde, phi, i)
-			qtilde = point%q(:,i) - 0.5d0*phi*temp
+			qtilde = point%q(:,i) - 0.50*phi*temp
 			call qtilde_to_primitive(qtilde, prim)
 			call flux_Gxp(G_i, tan1, tan2, nor, prim)
 !
             temp = delx*point%dq(1,:,k) + dely*point%dq(2,:,k) + delz*point%dq(3,:,k)  
-			qtilde = point%q(:,k) - 0.5d0*temp
+			qtilde = point%q(:,k) - 0.50*temp
 			call venkat_limiter(qtilde, phi, k)
-			qtilde = point%q(:,k) - 0.5d0*phi*temp
+			qtilde = point%q(:,k) - 0.50*phi*temp
 			call qtilde_to_primitive(qtilde, prim)
 			call flux_Gxp(G_k, tan1, tan2, nor, prim)
 !       
@@ -117,7 +117,7 @@ contains
 			- sum_delx_dely*(sum_delx_dely*sum_delz_sqr - sum_dely_delz*sum_delz_delx) &
 			+ sum_delz_delx*(sum_delx_dely*sum_dely_delz - sum_dely_sqr*sum_delz_delx)
 !                        
-		one_by_det = 1.d0/det
+		one_by_det = 1.0/det
 !
 		temp = sum_delx_delf*(sum_dely_sqr*sum_delz_sqr - sum_dely_delz*sum_dely_delz) &
 			- sum_dely_delf*(sum_delx_dely*sum_delz_sqr - sum_delz_delx*sum_dely_delz) &
@@ -155,17 +155,17 @@ contains
 		real*8 :: maxi(5), mini(5)
 
 
-		sum_delx_sqr = 0.0d0
-		sum_dely_sqr = 0.0d0
-		sum_delz_sqr = 0.0d0
+		sum_delx_sqr = 0.00
+		sum_dely_sqr = 0.00
+		sum_delz_sqr = 0.00
 !
-		sum_delx_dely = 0.0d0
-		sum_dely_delz = 0.0d0
-		sum_delz_delx = 0.0d0
+		sum_delx_dely = 0.00
+		sum_dely_delz = 0.00
+		sum_delz_delx = 0.00
 !
-		sum_delx_delf = 0.0d0
-		sum_dely_delf = 0.0d0
-		sum_delz_delf = 0.0d0
+		sum_delx_delf = 0.00
+		sum_dely_delf = 0.00
+		sum_delz_delf = 0.00
 !
 		x_i = point%x(i)
 		y_i = point%y(i)
@@ -191,7 +191,7 @@ contains
 					delt = delx*tan2(1) + dely*tan2(2) + delz*tan2(3)
 					deln = delx*nor(1) + dely*nor(2) + delz*nor(3)
 !
-					dist = dsqrt(dels*dels + delt*delt + deln*deln)
+					dist = sqrt(dels*dels + delt*delt + deln*deln)
 					weights = dist**power
 !
 					dels_weights = dels*weights
@@ -207,18 +207,18 @@ contains
 					sum_delz_delx = sum_delz_delx + deln*dels_weights
 !
 					temp = delx*point%dq(1,:,i) + dely*point%dq(2,:,i) + delz*point%dq(3,:,i)  
-					qtilde_i = point%q(:,i) - 0.5d0*temp
+					qtilde_i = point%q(:,i) - 0.50*temp
 					temp = delx*point%dq(1,:,k) + dely*point%dq(2,:,k) + delz*point%dq(3,:,k)  
-					qtilde_k = point%q(:,k) - 0.5d0*temp
+					qtilde_k = point%q(:,k) - 0.50*temp
 !
 					if(limiter_flag .eq. 1) then 
 						call venkat_limiter(qtilde_i, phi_i, i)
 						call venkat_limiter(qtilde_k, phi_k, k)
 !
 						temp = delx*point%dq(1,:,i) + dely*point%dq(2,:,i) + delz*point%dq(3,:,i)  
-						qtilde_i = point%q(:,i) - 0.5d0*phi_i*temp
+						qtilde_i = point%q(:,i) - 0.50*phi_i*temp
 						temp = delx*point%dq(1,:,k) + dely*point%dq(2,:,k) + delz*point%dq(3,:,k)  
-						qtilde_k = point%q(:,k) - 0.5d0*phi_k*temp
+						qtilde_k = point%q(:,k) - 0.50*phi_k*temp
 !
 					elseif(limiter_flag .eq. 2) then 
 						call max_q_value(i, maxi)
@@ -261,7 +261,7 @@ contains
 					- sum_delx_dely*(sum_delx_dely*sum_delz_sqr - sum_dely_delz*sum_delx_delz) &
 					+ sum_delx_delz*(sum_delx_dely*sum_dely_delz - sum_dely_sqr*sum_delx_delz)
 !                        
-			one_by_det = 1.d0/det
+			one_by_det = 1.0/det
 !
 			temp = sum_delx_delf*(sum_dely_sqr*sum_delz_sqr - sum_dely_delz*sum_dely_delz) &
 					- sum_dely_delf*(sum_delx_dely*sum_delz_sqr - sum_delx_delz*sum_dely_delz) &
@@ -300,17 +300,17 @@ contains
 		real*8 :: maxi(5), mini(5)
 
 
-		sum_delx_sqr = 0.0d0
-		sum_dely_sqr = 0.0d0
-		sum_delz_sqr = 0.0d0
+		sum_delx_sqr = 0.00
+		sum_dely_sqr = 0.00
+		sum_delz_sqr = 0.00
 !
-		sum_delx_dely = 0.0d0
-		sum_dely_delz = 0.0d0
-		sum_delz_delx = 0.0d0
+		sum_delx_dely = 0.00
+		sum_dely_delz = 0.00
+		sum_delz_delx = 0.00
 !
-		sum_delx_delf = 0.0d0
-		sum_dely_delf = 0.0d0
-		sum_delz_delf = 0.0d0
+		sum_delx_delf = 0.00
+		sum_dely_delf = 0.00
+		sum_delz_delf = 0.00
 !
 		x_i = point%x(i)
 		y_i = point%y(i)
@@ -336,7 +336,7 @@ contains
 					delt = delx*tan2(1) + dely*tan2(2) + delz*tan2(3)
 					deln = delx*nor(1) + dely*nor(2) + delz*nor(3)
 !
-					dist = dsqrt(dels*dels + delt*delt + deln*deln)
+					dist = sqrt(dels*dels + delt*delt + deln*deln)
 					weights = dist**power
 !
 					dels_weights = dels*weights
@@ -352,18 +352,18 @@ contains
 					sum_delz_delx = sum_delz_delx + deln*dels_weights
 !
 					temp = delx*point%dq(1,:,i) + dely*point%dq(2,:,i) + delz*point%dq(3,:,i)  
-					qtilde_i = point%q(:,i) - 0.5d0*temp
+					qtilde_i = point%q(:,i) - 0.50*temp
 					temp = delx*point%dq(1,:,k) + dely*point%dq(2,:,k) + delz*point%dq(3,:,k)  
-					qtilde_k = point%q(:,k) - 0.5d0*temp
+					qtilde_k = point%q(:,k) - 0.50*temp
 !
 					if(limiter_flag .eq. 1) then 
 						call venkat_limiter(qtilde_i, phi_i, i)
 						call venkat_limiter(qtilde_k, phi_k, k)
 !
 						temp = delx*point%dq(1,:,i) + dely*point%dq(2,:,i) + delz*point%dq(3,:,i)  
-						qtilde_i = point%q(:,i) - 0.5d0*phi_i*temp
+						qtilde_i = point%q(:,i) - 0.50*phi_i*temp
 						temp = delx*point%dq(1,:,k) + dely*point%dq(2,:,k) + delz*point%dq(3,:,k)  
-						qtilde_k = point%q(:,k) - 0.5d0*phi_k*temp
+						qtilde_k = point%q(:,k) - 0.50*phi_k*temp
 !
 					elseif(limiter_flag .eq. 2) then 
 						call max_q_value(i, maxi)
@@ -406,7 +406,7 @@ contains
 					- sum_delx_dely*(sum_delx_dely*sum_delz_sqr - sum_dely_delz*sum_delx_delz) &
 					+ sum_delx_delz*(sum_delx_dely*sum_dely_delz - sum_dely_sqr*sum_delx_delz)
 !                        
-			one_by_det = 1.d0/det
+			one_by_det = 1.0/det
 !
 			temp = sum_delx_sqr*(sum_dely_delf*sum_delz_sqr - sum_dely_delz*sum_delz_delf) &
 					- sum_delx_dely*(sum_delx_delf*sum_delz+sqr - sum_delz_delx*sum_delz_delf) &
@@ -447,17 +447,17 @@ contains
 		real*8 :: maxi(5), mini(5)
 
 
-		sum_delx_sqr = 0.0d0
-		sum_dely_sqr = 0.0d0
-		sum_delz_sqr = 0.0d0
+		sum_delx_sqr = 0.00
+		sum_dely_sqr = 0.00
+		sum_delz_sqr = 0.00
 !
-		sum_delx_dely = 0.0d0
-		sum_dely_delz = 0.0d0
-		sum_delz_delx = 0.0d0
+		sum_delx_dely = 0.00
+		sum_dely_delz = 0.00
+		sum_delz_delx = 0.00
 !
-		sum_delx_delf = 0.0d0
-		sum_dely_delf = 0.0d0
-		sum_delz_delf = 0.0d0
+		sum_delx_delf = 0.00
+		sum_dely_delf = 0.00
+		sum_delz_delf = 0.00
 !
 		x_i = point%x(i)
 		y_i = point%y(i)
@@ -483,7 +483,7 @@ contains
 					delt = delx*tan2(1) + dely*tan2(2) + delz*tan2(3)
 					deln = delx*nor(1) + dely*nor(2) + delz*nor(3)
 !
-					dist = dsqrt(dels*dels + delt*delt + deln*deln)
+					dist = sqrt(dels*dels + delt*delt + deln*deln)
 					weights = dist**power
 !
 					dels_weights = dels*weights
@@ -499,18 +499,18 @@ contains
 					sum_delz_delx = sum_delz_delx + deln*dels_weights
 !
 					temp = delx*point%dq(1,:,i) + dely*point%dq(2,:,i) + delz*point%dq(3,:,i)  
-					qtilde_i = point%q(:,i) - 0.5d0*temp
+					qtilde_i = point%q(:,i) - 0.50*temp
 					temp = delx*point%dq(1,:,k) + dely*point%dq(2,:,k) + delz*point%dq(3,:,k)  
-					qtilde_k = point%q(:,k) - 0.5d0*temp
+					qtilde_k = point%q(:,k) - 0.50*temp
 !
 					if(limiter_flag .eq. 1) then 
 						call venkat_limiter(qtilde_i, phi_i, i)
 						call venkat_limiter(qtilde_k, phi_k, k)
 !
 						temp = delx*point%dq(1,:,i) + dely*point%dq(2,:,i) + delz*point%dq(3,:,i)  
-						qtilde_i = point%q(:,i) - 0.5d0*phi_i*temp
+						qtilde_i = point%q(:,i) - 0.50*phi_i*temp
 						temp = delx*point%dq(1,:,k) + dely*point%dq(2,:,k) + delz*point%dq(3,:,k)  
-						qtilde_k = point%q(:,k) - 0.5d0*phi_k*temp
+						qtilde_k = point%q(:,k) - 0.50*phi_k*temp
 !
 					elseif(limiter_flag .eq. 2) then 
 						call max_q_value(i, maxi)
@@ -553,7 +553,7 @@ contains
 					- sum_delx_dely*(sum_delx_dely*sum_delz_sqr - sum_dely_delz*sum_delx_delz) &
 					+ sum_delx_delz*(sum_delx_dely*sum_dely_delz - sum_dely_sqr*sum_delx_delz)
 !                        
-			one_by_det = 1.d0/det
+			one_by_det = 1.0/det
 !
 			temp = sum_delx_sqr*(sum_dely_delf*sum_delz_sqr - sum_dely_delz*sum_delz_delf) &
 					- sum_delx_dely*(sum_delx_delf*sum_delz+sqr - sum_delz_delx*sum_delz_delf) &
@@ -594,17 +594,17 @@ contains
 		real*8 :: maxi(5), mini(5)
 
 
-		sum_delx_sqr = 0.0d0
-		sum_dely_sqr = 0.0d0
-		sum_delz_sqr = 0.0d0
+		sum_delx_sqr = 0.00
+		sum_dely_sqr = 0.00
+		sum_delz_sqr = 0.00
 !
-		sum_delx_dely = 0.0d0
-		sum_dely_delz = 0.0d0
-		sum_delz_delx = 0.0d0
+		sum_delx_dely = 0.00
+		sum_dely_delz = 0.00
+		sum_delz_delx = 0.00
 !
-		sum_delx_delf = 0.0d0
-		sum_dely_delf = 0.0d0
-		sum_delz_delf = 0.0d0
+		sum_delx_delf = 0.00
+		sum_dely_delf = 0.00
+		sum_delz_delf = 0.00
 !
 		x_i = point%x(i)
 		y_i = point%y(i)
@@ -630,7 +630,7 @@ contains
 					delt = delx*tan2(1) + dely*tan2(2) + delz*tan2(3)
 					deln = delx*nor(1) + dely*nor(2) + delz*nor(3)
 !
-					dist = dsqrt(dels*dels + delt*delt + deln*deln)
+					dist = sqrt(dels*dels + delt*delt + deln*deln)
 					weights = dist**power
 !
 					dels_weights = dels*weights
@@ -646,18 +646,18 @@ contains
 					sum_delz_delx = sum_delz_delx + deln*dels_weights
 !
 					temp = delx*point%dq(1,:,i) + dely*point%dq(2,:,i) + delz*point%dq(3,:,i)  
-					qtilde_i = point%q(:,i) - 0.5d0*temp
+					qtilde_i = point%q(:,i) - 0.50*temp
 					temp = delx*point%dq(1,:,k) + dely*point%dq(2,:,k) + delz*point%dq(3,:,k)  
-					qtilde_k = point%q(:,k) - 0.5d0*temp
+					qtilde_k = point%q(:,k) - 0.50*temp
 !
 					if(limiter_flag .eq. 1) then 
 						call venkat_limiter(qtilde_i, phi_i, i)
 						call venkat_limiter(qtilde_k, phi_k, k)
 !
 						temp = delx*point%dq(1,:,i) + dely*point%dq(2,:,i) + delz*point%dq(3,:,i)  
-						qtilde_i = point%q(:,i) - 0.5d0*phi_i*temp
+						qtilde_i = point%q(:,i) - 0.50*phi_i*temp
 						temp = delx*point%dq(1,:,k) + dely*point%dq(2,:,k) + delz*point%dq(3,:,k)  
-						qtilde_k = point%q(:,k) - 0.5d0*phi_k*temp
+						qtilde_k = point%q(:,k) - 0.50*phi_k*temp
 !
 					elseif(limiter_flag .eq. 2) then 
 						call max_q_value(i, maxi)
@@ -700,7 +700,7 @@ contains
 					- sum_delx_dely*(sum_delx_dely*sum_delz_sqr - sum_dely_delz*sum_delx_delz) &
 					+ sum_delx_delz*(sum_delx_dely*sum_dely_delz - sum_dely_sqr*sum_delx_delz)
 !                        
-			one_by_det = 1.d0/det
+			one_by_det = 1.0/det
 !
 			temp = sum_delx_sqr*(sum_dely_sqr*sum_delz_delf - sum_dely_delf*sum_dely_delz) &
 					- sum_delx_dely*(sum_delx_dely*sum_delz_delf - sum_delx_delf*sum_dely_delz) &
@@ -740,17 +740,17 @@ contains
 		real*8 :: maxi(5), mini(5)
 
 
-		sum_delx_sqr = 0.0d0
-		sum_dely_sqr = 0.0d0
-		sum_delz_sqr = 0.0d0
+		sum_delx_sqr = 0.00
+		sum_dely_sqr = 0.00
+		sum_delz_sqr = 0.00
 !
-		sum_delx_dely = 0.0d0
-		sum_dely_delz = 0.0d0
-		sum_delz_delx = 0.0d0
+		sum_delx_dely = 0.00
+		sum_dely_delz = 0.00
+		sum_delz_delx = 0.00
 !
-		sum_delx_delf = 0.0d0
-		sum_dely_delf = 0.0d0
-		sum_delz_delf = 0.0d0
+		sum_delx_delf = 0.00
+		sum_dely_delf = 0.00
+		sum_delz_delf = 0.00
 !
 		x_i = point%x(i)
 		y_i = point%y(i)
@@ -776,7 +776,7 @@ contains
 					delt = delx*tan2(1) + dely*tan2(2) + delz*tan2(3)
 					deln = delx*nor(1) + dely*nor(2) + delz*nor(3)
 !
-					dist = dsqrt(dels*dels + delt*delt + deln*deln)
+					dist = sqrt(dels*dels + delt*delt + deln*deln)
 					weights = dist**power
 !
 					dels_weights = dels*weights
@@ -792,18 +792,18 @@ contains
 					sum_delz_delx = sum_delz_delx + deln*dels_weights
 !
 					temp = delx*point%dq(1,:,i) + dely*point%dq(2,:,i) + delz*point%dq(3,:,i)  
-					qtilde_i = point%q(:,i) - 0.5d0*temp
+					qtilde_i = point%q(:,i) - 0.50*temp
 					temp = delx*point%dq(1,:,k) + dely*point%dq(2,:,k) + delz*point%dq(3,:,k)  
-					qtilde_k = point%q(:,k) - 0.5d0*temp
+					qtilde_k = point%q(:,k) - 0.50*temp
 !
 					if(limiter_flag .eq. 1) then 
 						call venkat_limiter(qtilde_i, phi_i, i)
 						call venkat_limiter(qtilde_k, phi_k, k)
 !
 						temp = delx*point%dq(1,:,i) + dely*point%dq(2,:,i) + delz*point%dq(3,:,i)  
-						qtilde_i = point%q(:,i) - 0.5d0*phi_i*temp
+						qtilde_i = point%q(:,i) - 0.50*phi_i*temp
 						temp = delx*point%dq(1,:,k) + dely*point%dq(2,:,k) + delz*point%dq(3,:,k)  
-						qtilde_k = point%q(:,k) - 0.5d0*phi_k*temp
+						qtilde_k = point%q(:,k) - 0.50*phi_k*temp
 !
 					elseif(limiter_flag .eq. 2) then 
 						call max_q_value(i, maxi)
@@ -846,7 +846,7 @@ contains
 					- sum_delx_dely*(sum_delx_dely*sum_delz_sqr - sum_dely_delz*sum_delx_delz) &
 					+ sum_delx_delz*(sum_delx_dely*sum_dely_delz - sum_dely_sqr*sum_delx_delz)
 !                        
-			one_by_det = 1.d0/det
+			one_by_det = 1.0/det
 !
 			temp = sum_delx_sqr*(sum_dely_sqr*sum_delz_delf - sum_dely_delf*sum_dely_delz) &
 					- sum_delx_dely*(sum_delx_dely*sum_delz_delf - sum_delx_delf*sum_dely_delz) &

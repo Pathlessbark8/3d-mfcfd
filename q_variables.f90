@@ -24,11 +24,11 @@ contains
 				u3 = point%prim(4,k)                
 				pr = point%prim(5,k)
 !
-				beta = 0.5d0*rho/pr
+				beta = 0.50*rho/pr
 !
-				point%q(1,k) = dlog(rho) + (dlog(beta)*2.5d0) - beta*(u1*u1 + u2*u2 + u3*u3)
+				point%q(1,k) = dlog(rho) + (dlog(beta)*2.50) - beta*(u1*u1 + u2*u2 + u3*u3)
 !
-				two_times_beta = 2.0d0*beta
+				two_times_beta = 2.00*beta
 !
 				point%q(2,k) = two_times_beta*u1
 				point%q(3,k) = two_times_beta*u2

@@ -19,7 +19,7 @@ module timestep_delt_mod
 !
 		do i = 1, max_points
 !
-			min_delt = 1.0d0						
+			min_delt = 1.00						
 !			
 			do r = 1, point%nbhs(i)
 !			
@@ -35,11 +35,11 @@ module timestep_delt_mod
 				dely = point%y(k) - point%y(i)
 				delz = point%z(k) - point%z(i)
 !
-                dist = dsqrt(delx*delx + dely*dely + delz*delz)
+                dist = sqrt(delx*delx + dely*dely + delz*delz)
 !
-                mod_u = dsqrt(u1*u1 + u2*u2 + u3*u3)
+                mod_u = sqrt(u1*u1 + u2*u2 + u3*u3)
 
-                delt = cfl*dist/(mod_u + 3.0d0*dsqrt(pr/rho))
+                delt = cfl*dist/(mod_u + 3.00*sqrt(pr/rho))
 !
                 if(delt < min_delt) then
 					min_delt = delt

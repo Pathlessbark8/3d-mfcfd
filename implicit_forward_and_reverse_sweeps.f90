@@ -36,13 +36,13 @@ module implicit_forward_and_reverse_sweeps_mod
 				call implicit_LdelU_forward_sweep_interior(p, LdelU)
 				point%delUp(:,p) = - D_inv*(point%flux_res(:,p) + LdelU)
 			else if(point_status == 5 .OR. point_status == 6) then ! supersonic inlet/outlet points ..
-				min_dist = 1000000.0d0
+				min_dist = 1000000.00
 				do r = 1, point%nbhs(p)
 					nbh = point%conn(r,p)
 					dx = point%x(nbh) - point%x(p)
 					dy = point%y(nbh) - point%y(p)
 					dz = point%z(nbh) - point%z(p)
-					ds = dsqrt(dx*dx + dy*dy + dz*dz)
+					ds = sqrt(dx*dx + dy*dy + dz*dz)
 					if(ds < min_dist) then
 						min_dist = ds
 						q = nbh
@@ -67,13 +67,13 @@ module implicit_forward_and_reverse_sweeps_mod
 				call implicit_UdelU_backward_sweep_interior(p, UdelU)
 				point%delUn(:,p) = point%delUp(:,p) - D_inv*UdelU
 			else if(point_status == 5 .OR. point_status == 6) then ! supersonic inlet/outlet points ..
-				min_dist = 1000000.0d0
+				min_dist = 1000000.00
 				do r = 1, point%nbhs(p)
 					nbh = point%conn(r,p)
 					dx = point%x(nbh) - point%x(p)
 					dy = point%y(nbh) - point%y(p)
 					dz = point%z(nbh) - point%z(p)
-					ds = dsqrt(dx*dx + dy*dy + dz*dz)
+					ds = sqrt(dx*dx + dy*dy + dz*dz)
 					if(ds < min_dist) then
 						min_dist = ds
 						q = nbh

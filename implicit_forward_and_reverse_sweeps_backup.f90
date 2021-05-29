@@ -45,14 +45,14 @@ module implicit_forward_and_reverse_sweeps_mod
 		enddo	
 !
 		do i = 1, supersonic_inlet_points
-			min_dist = 100000.0d0
+			min_dist = 100000.00
 			k = supersonic_inlet_points_index(i)
 			do r = 1, point%nbhs(k)
 				nbh = point%conn(r,k)
 				dx = point%x(nbh) - point%x(k)
 				dy = point%y(nbh) - point%y(k)
 				dz = point%z(nbh) - point%z(k)
-				ds = dsqrt(dx*dx + dy*dy + dz*dz)
+				ds = sqrt(dx*dx + dy*dy + dz*dz)
 				if(ds < min_dist .AND. point%status(nbh) .ne. 1) then
 					min_dist = ds
 					p = nbh
@@ -62,14 +62,14 @@ module implicit_forward_and_reverse_sweeps_mod
 		enddo
 !
 		do i = 1, supersonic_outlet_points
-			min_dist = 100000.0d0
+			min_dist = 100000.00
 			k = supersonic_outlet_points_index(i)
 			do r = 1, point%nbhs(k)
 				nbh = point%conn(r,k)
 				dx = point%x(nbh) - point%x(k)
 				dy = point%y(nbh) - point%y(k)
 				dz = point%z(nbh) - point%z(k)
-				ds = dsqrt(dx*dx + dy*dy + dz*dz)
+				ds = sqrt(dx*dx + dy*dy + dz*dz)
 				if(ds < min_dist .AND. point%status(nbh) .ne. 1) then
 					min_dist = ds
 					p = nbh
@@ -105,14 +105,14 @@ module implicit_forward_and_reverse_sweeps_mod
 		enddo	
 !
 		do i = supersonic_inlet_points, 1, -1
-			min_dist = 100000.0d0
+			min_dist = 100000.00
 			k = supersonic_inlet_points_index(i)
 			do r = 1, point%nbhs(k)
 				nbh = point%conn(r,k)
 				dx = point%x(nbh) - point%x(k)
 				dy = point%y(nbh) - point%y(k)
 				dz = point%z(nbh) - point%z(k)
-				ds = dsqrt(dx*dx + dy*dy + dz*dz)
+				ds = sqrt(dx*dx + dy*dy + dz*dz)
 				if(ds < min_dist .AND. point%status(nbh) .ne. 1) then
 					min_dist = ds
 					p = nbh
@@ -122,14 +122,14 @@ module implicit_forward_and_reverse_sweeps_mod
 		enddo
 !
 		do i = supersonic_outlet_points, 1, -1
-			min_dist = 100000.0d0
+			min_dist = 100000.00
 			k = supersonic_outlet_points_index(i)
 			do r = 1, point%nbhs(k)
 				nbh = point%conn(r,k)
 				dx = point%x(nbh) - point%x(k)
 				dy = point%y(nbh) - point%y(k)
 				dz = point%z(nbh) - point%z(k)
-				ds = dsqrt(dx*dx + dy*dy + dz*dz)
+				ds = sqrt(dx*dx + dy*dy + dz*dz)
 				if(ds < min_dist .AND. point%status(nbh) .ne. 1) then
 					min_dist = ds
 					p = nbh

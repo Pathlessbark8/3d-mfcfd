@@ -38,17 +38,17 @@ contains
 		real*8 :: dels_weights, delt_weights, deln_weights
 !
 !
-		sum_delx_sqr = 0.0d0
-		sum_dely_sqr = 0.0d0
-		sum_delz_sqr = 0.0d0
+		sum_delx_sqr = 0.00
+		sum_dely_sqr = 0.00
+		sum_delz_sqr = 0.00
 !
-		sum_delx_dely = 0.0d0
-		sum_dely_delz = 0.0d0
-		sum_delz_delx = 0.0d0
+		sum_delx_dely = 0.00
+		sum_dely_delz = 0.00
+		sum_delz_delx = 0.00
 !
-		sum_delx_delf = 0.0d0
-		sum_dely_delf = 0.0d0
-		sum_delz_delf = 0.0d0
+		sum_delx_delf = 0.00
+		sum_dely_delf = 0.00
+		sum_delz_delf = 0.00
 !
 		x_i = point%x(i)
 		y_i = point%y(i)
@@ -74,8 +74,8 @@ contains
 			delt = delx*tan2(1) + dely*tan2(2) + delz*tan2(3)
 			deln = delx*nor(1) + dely*nor(2) + delz*nor(3)
 !
-			dist = dsqrt(dels*dels + delt*delt + deln*deln)
-			weights = 1.0d0/(dist**power)
+			dist = sqrt(dels*dels + delt*delt + deln*deln)
+			weights = 1.00/(dist**power)
 !
 			dels_weights = dels*weights
 			delt_weights = delt*weights
@@ -90,16 +90,16 @@ contains
 			sum_delz_delx = sum_delz_delx + deln*dels_weights
 !
 			temp = delx*point%dq(1,:,i) + dely*point%dq(2,:,i) + delz*point%dq(3,:,i)  
-			qtilde = point%q(:,i) - 0.5d0*temp
+			qtilde = point%q(:,i) - 0.50*temp
 			call venkat_limiter(qtilde, phi, i)
-			qtilde = point%q(:,i) - 0.5d0*phi*temp
+			qtilde = point%q(:,i) - 0.50*phi*temp
 			call qtilde_to_primitive(qtilde, prim)
 			call flux_Gwxp(G_i, tan1, tan2, nor, prim)
 !
             temp = delx*point%dq(1,:,k) + dely*point%dq(2,:,k) + delz*point%dq(3,:,k)  
-			qtilde = point%q(:,k) - 0.5d0*temp
+			qtilde = point%q(:,k) - 0.50*temp
 			call venkat_limiter(qtilde, phi, k)
-			qtilde = point%q(:,k) - 0.5d0*phi*temp
+			qtilde = point%q(:,k) - 0.50*phi*temp
 			call qtilde_to_primitive(qtilde, prim)
 			call flux_Gwxp(G_k, tan1, tan2, nor, prim)
 !       

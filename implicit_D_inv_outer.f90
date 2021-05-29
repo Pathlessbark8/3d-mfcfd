@@ -44,21 +44,21 @@ contains
 		nor = point%nor(:,i)
 !
 		delt = point%delt(i)
-		as = dsqrt(1.40d0*point%prim(5,i)/point%prim(1,i))
+		as = sqrt(1.400*point%prim(5,i)/point%prim(1,i))
 !
 !	Compute dGxpos contributions to D_inv ..
 !
-		sum_delx_sqr = 0.0d0
-		sum_dely_sqr = 0.0d0
-		sum_delz_sqr = 0.0d0
+		sum_delx_sqr = 0.00
+		sum_dely_sqr = 0.00
+		sum_delz_sqr = 0.00
 !
-		sum_delx_dely = 0.0d0
-		sum_dely_delz = 0.0d0
-		sum_delz_delx = 0.0d0
+		sum_delx_dely = 0.00
+		sum_dely_delz = 0.00
+		sum_delz_delx = 0.00
 !
-		sum_delx = 0.0d0
-		sum_dely = 0.0d0
-		sum_delz = 0.0d0
+		sum_delx = 0.00
+		sum_dely = 0.00
+		sum_delz = 0.00
 !
 		do j = 1, point%xpos_nbhs(i)
 !
@@ -76,8 +76,8 @@ contains
 				delt = delx*tan2(1) + dely*tan2(2) + delz*tan2(3)
 				deln = delx*nor(1) + dely*nor(2) + delz*nor(3)
 !
-				dist = dsqrt(dels*dels + delt*delt + deln*deln)
-				weights = 1.0d0/(dist**power)
+				dist = sqrt(dels*dels + delt*delt + deln*deln)
+				weights = 1.00/(dist**power)
 !
 				dels_weights = dels*weights
 				delt_weights = delt*weights
@@ -106,22 +106,22 @@ contains
 				+ sum_delz*(sum_delx_dely*sum_dely_delz - sum_delz_delx*sum_dely_sqr)
 !
 		temp1 = point%prim(2,i) + as
-		dGxp = 0.50d0*dabs(temp1 + dabs(temp1))*temp/det
+		dGxp = 0.500*dabs(temp1 + dabs(temp1))*temp/det
 !
 !
 !	Compute dGxneg contributions to D_inv ..
 !
-		sum_delx_sqr = 0.0d0
-		sum_dely_sqr = 0.0d0
-		sum_delz_sqr = 0.0d0
+		sum_delx_sqr = 0.00
+		sum_dely_sqr = 0.00
+		sum_delz_sqr = 0.00
 !
-		sum_delx_dely = 0.0d0
-		sum_dely_delz = 0.0d0
-		sum_delz_delx = 0.0d0
+		sum_delx_dely = 0.00
+		sum_dely_delz = 0.00
+		sum_delz_delx = 0.00
 !
-		sum_delx = 0.0d0
-		sum_dely = 0.0d0
-		sum_delz = 0.0d0
+		sum_delx = 0.00
+		sum_dely = 0.00
+		sum_delz = 0.00
 !
 		do j = 1, point%xneg_nbhs(i)
 !
@@ -139,8 +139,8 @@ contains
 				delt = delx*tan2(1) + dely*tan2(2) + delz*tan2(3)
 				deln = delx*nor(1) + dely*nor(2) + delz*nor(3)
 !
-				dist = dsqrt(dels*dels + delt*delt + deln*deln)
-				weights = 1.0d0/(dist**power)
+				dist = sqrt(dels*dels + delt*delt + deln*deln)
+				weights = 1.00/(dist**power)
 !
 				dels_weights = dels*weights
 				delt_weights = delt*weights
@@ -168,22 +168,22 @@ contains
 				+ sum_delz*(sum_delx_dely*sum_dely_delz - sum_delz_delx*sum_dely_sqr)
 !
 		temp1 = point%prim(2,i) - as
-		dGxn = 0.50d0*dabs(temp1 - dabs(temp1))*temp/det
+		dGxn = 0.500*dabs(temp1 - dabs(temp1))*temp/det
 !
 !
 !	Compute dGypos contributions to D_inv ..
 !
-		sum_delx_sqr = 0.0d0
-		sum_dely_sqr = 0.0d0
-		sum_delz_sqr = 0.0d0
+		sum_delx_sqr = 0.00
+		sum_dely_sqr = 0.00
+		sum_delz_sqr = 0.00
 !
-		sum_delx_dely = 0.0d0
-		sum_dely_delz = 0.0d0
-		sum_delz_delx = 0.0d0
+		sum_delx_dely = 0.00
+		sum_dely_delz = 0.00
+		sum_delz_delx = 0.00
 !
-		sum_delx = 0.0d0
-		sum_dely = 0.0d0
-		sum_delz = 0.0d0
+		sum_delx = 0.00
+		sum_dely = 0.00
+		sum_delz = 0.00
 !
 		do j = 1, point%ypos_nbhs(i)
 !
@@ -201,8 +201,8 @@ contains
 				delt = delx*tan2(1) + dely*tan2(2) + delz*tan2(3)
 				deln = delx*nor(1) + dely*nor(2) + delz*nor(3)
 !
-				dist = dsqrt(dels*dels + delt*delt + deln*deln)
-				weights = 1.0d0/(dist**power)
+				dist = sqrt(dels*dels + delt*delt + deln*deln)
+				weights = 1.00/(dist**power)
 !
 				dels_weights = dels*weights
 				delt_weights = delt*weights
@@ -230,22 +230,22 @@ contains
 				+ sum_delz_delx*(sum_delx*sum_dely_delz - sum_delz_delx*sum_dely)
 !
 		temp1 = point%prim(3,i) + as
-		dGyp = 0.50d0*dabs(temp1 + dabs(temp1))*temp/det
+		dGyp = 0.500*dabs(temp1 + dabs(temp1))*temp/det
 !
 !
 !	Compute dGyneg contributions to D_inv ..
 !
-		sum_delx_sqr = 0.0d0
-		sum_dely_sqr = 0.0d0
-		sum_delz_sqr = 0.0d0
+		sum_delx_sqr = 0.00
+		sum_dely_sqr = 0.00
+		sum_delz_sqr = 0.00
 !
-		sum_delx_dely = 0.0d0
-		sum_dely_delz = 0.0d0
-		sum_delz_delx = 0.0d0
+		sum_delx_dely = 0.00
+		sum_dely_delz = 0.00
+		sum_delz_delx = 0.00
 !
-		sum_delx = 0.0d0
-		sum_dely = 0.0d0
-		sum_delz = 0.0d0
+		sum_delx = 0.00
+		sum_dely = 0.00
+		sum_delz = 0.00
 !
 		do j = 1, point%yneg_nbhs(i)
 !
@@ -263,8 +263,8 @@ contains
 				delt = delx*tan2(1) + dely*tan2(2) + delz*tan2(3)
 				deln = delx*nor(1) + dely*nor(2) + delz*nor(3)
 !
-				dist = dsqrt(dels*dels + delt*delt + deln*deln)
-				weights = 1.0d0/(dist**power)
+				dist = sqrt(dels*dels + delt*delt + deln*deln)
+				weights = 1.00/(dist**power)
 !
 				dels_weights = dels*weights
 				delt_weights = delt*weights
@@ -292,22 +292,22 @@ contains
 				+ sum_delz_delx*(sum_delx*sum_dely_delz - sum_delz_delx*sum_dely)
 !
 		temp1 = point%prim(3,i) - as
-		dGyn = 0.50d0*dabs(temp1 - dabs(temp1))*temp/det
+		dGyn = 0.500*dabs(temp1 - dabs(temp1))*temp/det
 !
 !
 !	Compute dGzpos contributions to D_inv ..
 !
-		sum_delx_sqr = 0.0d0
-		sum_dely_sqr = 0.0d0
-		sum_delz_sqr = 0.0d0
+		sum_delx_sqr = 0.00
+		sum_dely_sqr = 0.00
+		sum_delz_sqr = 0.00
 !
-		sum_delx_dely = 0.0d0
-		sum_dely_delz = 0.0d0
-		sum_delz_delx = 0.0d0
+		sum_delx_dely = 0.00
+		sum_dely_delz = 0.00
+		sum_delz_delx = 0.00
 !
-		sum_delx = 0.0d0
-		sum_dely = 0.0d0
-		sum_delz = 0.0d0
+		sum_delx = 0.00
+		sum_dely = 0.00
+		sum_delz = 0.00
 !
 		do j = 1, point%nbhs(i)
 !
@@ -325,8 +325,8 @@ contains
 				delt = delx*tan2(1) + dely*tan2(2) + delz*tan2(3)
 				deln = delx*nor(1) + dely*nor(2) + delz*nor(3)
 !
-				dist = dsqrt(dels*dels + delt*delt + deln*deln)
-				weights = 1.0d0/(dist**power)
+				dist = sqrt(dels*dels + delt*delt + deln*deln)
+				weights = 1.00/(dist**power)
 !
 				dels_weights = dels*weights
 				delt_weights = delt*weights
@@ -354,11 +354,11 @@ contains
 				+ sum_delz_delx*(sum_delx_dely*sum_dely - sum_delx*sum_dely_sqr)
 !
 		temp1 = point%prim(4,i) + as
-		dGzp = 0.50d0*dabs(temp1 + dabs(temp1))*temp/det
+		dGzp = 0.500*dabs(temp1 + dabs(temp1))*temp/det
 !
 !
-		temp = (1.0d0/delt) - dGxp + dGxn - dGyp + dGyn - dGzp 
-		D_inv = 1.0d0/temp
+		temp = (1.00/delt) - dGxp + dGxn - dGyp + dGyn - dGzp 
+		D_inv = 1.00/temp
 !			
         end subroutine
 !

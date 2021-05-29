@@ -47,7 +47,7 @@ contains
             call wall_dGy_neg(Gyn, k)
             call wall_dGz_neg(Gzn, k)            
 !
-			point%flux_res(:,k) = 2.0d0*(Gxp + Gxn + Gyp + Gyn + Gzn)
+			point%flux_res(:,k) = 2.00*(Gxp + Gxn + Gyp + Gyn + Gzn)
 !
 		enddo
 !

@@ -28,7 +28,7 @@ module compute_conserved_vector_mod
 				point%U(4,k) = temp1*point%nor(1,k) + temp2*point%nor(2,k) + temp3*point%nor(3,k)
 !
 				temp1 = point%prim(2,k)*point%prim(2,k) + point%prim(3,k)*point%prim(3,k) + point%prim(4,k)*point%prim(4,k)								
-				point%U(5,k) = 2.5d0*point%prim(5,k) + 0.5d0*point%U(1,k)*temp1
+				point%U(5,k) = 2.50*point%prim(5,k) + 0.50*point%U(1,k)*temp1
 			enddo
 !
 		end subroutine 

@@ -17,7 +17,7 @@ module get_primitive_vector_mod
 !		
 !			
 			prim(1) = U(1)
-			temp = 1.0d0/U(1)	
+			temp = 1.00/U(1)	
 !
 !
 			U2_rot = U(2)
@@ -36,7 +36,7 @@ module get_primitive_vector_mod
 !		
 			temp = prim(2)*prim(2) + prim(3)*prim(3) + prim(4)*prim(4)
 
-			prim(5) = 0.4d0*(U(5) - 0.5d0*prim(1)*temp)
+			prim(5) = 0.40*(U(5) - 0.50*prim(1)*temp)
 !	
 		end subroutine
 !		

@@ -24,27 +24,27 @@ contains
 			del_neg = qtilde(r) - q
 !
 			if(dabs(del_neg) .le. 10e-6) then
-				phi(r)=1.0d0
+				phi(r)=1.00
 			else if(dabs(del_neg) .gt. 10e-6) then              
-				if(del_neg .gt. 0.0d0) then 
+				if(del_neg .gt. 0.00) then 
 					del_pos = point%qm(1,r,k) - q
-				else if(del_neg .lt. 0.0d0) then
+				else if(del_neg .lt. 0.00) then
                     del_pos = point%qm(2,r,k) - q
                 endif
 !
 				epsi = VL_CONST*point%min_dist(k)
-				epsi = epsi**3.0d0
+				epsi = epsi**3.00
 				num = (del_pos*del_pos) + (epsi*epsi)  ! Numerator .. 
-				num = num*del_neg + 2.0d0*del_neg*del_neg*del_pos
-				den = del_pos*del_pos + 2.0d0*del_neg*del_neg ! Denominator ..
+				num = num*del_neg + 2.00*del_neg*del_neg*del_pos
+				den = del_pos*del_pos + 2.00*del_neg*del_neg ! Denominator ..
 				den = den + del_neg*del_pos + epsi*epsi
 				den = den*del_neg
 				temp = num/den
 !
-				if(temp .lt. 1.d0) then
+				if(temp .lt. 1.0) then
 					phi(r) = temp
 				else 
-					phi(r) = 1.d0
+					phi(r) = 1.0
 				endif
 			endif
         enddo

@@ -48,17 +48,17 @@ contains
 !
 !	Compute dGxpos contributions to LdelU ..
 !
-		sum_delx_sqr = 0.0d0
-		sum_dely_sqr = 0.0d0
-		sum_delz_sqr = 0.0d0
+		sum_delx_sqr = 0.00
+		sum_dely_sqr = 0.00
+		sum_delz_sqr = 0.00
 !
-		sum_delx_dely = 0.0d0
-		sum_dely_delz = 0.0d0
-		sum_delz_delx = 0.0d0
+		sum_delx_dely = 0.00
+		sum_dely_delz = 0.00
+		sum_delz_delx = 0.00
 !
-		sum_delx_delf = 0.0d0
-		sum_dely_delf = 0.0d0
-		sum_delz_delf = 0.0d0
+		sum_delx_delf = 0.00
+		sum_dely_delf = 0.00
+		sum_delz_delf = 0.00
 !
 		do j = 1, point%xpos_nbhs(i)
 			k = point%xpos_conn(j,i)
@@ -75,8 +75,8 @@ contains
 			delt = delx*tan2(1) + dely*tan2(2) + delz*tan2(3)
 			deln = delx*nor(1) + dely*nor(2) + delz*nor(3)
 !
-			dist = dsqrt(dels*dels + delt*delt + deln*deln)
-			weights = 1.0d0/(dist**power)
+			dist = sqrt(dels*dels + delt*delt + deln*deln)
+			weights = 1.00/(dist**power)
 !
 			dels_weights = dels*weights
 			delt_weights = delt*weights
@@ -119,17 +119,17 @@ contains
 !
 !	Compute dGxneg contributions to LdelU ..
 !
-		sum_delx_sqr = 0.0d0
-		sum_dely_sqr = 0.0d0
-		sum_delz_sqr = 0.0d0
+		sum_delx_sqr = 0.00
+		sum_dely_sqr = 0.00
+		sum_delz_sqr = 0.00
 !
-		sum_delx_dely = 0.0d0
-		sum_dely_delz = 0.0d0
-		sum_delz_delx = 0.0d0
+		sum_delx_dely = 0.00
+		sum_dely_delz = 0.00
+		sum_delz_delx = 0.00
 !
-		sum_delx_delf = 0.0d0
-		sum_dely_delf = 0.0d0
-		sum_delz_delf = 0.0d0
+		sum_delx_delf = 0.00
+		sum_dely_delf = 0.00
+		sum_delz_delf = 0.00
 !
 		do j = 1, point%xneg_nbhs(i)
 			k = point%xneg_conn(j,i)
@@ -146,8 +146,8 @@ contains
 			delt = delx*tan2(1) + dely*tan2(2) + delz*tan2(3)
 			deln = delx*nor(1) + dely*nor(2) + delz*nor(3)
 !
-			dist = dsqrt(dels*dels + delt*delt + deln*deln)
-			weights = 1.0d0/(dist**power)
+			dist = sqrt(dels*dels + delt*delt + deln*deln)
+			weights = 1.00/(dist**power)
 !
 			dels_weights = dels*weights
 			delt_weights = delt*weights
@@ -190,17 +190,17 @@ contains
 !
 !	Compute dGypos contributions to LdelU ..
 !
-		sum_delx_sqr = 0.0d0
-		sum_dely_sqr = 0.0d0
-		sum_delz_sqr = 0.0d0
+		sum_delx_sqr = 0.00
+		sum_dely_sqr = 0.00
+		sum_delz_sqr = 0.00
 !
-		sum_delx_dely = 0.0d0
-		sum_dely_delz = 0.0d0
-		sum_delz_delx = 0.0d0
+		sum_delx_dely = 0.00
+		sum_dely_delz = 0.00
+		sum_delz_delx = 0.00
 !
-		sum_delx_delf = 0.0d0
-		sum_dely_delf = 0.0d0
-		sum_delz_delf = 0.0d0
+		sum_delx_delf = 0.00
+		sum_dely_delf = 0.00
+		sum_delz_delf = 0.00
 !
 		do j = 1, point%ypos_nbhs(i)
 			k = point%ypos_conn(j,i)
@@ -217,8 +217,8 @@ contains
 			delt = delx*tan2(1) + dely*tan2(2) + delz*tan2(3)
 			deln = delx*nor(1) + dely*nor(2) + delz*nor(3)
 !
-			dist = dsqrt(dels*dels + delt*delt + deln*deln)
-			weights = 1.0d0/(dist**power)
+			dist = sqrt(dels*dels + delt*delt + deln*deln)
+			weights = 1.00/(dist**power)
 !
 			dels_weights = dels*weights
 			delt_weights = delt*weights
@@ -261,17 +261,17 @@ contains
 !
 !	Compute dGyneg contributions to LdelU ..
 !
-		sum_delx_sqr = 0.0d0
-		sum_dely_sqr = 0.0d0
-		sum_delz_sqr = 0.0d0
+		sum_delx_sqr = 0.00
+		sum_dely_sqr = 0.00
+		sum_delz_sqr = 0.00
 !
-		sum_delx_dely = 0.0d0
-		sum_dely_delz = 0.0d0
-		sum_delz_delx = 0.0d0
+		sum_delx_dely = 0.00
+		sum_dely_delz = 0.00
+		sum_delz_delx = 0.00
 !
-		sum_delx_delf = 0.0d0
-		sum_dely_delf = 0.0d0
-		sum_delz_delf = 0.0d0
+		sum_delx_delf = 0.00
+		sum_dely_delf = 0.00
+		sum_delz_delf = 0.00
 !
 		do j = 1, point%yneg_nbhs(i)
 			k = point%yneg_conn(j,i)
@@ -288,8 +288,8 @@ contains
 			delt = delx*tan2(1) + dely*tan2(2) + delz*tan2(3)
 			deln = delx*nor(1) + dely*nor(2) + delz*nor(3)
 !
-			dist = dsqrt(dels*dels + delt*delt + deln*deln)
-			weights = 1.0d0/(dist**power)
+			dist = sqrt(dels*dels + delt*delt + deln*deln)
+			weights = 1.00/(dist**power)
 !
 			dels_weights = dels*weights
 			delt_weights = delt*weights
@@ -332,17 +332,17 @@ contains
 !
 !	Compute dGzpos contributions to LdelU ..
 !
-		sum_delx_sqr = 0.0d0
-		sum_dely_sqr = 0.0d0
-		sum_delz_sqr = 0.0d0
+		sum_delx_sqr = 0.00
+		sum_dely_sqr = 0.00
+		sum_delz_sqr = 0.00
 !
-		sum_delx_dely = 0.0d0
-		sum_dely_delz = 0.0d0
-		sum_delz_delx = 0.0d0
+		sum_delx_dely = 0.00
+		sum_dely_delz = 0.00
+		sum_delz_delx = 0.00
 !
-		sum_delx_delf = 0.0d0
-		sum_dely_delf = 0.0d0
-		sum_delz_delf = 0.0d0
+		sum_delx_delf = 0.00
+		sum_dely_delf = 0.00
+		sum_delz_delf = 0.00
 !
 		do j = 1, point%zpos_nbhs(i)
 			k = point%zpos_conn(j,i)
@@ -359,8 +359,8 @@ contains
 			delt = delx*tan2(1) + dely*tan2(2) + delz*tan2(3)
 			deln = delx*nor(1) + dely*nor(2) + delz*nor(3)
 !
-			dist = dsqrt(dels*dels + delt*delt + deln*deln)
-			weights = 1.0d0/(dist**power)
+			dist = sqrt(dels*dels + delt*delt + deln*deln)
+			weights = 1.00/(dist**power)
 !
 			dels_weights = dels*weights
 			delt_weights = delt*weights
@@ -403,17 +403,17 @@ contains
 !
 !	Compute dGzneg contributions to LdelU ..
 !
-		sum_delx_sqr = 0.0d0
-		sum_dely_sqr = 0.0d0
-		sum_delz_sqr = 0.0d0
+		sum_delx_sqr = 0.00
+		sum_dely_sqr = 0.00
+		sum_delz_sqr = 0.00
 !
-		sum_delx_dely = 0.0d0
-		sum_dely_delz = 0.0d0
-		sum_delz_delx = 0.0d0
+		sum_delx_dely = 0.00
+		sum_dely_delz = 0.00
+		sum_delz_delx = 0.00
 !
-		sum_delx_delf = 0.0d0
-		sum_dely_delf = 0.0d0
-		sum_delz_delf = 0.0d0
+		sum_delx_delf = 0.00
+		sum_dely_delf = 0.00
+		sum_delz_delf = 0.00
 !
 		do j = 1, point%zneg_nbhs(i)
 			k = point%zneg_conn(j,i)
@@ -430,8 +430,8 @@ contains
 			delt = delx*tan2(1) + dely*tan2(2) + delz*tan2(3)
 			deln = delx*nor(1) + dely*nor(2) + delz*nor(3)
 !
-			dist = dsqrt(dels*dels + delt*delt + deln*deln)
-			weights = 1.0d0/(dist**power)
+			dist = sqrt(dels*dels + delt*delt + deln*deln)
+			weights = 1.00/(dist**power)
 !
 			dels_weights = dels*weights
 			delt_weights = delt*weights

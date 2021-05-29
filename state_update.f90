@@ -22,8 +22,8 @@ module state_update_mod
 				real*8 :: res_sqr, sum_res_sqr
 				real*8 :: dx,dy,dz,ds
 !			
-				sum_res_sqr = 0.0d0
-				max_res = 0.0d0	
+				sum_res_sqr = 0.00
+				max_res = 0.00	
 !
 !
 				do i =	1, wall_points
@@ -34,7 +34,7 @@ module state_update_mod
 					temp = point%U(1,k)
 !					U = U - point%delt(k)*point%flux_res(:,k)
 				        U = point%U(:,k) + point%delUn(:,k)
-					U(4) = 0.0d0
+					U(4) = 0.00
 !
 					res_sqr = (U(1) - temp)*(U(1) - temp)					
 					if(res_sqr .gt. max_res) then 
@@ -78,14 +78,14 @@ module state_update_mod
 				enddo
 !				
 				do i = 1, supersonic_outlet_points
-					min_dist = 100000.0d0
+					min_dist = 100000.00
 					k = supersonic_outlet_points_index(i)
 						do r = 1, point%nbhs(k)
 							nbh = point%conn(r,k)
 							dx = point%x(nbh) - point%x(k)
 							dy = point%y(nbh) - point%y(k)
 							dz = point%z(nbh) - point%z(k)
-							ds = dsqrt(dx*dx + dy*dy + dz*dz)
+							ds = sqrt(dx*dx + dy*dy + dz*dz)
 !							if(ds < min_dist .AND. point%status(nbh) .ne. 1) then
 							if(ds < min_dist) then
 								min_dist = ds
@@ -96,14 +96,14 @@ module state_update_mod
 				enddo	
 !
 				do i = 1, supersonic_inlet_points
-					min_dist = 100000.0d0
+					min_dist = 100000.00
 					k = supersonic_inlet_points_index(i)
 						do r = 1, point%nbhs(k)
 							nbh = point%conn(r,k)
 							dx = point%x(nbh) - point%x(k)
 							dy = point%y(nbh) - point%y(k)
 							dz = point%z(nbh) - point%z(k)
-							ds = dsqrt(dx*dx + dy*dy + dz*dz)
+							ds = sqrt(dx*dx + dy*dy + dz*dz)
 !							if(ds < min_dist .AND. point%status(nbh) .ne. 1) then
 							if(ds < min_dist) then
 								min_dist = ds
@@ -112,7 +112,7 @@ module state_update_mod
 						enddo
 					point%prim(:,k) = point%prim(:,p)
 				enddo	
-				res_new = dsqrt(sum_res_sqr)/max_points
+				res_new = sqrt(sum_res_sqr)/max_points
 !
 !
 		end subroutine 							
