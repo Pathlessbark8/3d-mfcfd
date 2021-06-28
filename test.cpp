@@ -1,91 +1,131 @@
-#include<iostream>
-#include<fstream>
-#include<random>
-#include"split_fluxes_mod.h"
-#include<iomanip>
+#include <iostream>
+#include <fstream>
+#include <random>
+#include "split_fluxes_mod.h"
+#include <iomanip>
 #include "octant_fluxes_mod.h"
+#include "wall_flux_dGxneg_mod.h"
+#include "wall_flux_dGyneg_mod.h"
+#include "wall_flux_dGxpos_mod.h"
+#include "wall_flux_dGypos_mod.h"
+#include "wall_flux_dGzneg_mod.h"
+#include "point_preprocessor_mod.h"
+#include "compute_conserved_vector_mod.h"
+#include "timestep_delt_mod.h"
+#include "generate_connectivity_mod.h"
+#include "implicit_aliasing_mod.h"
+#include "flux_residual_mod.h"
+#include "initial_conditions_mod.h"
+#include "interior_flux_dGxneg_mod.h"
+#include "interior_flux_dGxpos_mod.h"
+#include "interior_flux_dGyneg_mod.h"
+#include "interior_flux_dGypos_mod.h"
 using namespace std;
-// int main(){
+//  int main(){
 // srand(time(0));
 
 // fstream fout;
 // fout.open("test_data.dat",ios::out);
 // for(int i=0;i<1000;i++)
 // {
-//     for(int j=0;j<19;j++)
+//     for(int j=0;j<5;j++)
 //     {
-//         fout<<rand()<<" ";
+//         fout<<rand()%100 + 1<<" ";
 //     }
 //     fout<<endl;
 // }
 // fout.close();
 // }
 
-int main(){
-    fstream fin,fout;
-    double G[5],t1[3],prim[5],n[3],t2[3];
-    fin.open("test_data.dat",ios::in);
-    fout.open("cpp_out.dat",ios::out);
-    fout<<fixed<<scientific;
-    fout<<setprecision(15);
-    for(int i=0;i<1000;i++)
+int main()
+{
+    // fstream fin,fout;
+    // double G[5];
+    // fin.open("test_data.dat",ios::in);
+    // fout.open("cpp_out.dat",ios::out);
+    // fout<<fixed<<scientific;
+    // fout<<setprecision(15);
+    // for(int i=0;i<1000;i++)
+    // {
+    //     for(int j=0;j<5;j++)
+    //     {
+    //         fin>>G[j];
+    //     }
+    //     wall_dGx_neg(G,i);
+    //      wall_dGx_pos(G,i);
+    //      wall_dGy_neg(G,i);
+    //      wall_dGy_pos(G,i);
+    //      wall_dGz_neg(G,i);
+    //     for(int j=0;j<5;j++)
+    //     {
+    //         fout<<G[j]<<" ";
+    //     }
+    //     fout<<endl;
+    // }
+    // fin.close();
+    // fout.close();
+    double G[5] = {0};
+    read_input_point_data();
+    initial_conditions();
+    generate_split_stencils();
+    aliasing();
+    compute_conserved_vector();
+    eval_q_variables();
+    //  for(int r=0;r<5;r++)
+    // {
+    //      cout<<point.dq[0][r][0]<<" ";
+    // }
+    // cout<<endl;
+    eval_q_derivatives();
+    //  for(int r=0;r<5;r++)
+    // {
+    //     cout<<point.dq[0][r][0]<<" ";
+    // }
+    // cout<<endl;
+ 
+    timestep_delt();
+    
+    eval_flux_residual();
+    fstream fout;
+    fout.open("flux_res_var_cpp",ios::out);
+    for(int i=0;i<wall_points;i++)
     {
+        int k = wall_points_index[i];
         for(int j=0;j<5;j++)
         {
-            fin>>G[j];
-        }
-        for(int j=0;j<3;j++)
-        {
-            fin>>t1[j];
-        }
-        for(int j=0;j<3;j++)
-        {
-            fin>>t2[j];
-        }
-        for(int j=0;j<3;j++)
-        {
-            fin>>n[j];
-        }
-        for(int j=0;j<5;j++)
-        {
-            fin>>prim[j];
-        }
-        flux_Gxp(G,t1,t2,n,prim);
-        flux_Gxn(G,t1,t2,n,prim);
-        flux_Gyn(G,t1,t2,n,prim);
-        flux_Gyp(G,t1,t2,n,prim);
-        flux_Gzn(G,t1,t2,n,prim);
-        flux_Gzp(G,t1,t2,n,prim);
-        flux_Gwxn(G,t1,t2,n,prim);
-        flux_Gwxp(G,t1,t2,n,prim);
-        flux_Gwyn(G,t1,t2,n,prim);
-        flux_Gwyp(G,t1,t2,n,prim);
-        flux_Goxn(G,t1,t2,n,prim);
-        flux_Goxp(G,t1,t2,n,prim);
-        flux_Goyn(G,t1,t2,n,prim);
-        flux_Goyp(G,t1,t2,n,prim);
-        for(int j=0;j<5;j++)
-        {
-            fout<<G[j]<<" ";
-        }
-        for(int j=0;j<3;j++)
-        {
-            fout<<t1[j]<<" ";
-        }
-        for(int j=0;j<3;j++)
-        {
-            fout<<t2[j]<<" ";
-        }
-        for(int j=0;j<3;j++)
-        {
-            fout<<n[j]<<" ";
-        }
-        for(int j=0;j<5;j++)
-        {
-            fout<<prim[j]<<" ";
+            fout<<std::scientific<<point.flux_res[j][k]<<" ";
         }
         fout<<endl;
     }
-    fin.close();
     fout.close();
+    // for (int i = 0; i < wall_points; i++)
+    // {
+    //     int k = wall_points_index[i];
+        // for (int r = 0; r < 5; r++)
+        // {
+        //     cout << point.dq[0][r][k] << " ";
+        // }
+        // cout << endl;
+        // wall_dGx_neg(G,k);
+        // wall_dGx_pos(G,k);
+        // wall_dGy_neg(G,k);
+        // wall_dGy_pos(G,k);
+        // wall_dGz_neg(G,k);
+        // for (int j = 0; j < 5; j++)
+        // {
+        //     cout << G[j] << " ";
+        // }
+        // cout << endl;
+    // }
+    // for (int i = 0; i < interior_points; i++)
+    // {
+    //     int k = interior_points_index[i];
+    //     // // cout<<"k "<<k<<endl;
+    //     interior_dGx_neg(G, k);
+    //     for (int j = 0; j < 5; j++)
+    //     {
+    //         cout << G[j] << " ";
+    //     }
+    //     cout << endl;
+    // }
 }

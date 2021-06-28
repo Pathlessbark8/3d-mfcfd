@@ -1,7 +1,7 @@
 
 //
+#pragma once
 #include "parameter_mod.h"
-#define max_points 625000
 //
 //
 struct points

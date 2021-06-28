@@ -5,8 +5,8 @@ module parameter_mod
     !
     !		integer, parameter :: max_points = 136161
     !		integer, parameter :: max_points = 7623
-            integer, parameter :: max_points = 26133
-            integer, parameter :: max_iters = 1000
+            integer, parameter :: max_points = 136161
+            integer, parameter :: max_iters = 1 !1000
     !
     !		Flow conditions ..
     !

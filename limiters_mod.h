@@ -10,17 +10,16 @@ void venkat_limiter(double *qtilde, double *phi, int k)
 //
 {
 	//
-	int r, k;
-	double qtilde[4], phi[4];
+	int r;
 	double q, del_neg, del_pos;
 	double max_q, min_q, ds, epsi, num, den, temp;
 	//
-	for (r = 1; r <= 5; r++)
+	for (r = 0; r < 5; r++)
 	{
 		q = point.q[r][k];
 		del_neg = qtilde[r] - q;
 		//
-		if (abs(del_neg) < 10e-6)
+		if (abs(del_neg) <= 10e-6)
 			phi[r] = 1.00;
 		else if (abs(del_neg) > 10e-6)
 		{
