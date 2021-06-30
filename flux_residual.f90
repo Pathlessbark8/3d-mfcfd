@@ -35,54 +35,61 @@ contains
 		integer :: i, k
 		real*8 :: Gxp(5), Gyp(5), Gzp(5)
 		real*8 :: Gxn(5), Gyn(5), Gzn(5)
+
+		! Gxn = 0.0d0
+		! write(*,*) Gxn
 !
 !
-		print *,Gxn
 		do i = 1, wall_points
 !
 			k = wall_points_index(i)
 !	
 			
             call wall_dGx_pos(Gxp, k) 
+			! print *,Gxp
+            call wall_dGx_neg(Gxn, k) 
 			
-            ! call wall_dGx_neg(Gxn, k) 
-            ! call wall_dGy_pos(Gyp, k)
-            ! call wall_dGy_neg(Gyn, k)
-            ! call wall_dGz_neg(Gzn, k)            
+            call wall_dGy_pos(Gyp, k)
+			call wall_dGy_neg(Gyn, k)
+            call wall_dGz_neg(Gzn, k)  
+			! print *,Gzn          
 !
 			point%flux_res(:,k) = 2.00*(Gxp + Gxn + Gyp + Gyn + Gzn)
 !			
+			
+		enddo
+!		
+		print *,outer_points
+		do i = 1, outer_points
+!
+			k = outer_points_index(i)
+!
+			call outer_dGx_pos(Gxp, k)
+			call outer_dGx_neg(Gxn, k) 
+			call outer_dGy_pos(Gyp, k) 
+			call outer_dGy_neg(Gyn, k) 
+			call outer_dGz_pos(Gzp, k) 			
+!
+			point%flux_res(:,k) = (Gxp + Gxn + Gyp + Gyn + Gzp)
+!
+			
+		enddo
+! !
+		do i = 1, interior_points
+!
+			k = interior_points_index(i)
+!
+			call interior_dGx_pos(Gxp, k) 
+			call interior_dGx_neg(Gxn, k) 
+			call interior_dGy_pos(Gyp, k) 
+			call interior_dGy_neg(Gyn, k) 
+			call interior_dGz_pos(Gzp, k) 
+			call interior_dGz_neg(Gzn, k) 			
+!
+			point%flux_res(:,k) = (Gxp + Gxn + Gyp + Gyn + Gzp + Gzn)
+!
 			! print *,point%flux_res(:,k)
 		enddo
-!
-! 		do i = 1, outer_points
-! !
-! 			k = outer_points_index(i)
-! !
-! 			call outer_dGx_pos(Gxp, k)
-! 			call outer_dGx_neg(Gxn, k) 
-! 			call outer_dGy_pos(Gyp, k) 
-! 			call outer_dGy_neg(Gyn, k) 
-! 			call outer_dGz_pos(Gzp, k) 			
-! !
-! 			point%flux_res(:,k) = (Gxp + Gxn + Gyp + Gyn + Gzp)
-! !
-! 		enddo
-! !
-! 		do i = 1, interior_points
-! !
-! 			k = interior_points_index(i)
-! !
-! 			call interior_dGx_pos(Gxp, k) 
-! 			call interior_dGx_neg(Gxn, k) 
-! 			call interior_dGy_pos(Gyp, k) 
-! 			call interior_dGy_neg(Gyn, k) 
-! 			call interior_dGz_pos(Gzp, k) 
-! 			call interior_dGz_neg(Gzn, k) 			
-! !
-! 			point%flux_res(:,k) = (Gxp + Gxn + Gyp + Gyn + Gzp + Gzn)
-! !
-! 		enddo
 !
 !
 	end subroutine

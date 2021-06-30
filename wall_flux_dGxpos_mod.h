@@ -47,9 +47,11 @@ void wall_dGx_pos(double *G, int i)
             sum_delz_delf[r] = 0;
         }
     //
+    //  cout<<"Here"<<endl;
     x_i = point.x[i];
     y_i = point.y[i];
     z_i = point.z[i];
+    //   cout<<"Here"<<endl;
     //
     for (int r = 0; r < 3; r++)
     {
@@ -58,10 +60,12 @@ void wall_dGx_pos(double *G, int i)
         nor[r] = point.nor[r][i];
     }
     //
+   
     // cout<<point.xpos_nbhs[i]<<" "<<endl;
     for (j = 0; j < point.xpos_nbhs[i]; j++)
     //
     {
+        // cout<<i<<endl;
         k = point.xpos_conn[j][i];
         //
         x_k = point.x[k];
@@ -72,7 +76,7 @@ void wall_dGx_pos(double *G, int i)
         dely = y_k - y_i;
         delz = z_k - z_i;
         // if(j==0)
-            // cout<<x_k<<" "<<x_i<<endl;
+        //     cout<<x_k<<" "<<x_i<<endl;
         //
         dels = delx * tan1[0] + dely * tan1[1] + delz * tan1[2];
         delt = delx * tan2[0] + dely * tan2[1] + delz * tan2[2];

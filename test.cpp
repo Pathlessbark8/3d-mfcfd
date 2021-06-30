@@ -66,7 +66,9 @@ int main()
     // fout.close();
     double G[5] = {0};
     read_input_point_data();
+    // cout<<outer_points<<endl;
     initial_conditions();
+    // cout<< wall_points<<endl;
     generate_split_stencils();
     aliasing();
     compute_conserved_vector();
@@ -86,18 +88,18 @@ int main()
     timestep_delt();
     
     eval_flux_residual();
-    fstream fout;
-    fout.open("flux_res_var_cpp",ios::out);
-    for(int i=0;i<wall_points;i++)
-    {
-        int k = wall_points_index[i];
-        for(int j=0;j<5;j++)
-        {
-            fout<<std::scientific<<point.flux_res[j][k]<<" ";
-        }
-        fout<<endl;
-    }
-    fout.close();
+    // fstream fout;
+    // fout.open("flux_res_var_cpp",ios::out);
+    // for(int i=0;i<wall_points;i++)
+    // {
+    //     int k = wall_points_index[i];
+    //     for(int j=0;j<5;j++)
+    //     {
+    //         fout<<std::scientific<<point.flux_res[j][k]<<" ";
+    //     }
+    //     fout<<endl;
+    // }
+    // fout.close();
     // for (int i = 0; i < wall_points; i++)
     // {
     //     int k = wall_points_index[i];

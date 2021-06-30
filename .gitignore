@@ -1,3 +1,11 @@
 *.mod
 *.out
 *.dat
+*.txt
+dq_var_cpp
+dq_var_fortran
+q_var_fortran
+flux_res_var_cpp
+flux_res_var_fortran
+q_var_cpp
+q_var_fortran

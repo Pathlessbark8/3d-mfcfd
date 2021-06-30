@@ -35,16 +35,16 @@ program test
     call eval_q_derivatives()
     !  print *,point%dq(1,:,1)
     call timestep_delt()
-    call  eval_flux_residual()
+    call eval_flux_residual()
     
    
-    OPEN(UNIT=80,FILE="flux_res_var_fortran",FORM="FORMATTED")
-    do k=1,wall_points
-        i=wall_points_index(k)
-        write(80,*) point%flux_res(:,i)
-    end do
-    ! print *,wall_points
-    close(80)
+    ! OPEN(UNIT=80,FILE="flux_res_var_fortran",STATUS="OLD")
+    ! do k=1,wall_points
+    !     i=wall_points_index(k)
+    !     write(80) point%flux_res(:,i)
+    ! end do
+    ! ! print *,wall_points
+    ! close(80)
 
 
     ! do i=1,wall_points
