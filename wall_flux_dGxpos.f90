@@ -58,7 +58,6 @@ contains
 		tan2 = point%tan2(:,i)
 		nor = point%nor(:,i)
 !
-		! print *,point%xpos_nbhs(i)
 		do j = 1, point%xpos_nbhs(i)
 !
 			k = point%xpos_conn(j,i)
@@ -72,7 +71,6 @@ contains
 			delz = z_k - z_i
 !
 			
-			! print *,x_k,x_i
 			dels = delx*tan1(1) + dely*tan1(2) + delz*tan1(3)
 			delt = delx*tan2(1) + dely*tan2(2) + delz*tan2(3)
 			deln = delx*nor(1) + dely*nor(2) + delz*nor(3)
@@ -94,7 +92,6 @@ contains
 !
 			temp = delx*point%dq(1,:,i) + dely*point%dq(2,:,i) + delz*point%dq(3,:,i)  
 			qtilde = point%q(:,i) - 0.50*temp
-			! print *,delx
 			call venkat_limiter(qtilde, phi, i)
 			qtilde = point%q(:,i) - 0.50*phi*temp
 			call qtilde_to_primitive(qtilde, prim)
@@ -123,7 +120,6 @@ contains
 			- sum_dely_delf*(sum_delx_dely*sum_delz_sqr - sum_delz_delx*sum_dely_delz) &
 			+ sum_delz_delf*(sum_delx_dely*sum_dely_delz - sum_delz_delx*sum_dely_sqr)
 !	
-			! print *,det
 		G = temp/det
 !
         end subroutine

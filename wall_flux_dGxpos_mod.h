@@ -41,17 +41,15 @@ void wall_dGx_pos(double *G, int i)
     sum_delz_delx = 0.00;
     //
     for (int r = 0; r < 5; r++)
-        {
-            sum_delx_delf[r] = 0;
-            sum_dely_delf[r] = 0;
-            sum_delz_delf[r] = 0;
-        }
+    {
+        sum_delx_delf[r] = 0;
+        sum_dely_delf[r] = 0;
+        sum_delz_delf[r] = 0;
+    }
     //
-    //  cout<<"Here"<<endl;
     x_i = point.x[i];
     y_i = point.y[i];
     z_i = point.z[i];
-    //   cout<<"Here"<<endl;
     //
     for (int r = 0; r < 3; r++)
     {
@@ -60,12 +58,10 @@ void wall_dGx_pos(double *G, int i)
         nor[r] = point.nor[r][i];
     }
     //
-   
-    // cout<<point.xpos_nbhs[i]<<" "<<endl;
+
     for (j = 0; j < point.xpos_nbhs[i]; j++)
     //
     {
-        // cout<<i<<endl;
         k = point.xpos_conn[j][i];
         //
         x_k = point.x[k];
@@ -75,8 +71,6 @@ void wall_dGx_pos(double *G, int i)
         delx = x_k - x_i;
         dely = y_k - y_i;
         delz = z_k - z_i;
-        // if(j==0)
-        //     cout<<x_k<<" "<<x_i<<endl;
         //
         dels = delx * tan1[0] + dely * tan1[1] + delz * tan1[2];
         delt = delx * tan2[0] + dely * tan2[1] + delz * tan2[2];
@@ -102,11 +96,6 @@ void wall_dGx_pos(double *G, int i)
             temp[r] = delx * point.dq[0][r][i] + dely * point.dq[1][r][i] + delz * point.dq[2][r][i];
             qtilde[r] = point.q[r][i] - 0.50 * temp[r];
         }
-        // for (int r = 0; r < 5; r++)
-        // {
-            // cout<<delx<<endl;
-        // }
-        // cout<<endl;
         venkat_limiter(qtilde, phi, i);
         for (int r = 0; r < 5; r++)
         {
@@ -149,12 +138,6 @@ void wall_dGx_pos(double *G, int i)
         temp[r] = sum_delx_delf[r] * (sum_dely_sqr * sum_delz_sqr - sum_dely_delz * sum_dely_delz) - sum_dely_delf[r] * (sum_delx_dely * sum_delz_sqr - sum_delz_delx * sum_dely_delz) + sum_delz_delf[r] * (sum_delx_dely * sum_dely_delz - sum_delz_delx * sum_dely_sqr);
     }
     //
-    // for (int r = 0; r < 5; r++)
-    // {
-        // cout<<temp[r]<<" ";
-    // }
-    // cout<<endl;
-    // cout<<det<<endl;
     for (int r = 0; r < 5; r++)
     {
         G[r] = temp[r] / det;

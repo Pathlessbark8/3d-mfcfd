@@ -29,39 +29,8 @@ program test
     call generate_split_stencils()
     call aliasing()
     call compute_conserved_vector()
-    ! print *,point%nbhs(1)
     call eval_q_variables()
-    !  print *,point%dq(1,:,1)
     call eval_q_derivatives()
-    !  print *,point%dq(1,:,1)
     call timestep_delt()
     call eval_flux_residual()
-    
-   
-    ! OPEN(UNIT=80,FILE="flux_res_var_fortran",STATUS="OLD")
-    ! do k=1,wall_points
-    !     i=wall_points_index(k)
-    !     write(80) point%flux_res(:,i)
-    ! end do
-    ! ! print *,wall_points
-    ! close(80)
-
-
-    ! do i=1,wall_points
-    !     k=wall_points_index(i)
-    !     print *,k, point%dq(1,:,k)
-    !     ! ! print *,k
-    !     ! call wall_dGx_neg(G,k)
-    !     ! call wall_dGx_pos(G,k)
-    !     ! call wall_dGy_neg(G,k)
-    !     ! call wall_dGy_pos(G,k)
-    !     ! call wall_dGz_neg(G,k)
-    !         ! print *, G
-    ! end do
-    !  do i=1,interior_points
-    !     k=interior_points_index(i)
-    !     ! ! print *,k
-    !     call interior_dGx_neg(G,k)
-    !         print *, G
-    ! end do
 end program test

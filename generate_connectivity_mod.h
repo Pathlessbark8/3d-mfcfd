@@ -48,42 +48,42 @@ void get_interior_point_neighbours(int i)
         {
             point.xpos_nbhs[i] = point.xpos_nbhs[i] + 1;
             count = point.xpos_nbhs[i];
-            point.xpos_conn[count-1][i] = k;
+            point.xpos_conn[count - 1][i] = k;
         }
         //
         if (dels > 0.00)
         {
             point.xneg_nbhs[i] = point.xneg_nbhs[i] + 1;
             count = point.xneg_nbhs[i];
-            point.xneg_conn[count-1][i] = k;
+            point.xneg_conn[count - 1][i] = k;
         }
         //
         if (delt <= 0.00)
         {
             point.ypos_nbhs[i] = point.ypos_nbhs[i] + 1;
             count = point.ypos_nbhs[i];
-            point.ypos_conn[count-1][i] = k;
+            point.ypos_conn[count - 1][i] = k;
         }
         //
         if (delt > 0.00)
         {
             point.yneg_nbhs[i] = point.yneg_nbhs[i] + 1;
             count = point.yneg_nbhs[i];
-            point.yneg_conn[count-1][i] = k;
+            point.yneg_conn[count - 1][i] = k;
         }
         //
         if (deln <= 0.00)
         {
             point.zpos_nbhs[i] = point.zpos_nbhs[i] + 1;
             count = point.zpos_nbhs[i];
-            point.zpos_conn[count-1][i] = k;
+            point.zpos_conn[count - 1][i] = k;
         }
         //
         if (deln > 0.00)
         {
             point.zneg_nbhs[i] = point.zneg_nbhs[i] + 1;
             count = point.zneg_nbhs[i];
-            point.zneg_conn[count-1][i] = k;
+            point.zneg_conn[count - 1][i] = k;
         }
         //
     }
@@ -127,39 +127,37 @@ void get_wall_point_neighbours(int i)
         delt = delx * point.tan2[0][i] + dely * point.tan2[1][i] + delz * point.tan2[2][i];
         deln = delx * point.nor[0][i] + dely * point.nor[1][i] + delz * point.nor[2][i];
         //
-        // cout<<xk<<" "<<xi<<endl;
-        //
         if (dels <= 0.00)
         {
             point.xpos_nbhs[i] = point.xpos_nbhs[i] + 1;
             count = point.xpos_nbhs[i];
-            point.xpos_conn[count-1][i] = k;
+            point.xpos_conn[count - 1][i] = k;
         }
         //
         if (dels >= 0.00)
         {
             point.xneg_nbhs[i] = point.xneg_nbhs[i] + 1;
             count = point.xneg_nbhs[i];
-            point.xneg_conn[count-1][i] = k;
+            point.xneg_conn[count - 1][i] = k;
         }
         //
         if (delt <= 0.00)
         {
             point.ypos_nbhs[i] = point.ypos_nbhs[i] + 1;
             count = point.ypos_nbhs[i];
-            point.ypos_conn[count-1][i] = k;
+            point.ypos_conn[count - 1][i] = k;
         }
         //
         if (delt >= 0.00)
         {
             point.yneg_nbhs[i] = point.yneg_nbhs[i] + 1;
             count = point.yneg_nbhs[i];
-            point.yneg_conn[count-1][i] = k;
+            point.yneg_conn[count - 1][i] = k;
         }
         //
         point.zneg_nbhs[i] = point.zneg_nbhs[i] + 1;
         count = point.zneg_nbhs[i];
-        point.zneg_conn[count-1][i] = k;
+        point.zneg_conn[count - 1][i] = k;
     }
     //
     //
@@ -206,33 +204,33 @@ void get_outer_point_neighbours(int i)
         {
             point.xpos_nbhs[i] = point.xpos_nbhs[i] + 1;
             count = point.xpos_nbhs[i];
-            point.xpos_conn[count-1][i] = k;
+            point.xpos_conn[count - 1][i] = k;
         }
         //
         if (dels >= 0.00)
         {
             point.xneg_nbhs[i] = point.xneg_nbhs[i] + 1;
             count = point.xneg_nbhs[i];
-            point.xneg_conn[count-1][i] = k;
+            point.xneg_conn[count - 1][i] = k;
         }
         //
         if (delt <= 0.00)
         {
             point.ypos_nbhs[i] = point.ypos_nbhs[i] + 1;
             count = point.ypos_nbhs[i];
-            point.ypos_conn[count-1][i] = k;
+            point.ypos_conn[count - 1][i] = k;
         }
         //
         if (delt >= 0.00)
         {
             point.yneg_nbhs[i] = point.yneg_nbhs[i] + 1;
             count = point.yneg_nbhs[i];
-            point.yneg_conn[count-1][i] = k;
+            point.yneg_conn[count - 1][i] = k;
         }
         //
         point.zpos_nbhs[i] = point.zpos_nbhs[i] + 1;
         count = point.zpos_nbhs[i];
-        point.zpos_conn[count-1][i] = k;
+        point.zpos_conn[count - 1][i] = k;
     }
     //
     //

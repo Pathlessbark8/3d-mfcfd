@@ -52,13 +52,6 @@ void wall_dGx_neg(double *G, int i)
 		tan2[r] = point.tan2[r][i];
 		nor[r] = point.nor[r][i];
 	}
-	// for (int r = 0; r < 3; r++)
-	// {
-	// 	cout<<point.tan1[r][i]<<" ";
-	// }
-	// cout<<endl;
-	//
-	// cout<<i<<" "<<point.xneg_nbhs[i]<<endl;
 	for (j = 0; j < point.xneg_nbhs[i]; j++)
 	//
 	{
@@ -90,18 +83,12 @@ void wall_dGx_neg(double *G, int i)
 		sum_delx_dely = sum_delx_dely + dels * delt_weights;
 		sum_dely_delz = sum_dely_delz + delt * deln_weights;
 		sum_delz_delx = sum_delz_delx + deln * dels_weights;
-		
+
 		for (int r = 0; r < 5; r++)
 		{
 			temp[r] = delx * point.dq[0][r][i] + dely * point.dq[1][r][i] + delz * point.dq[2][r][i];
 			qtilde[r] = point.q[r][i] - 0.50 * temp[r];
 		}
-		// for (int r = 0; r < 5; r++)
-		// {
-		// 	cout<<point.dq[0][r][i]<<" ";
-		// 	// cout<<G_i[r]<<" "<<tan1[r]<<" "<<tan2[r]<<" "<<nor[r]<<" "<<prim[r]<<" "<<endl;
-		// }
-		// cout<<endl;
 		venkat_limiter(qtilde, phi, i);
 		for (int r = 0; r < 5; r++)
 		{
@@ -109,12 +96,6 @@ void wall_dGx_neg(double *G, int i)
 		}
 		qtilde_to_primitive(qtilde, prim);
 		flux_Gwxn(G_i, tan1, tan2, nor, prim);
-		// for (int r = 0; r < 5; r++)
-		// {
-		// 	cout<<prim[r]<<" ";
-		// 	// cout<<G_i[r]<<" "<<tan1[r]<<" "<<tan2[r]<<" "<<nor[r]<<" "<<prim[r]<<" "<<endl;
-		// }
-		// cout<<endl;
 		for (int r = 0; r < 5; r++)
 		{
 			temp[r] = delx * point.dq[0][r][k] + dely * point.dq[1][r][k] + delz * point.dq[2][r][k];
@@ -127,23 +108,17 @@ void wall_dGx_neg(double *G, int i)
 		}
 		qtilde_to_primitive(qtilde, prim);
 		flux_Gwxn(G_k, tan1, tan2, nor, prim);
-		
+
 		for (int r = 0; r < 5; r++)
 		{
 			temp[r] = G_k[r] - G_i[r];
 		}
-		// for (int r = 0; r < 5; r++)
-		// {
-		// 	cout<<G_i[r] <<" ";
-		// }
-		// cout<<endl;
 		for (int r = 0; r < 5; r++)
 		{
 			sum_delx_delf[r] = sum_delx_delf[r] + temp[r] * dels_weights;
 			sum_dely_delf[r] = sum_dely_delf[r] + temp[r] * delt_weights;
 			sum_delz_delf[r] = sum_delz_delf[r] + temp[r] * deln_weights;
 		}
-		
 	}
 	//
 	det = sum_delx_sqr * (sum_dely_sqr * sum_delz_sqr - sum_dely_delz * sum_dely_delz) - sum_delx_dely * (sum_delx_dely * sum_delz_sqr - sum_dely_delz * sum_delz_delx) + sum_delz_delx * (sum_delx_dely * sum_dely_delz - sum_dely_sqr * sum_delz_delx);

@@ -67,9 +67,6 @@ contains
 					dist = sqrt(delx*delx + dely*dely + delz*delz)
 					weights = 1.00/(dist**power)
 !
-					! if(i==5) then
-					! 	print *, delx,dely,delz
-					! end if
 					sum_delx_sqr = sum_delx_sqr + delx*delx*weights
 					sum_dely_sqr = sum_dely_sqr + dely*dely*weights
 					sum_delz_sqr = sum_delz_sqr + delz*delz*weights
@@ -83,9 +80,6 @@ contains
 					sum_dely_delq = sum_dely_delq + weights*dely*temp
 					sum_delz_delq = sum_delz_delq + weights*delz*temp
 
-					! if(k==5)then
-					! 	print *,sum_delx_delq
-					! end if
 !
 				enddo
 !
@@ -95,7 +89,6 @@ contains
 !				
 				one_by_det = 1.00/det
 !
-				! print *,det
 				temp = sum_delx_delq*(sum_dely_sqr*sum_delz_sqr - sum_dely_delz*sum_dely_delz) &
 					 - sum_dely_delq*(sum_delx_dely*sum_delz_sqr - sum_delz_delx*sum_dely_delz) &
 					 + sum_delz_delq*(sum_delx_dely*sum_dely_delz - sum_delz_delx*sum_dely_sqr)
@@ -106,7 +99,6 @@ contains
 						- sum_delx_dely*(sum_delx_delq*sum_delz_sqr - sum_delz_delx*sum_delz_delq) &
 						+ sum_delz_delx*(sum_delx_delq*sum_dely_delz - sum_delz_delx*sum_dely_delq)				
 !
-							! print *,temp
 				point%dq(2,:,i) = temp*one_by_det
 !
 				temp = sum_delx_sqr*(sum_dely_sqr*sum_delz_delq - sum_dely_delq*sum_dely_delz) &

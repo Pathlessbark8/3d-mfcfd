@@ -33,13 +33,7 @@ contains
 			& point%tan2(1,k), point%tan2(2,k), point%tan2(3,k), &
 			& point%nor(1,k), point%nor(2,k), point%nor(3,k), &
 			& point%nbhs(k), (point%conn(r,k),r=1,point%nbhs(k)), point%min_dist(k)
-			! if(k .le. 10)then
-			! 	print *,point%x(k)
-			! end if
 		enddo
-		! do k=5,20
-		! 	print *,point%x(k)
-		! end do
 !
 !		Finding the number of interior, wall, outer and other boundary points ..
 !

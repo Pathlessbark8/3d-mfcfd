@@ -53,12 +53,6 @@ void flux_Gwxn(double *G, double *t1, double *t2, double *n, double *prim)
 	temp3 = (temp2 + pr) * ut1 * A1neg - (temp2 + 0.5 * pr) * B1;
 
 	G[4] = temp3 * A3neg - 0.5 * rho * un * B3 * temp1;
-		// for (int r = 0; r < 5; r++)
-		// {
-		// 	cout<<prim[r] <<" ";
-		// }
-		// cout<<endl;
-	//
 	//
 }
 //

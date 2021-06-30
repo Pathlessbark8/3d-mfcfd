@@ -25,12 +25,6 @@ void qtilde_to_primitive(double *q, double *prim)
     //
     prim[0] = exp(temp2);
     prim[4] = prim[0] * temp;
-    //  for (int r = 0; r < 5; r++)
-	// 	{
-	// 		cout<<q[r]<<" ";
-	// 		// cout<<G_i[r]<<" "<<tan1[r]<<" "<<tan2[r]<<" "<<nor[r]<<" "<<prim[r]<<" "<<endl;
-	// 	}
-	// 	cout<<endl;
 }
 //
 //

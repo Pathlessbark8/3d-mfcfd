@@ -48,16 +48,10 @@ void eval_flux_residual()
         wall_dGy_pos(Gyp, k);
         wall_dGy_neg(Gyn, k);
         wall_dGz_neg(Gzn, k);
-        // for (int r = 0; r < 5; r++)
-        // {
-        //     cout <<setprecision(13)<< Gzn[r] << " ";
-        // }
-        // cout << endl;
 
         //
     }
 
-    // cout<<outer_points<<endl;
     for (i = 0; i < outer_points; i++)
     {
         //
@@ -92,9 +86,7 @@ void eval_flux_residual()
         for (int r = 0; r < 5; r++)
         {
             point.flux_res[r][k] = (Gxp[r] + Gxn[r] + Gyp[r] + Gyn[r] + Gzn[r] + Gzp[r]);
-            cout << point.flux_res[r][k] << " ";
         }
-        cout << endl;
     }
     //
     //

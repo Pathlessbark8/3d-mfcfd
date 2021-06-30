@@ -91,7 +91,6 @@ contains
 !
 			temp = delx*point%dq(1,:,i) + dely*point%dq(2,:,i) + delz*point%dq(3,:,i)  
 			qtilde = point%q(:,i) - 0.50*temp
-			! print *,delx
 			call venkat_limiter(qtilde, phi, i)
 			qtilde = point%q(:,i) - 0.50*phi*temp
 			call qtilde_to_primitive(qtilde, prim)

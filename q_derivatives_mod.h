@@ -40,11 +40,6 @@ void eval_q_derivatives()
             sum_dely_delq[r] = 0;
             sum_delz_delq[r] = 0;
         }
-        //        for (r = 0; r < 5; r++)
-        //         {
-        //             cout << sum_delx_delq[r] << " ";
-        //         }
-        //         cout << endl;
         //Commented out as array needs to be initialised as 0 which is done when the array is declared
         // sum_delx_delq = 0.0;
         // sum_dely_delq = 0.0;
@@ -82,9 +77,6 @@ void eval_q_derivatives()
             //
             dist = sqrt(delx * delx + dely * dely + delz * delz);
             weights = 1.00 / (pow(dist, power));
-            //          if(i==4)
-            //         {cout<<delx<<" "<<dely<<" "<<delz;
-            // cout<<endl;}
             //
             sum_delx_sqr = sum_delx_sqr + delx * delx * weights;
             sum_dely_sqr = sum_dely_sqr + dely * dely * weights;
@@ -102,14 +94,6 @@ void eval_q_derivatives()
                 sum_dely_delq[r] = sum_dely_delq[r] + weights * dely * temp[r];
                 sum_delz_delq[r] = sum_delz_delq[r] + weights * delz * temp[r];
             }
-            // if (k == 4)
-            // {
-            //     for (r = 0; r < 5; r++)
-            //     {
-            //         cout << sum_delx_delq[r] << " ";
-            //     }
-            //     cout << endl;
-            // }
             //
         }
         //
@@ -117,17 +101,10 @@ void eval_q_derivatives()
         //
         one_by_det = 1.00 / det;
         //
-        // cout<<det<<endl;
-        //
         for (k = 0; k < 5; k++)
         {
             temp[k] = sum_delx_delq[k] * (sum_dely_sqr * sum_delz_sqr - sum_dely_delz * sum_dely_delz) - sum_dely_delq[k] * (sum_delx_dely * sum_delz_sqr - sum_delz_delx * sum_dely_delz) + sum_delz_delq[k] * (sum_delx_dely * sum_dely_delz - sum_delz_delx * sum_dely_sqr);
         }
-        // for (k = 0; k < 5; k++)
-        // {
-        //     cout<<sum_delx_delq[k] <<" ";
-        // }
-        // cout<<endl;
         //
         for (k = 0; k < 5; k++)
         {
@@ -139,11 +116,6 @@ void eval_q_derivatives()
             temp[k] = sum_delx_sqr * (sum_dely_delq[k] * sum_delz_sqr - sum_dely_delz * sum_delz_delq[k]) - sum_delx_dely * (sum_delx_delq[k] * sum_delz_sqr - sum_delz_delx * sum_delz_delq[k]) + sum_delz_delx * (sum_delx_delq[k] * sum_dely_delz - sum_delz_delx * sum_dely_delq[k]);
         }
         //
-            //  for (r = 0; r < 5; r++)
-            //     {
-            //         cout << temp[r] << " ";
-            //     }
-            //     cout << endl;
         for (k = 0; k < 5; k++)
         {
             point.dq[1][k][i] = temp[k] * one_by_det;
