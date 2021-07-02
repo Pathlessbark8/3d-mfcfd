@@ -53,4 +53,12 @@ int main()
     cudaFree(point_d);
     //
     cout << "Done\n";
+    for(int i=0;i<max_points;i++)
+    {
+        for(int r=0;r<5;r++)
+        {
+            cout<<point.flux_res[r][i]<<" ";
+        }
+        cout<<endl;
+    }
 }
