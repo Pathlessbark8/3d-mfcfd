@@ -145,7 +145,7 @@ void interior_dGx_pos(double *G, int i)
 
 
 
-__global__ void interior_dGx_pos_cuda(points &point,int power, double VL_CONST,double pi,int interior_points,int *interior_points_index)
+__global__ void interior_dGx_pos_cuda(points &point,double power, double VL_CONST,double pi,int interior_points,int *interior_points_index)
 //
 //
 {

@@ -257,7 +257,7 @@ void eval_q_derivatives()
 
 // Cuda function
 
-__global__ void eval_q_derivatives_cuda(points &point, int power,int inner_iterations)
+__global__ void eval_q_derivatives_cuda(points &point, double power,int inner_iterations)
 //
 //
 {

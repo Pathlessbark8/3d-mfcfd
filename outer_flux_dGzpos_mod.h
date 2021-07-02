@@ -146,7 +146,7 @@ void outer_dGz_pos(double *G, int i)
 
 
 
-__global__ void outer_dGz_pos_cuda(points &point,int power, double VL_CONST,double pi,int outer_points,int *outer_points_index)
+__global__ void outer_dGz_pos_cuda(points &point,double power, double VL_CONST,double pi,int outer_points,int *outer_points_index)
 //
 //
 {

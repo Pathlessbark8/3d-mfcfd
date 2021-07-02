@@ -143,7 +143,7 @@ void wall_dGy_neg(double *G, int i){
 
 
 
-__global__ void wall_dGy_neg_cuda(points &point,int power, double VL_CONST,double pi,int wall_points,int *wall_points_index)
+__global__ void wall_dGy_neg_cuda(points &point,double power, double VL_CONST,double pi,int wall_points,int *wall_points_index)
 //
 //
 {

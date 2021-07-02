@@ -39,12 +39,13 @@ int main()
     //
     cudaMalloc(&point_d, point_size);
     cudaMemcpy(point_d, &point, point_size, cudaMemcpyHostToDevice);
-    // cudaDeviceSynchronize();
+    cudaDeviceSynchronize();
     auto start = high_resolution_clock::now();
     cout<<"Starting CUDA excecution\n";
     //
     fpi_solver_cuda(point_d,stream); 
     //
+    cudaDeviceSynchronize();
     auto stop = high_resolution_clock::now();
     auto duration = duration_cast<microseconds>(stop - start);
     cout << "Time Taken :" << duration.count()/1000000.0 << endl;
@@ -53,12 +54,5 @@ int main()
     cudaFree(point_d);
     //
     cout << "Done\n";
-    for(int i=0;i<max_points;i++)
-    {
-        for(int r=0;r<5;r++)
-        {
-            cout<<point.flux_res[r][i]<<" ";
-        }
-        cout<<endl;
-    }
+    
 }

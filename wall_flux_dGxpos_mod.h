@@ -41,11 +41,11 @@ void wall_dGx_pos(double *G, int i)
     sum_delz_delx = 0.00;
     //
     for (int r = 0; r < 5; r++)
-        {
-            sum_delx_delf[r] = 0;
-            sum_dely_delf[r] = 0;
-            sum_delz_delf[r] = 0;
-        }
+    {
+        sum_delx_delf[r] = 0;
+        sum_dely_delf[r] = 0;
+        sum_delz_delf[r] = 0;
+    }
     //
     x_i = point.x[i];
     y_i = point.y[i];
@@ -58,7 +58,7 @@ void wall_dGx_pos(double *G, int i)
         nor[r] = point.nor[r][i];
     }
     //
-   
+
     for (j = 0; j < point.xpos_nbhs[i]; j++)
     //
     {
@@ -147,21 +147,19 @@ void wall_dGx_pos(double *G, int i)
 }
 //
 
-
-
-
-__global__ void wall_dGx_pos_cuda(points &point,int power, double VL_CONST,double pi,int wall_points,int *wall_points_index)
+__global__ void wall_dGx_pos_cuda(points &point, double power, double VL_CONST, double pi, int wall_points, int *wall_points_index)
 //
 //
 {
-   int ind = blockIdx.x * blockDim.x + threadIdx.x;
+    int ind = blockIdx.x * blockDim.x + threadIdx.x;
 
-    if (ind < 0 || ind >= wall_points){
+    if (ind < 0 || ind >= wall_points)
+    {
         return;
     }
 
-    int i=wall_points_index[ind];
-	int j,k;
+    int i = wall_points_index[ind];
+    int j, k;
     double prim[5];
     double x_i, y_i, z_i, x_k, y_k, z_k;
     double tan1[3], tan2[3], nor[3];
@@ -186,11 +184,11 @@ __global__ void wall_dGx_pos_cuda(points &point,int power, double VL_CONST,doubl
     sum_delz_delx = 0.00;
     //
     for (int r = 0; r < 5; r++)
-        {
-            sum_delx_delf[r] = 0;
-            sum_dely_delf[r] = 0;
-            sum_delz_delf[r] = 0;
-        }
+    {
+        sum_delx_delf[r] = 0;
+        sum_dely_delf[r] = 0;
+        sum_delz_delf[r] = 0;
+    }
     //
     x_i = point.x[i];
     y_i = point.y[i];
@@ -203,7 +201,7 @@ __global__ void wall_dGx_pos_cuda(points &point,int power, double VL_CONST,doubl
         nor[r] = point.nor[r][i];
     }
     //
-   
+
     for (j = 0; j < point.xpos_nbhs[i]; j++)
     //
     {
@@ -242,26 +240,26 @@ __global__ void wall_dGx_pos_cuda(points &point,int power, double VL_CONST,doubl
             qtilde[r] = point.q[r][i] - 0.50 * temp[r];
         }
 
-		venkat_limiter_cuda(point,qtilde, phi, i,VL_CONST);
+        venkat_limiter_cuda(point, qtilde, phi, i, VL_CONST);
         for (int r = 0; r < 5; r++)
         {
             qtilde[r] = point.q[r][i] - 0.50 * phi[r] * temp[r];
         }
         qtilde_to_primitive_cuda(qtilde, prim);
-        flux_Gwxp_cuda(G_i, tan1, tan2, nor, prim,pi);
+        flux_Gwxp_cuda(G_i, tan1, tan2, nor, prim, pi);
         //
         for (int r = 0; r < 5; r++)
         {
             temp[r] = delx * point.dq[0][r][k] + dely * point.dq[1][r][k] + delz * point.dq[2][r][k];
             qtilde[r] = point.q[r][k] - 0.50 * temp[r];
         }
-		venkat_limiter_cuda(point,qtilde, phi, k,VL_CONST);
+        venkat_limiter_cuda(point, qtilde, phi, k, VL_CONST);
         for (int r = 0; r < 5; r++)
         {
             qtilde[r] = point.q[r][k] - 0.50 * phi[r] * temp[r];
         }
         qtilde_to_primitive_cuda(qtilde, prim);
-        flux_Gwxp_cuda(G_k, tan1, tan2, nor, prim,pi);
+        flux_Gwxp_cuda(G_k, tan1, tan2, nor, prim, pi);
         //
         for (int r = 0; r < 5; r++)
         {
@@ -286,7 +284,7 @@ __global__ void wall_dGx_pos_cuda(points &point,int power, double VL_CONST,doubl
     //
     for (int r = 0; r < 5; r++)
     {
-        point.flux_res[r][i] = 2.00*temp[r] / det;
+        point.flux_res[r][i] = 2.00 * temp[r] / det;
     }
     //
 }
