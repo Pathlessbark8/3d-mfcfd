@@ -36,23 +36,9 @@ void read_input_point_data()
         for (r = 0; r < point.nbhs[k]; r++)
         {
             fin >> point.conn[r][k];
-            // cout<<endl;
             point.conn[r][k]-=1;
         }
-        // if(k<10)
-        // {
-        //     cout<<point.x[k]<<endl;
-        // }
         fin >> point.min_dist[k];
-
-        // if (k == 0)
-        // {
-        //     for (r = 0; r < point.nbhs[k]; r++)
-        //     {
-        //         cout << point.conn[r][k] << " ";
-        //     }
-        //     cout<<endl;
-        // }
     }
     fin.close();
     //

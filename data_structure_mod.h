@@ -58,6 +58,8 @@ int supersonic_inlet_points_index[max_points];
 //
 double res_old, res_new, max_res, residue;
 int max_res_point;
+
+int threads_per_block = 128;
 //
 //
 

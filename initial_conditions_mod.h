@@ -9,8 +9,8 @@
 //
 		{
 //
-			int k, i ;
-			double U[5],x1,y1,z1;
+			int k ;
+			double x1,y1,z1;
 //
 		// OPEN(UNIT=101,FILE="stored-solution.dat",FORM="FORMATTED",STATUS="OLD",ACTION="READ")
 		fstream fin;

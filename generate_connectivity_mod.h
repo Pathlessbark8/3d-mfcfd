@@ -127,7 +127,6 @@ void get_wall_point_neighbours(int i)
         delt = delx * point.tan2[0][i] + dely * point.tan2[1][i] + delz * point.tan2[2][i];
         deln = delx * point.nor[0][i] + dely * point.nor[1][i] + delz * point.nor[2][i];
         //
-        // cout<<xk<<" "<<xi<<endl;
         //
         if (dels <= 0.00)
         {

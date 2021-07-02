@@ -25,13 +25,26 @@ void qtilde_to_primitive(double *q, double *prim)
     //
     prim[0] = exp(temp2);
     prim[4] = prim[0] * temp;
-    //  for (int r = 0; r < 5; r++)
-	// 	{
-	// 		cout<<q[r]<<" ";
-	// 		// cout<<G_i[r]<<" "<<tan1[r]<<" "<<tan2[r]<<" "<<nor[r]<<" "<<prim[r]<<" "<<endl;
-	// 	}
-	// 	cout<<endl;
 }
 //
+__device__ void qtilde_to_primitive_cuda(double *q, double *prim)
 //
-//
+{
+    //
+    double beta, temp, temp1, temp2;
+    //
+    //
+    beta = -q[4] * 0.50;
+    //
+    temp = 0.50 / beta;
+    //
+    prim[1] = q[1] * temp;
+    prim[2] = q[2] * temp;
+    prim[3] = q[3] * temp;
+    //
+    temp1 = q[0] + beta * (prim[1] * prim[1] + prim[2] * prim[2] + prim[3] * prim[3]);
+    temp2 = temp1 - (log(beta) * 2.50);
+    //
+    prim[0] = exp(temp2);
+    prim[4] = prim[0] * temp;
+}
