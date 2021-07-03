@@ -33,26 +33,30 @@ int main()
     aliasing();
     //
     points *point_d;
-    unsigned long long point_size=sizeof(point);
-    cudaStream_t stream;
-    cudaStreamCreateWithFlags(&stream,cudaStreamNonBlocking);
+    unsigned long long point_size = sizeof(point);
+    // cudaStream_t stream;
+    // cudaStreamCreateWithFlags(&stream, cudaStreamNonBlocking);
+    //
+    // cudaError_t err = cudaGetLastError(); // add
+    // if (err != cudaSuccess)
+    //     std::cout << "CUDA error: " << cudaGetErrorString(err) << std::endl; // add
+    // cudaProfilerStop();
     //
     cudaMalloc(&point_d, point_size);
     cudaMemcpy(point_d, &point, point_size, cudaMemcpyHostToDevice);
     cudaDeviceSynchronize();
     auto start = high_resolution_clock::now();
-    cout<<"Starting CUDA excecution\n";
+    cout << "Starting CUDA excecution\n";
     //
-    fpi_solver_cuda(point_d,stream); 
+    fpi_solver_cuda(point_d);
     //
     cudaDeviceSynchronize();
     auto stop = high_resolution_clock::now();
     auto duration = duration_cast<microseconds>(stop - start);
-    cout << "Time Taken :" << duration.count()/1000000.0 << endl;
+    cout << "Time Taken :" << duration.count() / 1000000.0 << endl;
     //
     cudaMemcpy(&point, point_d, point_size, cudaMemcpyDeviceToHost);
     cudaFree(point_d);
     //
     cout << "Done\n";
-    
 }
