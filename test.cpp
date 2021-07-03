@@ -15,7 +15,7 @@
 #include "generate_connectivity_mod.h"
 #include "implicit_aliasing_mod.h"
 #include "flux_residual_mod.h"
-#include "initial_conditions_mod.h"F
+#include "initial_conditions_mod.h"
 #include "interior_flux_dGxneg_mod.h"
 #include "interior_flux_dGxpos_mod.h"
 #include "interior_flux_dGyneg_mod.h"

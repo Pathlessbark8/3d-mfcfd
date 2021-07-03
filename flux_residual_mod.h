@@ -48,7 +48,10 @@ void eval_flux_residual()
         wall_dGy_pos(Gyp, k);
         wall_dGy_neg(Gyn, k);
         wall_dGz_neg(Gzn, k);
-
+        for (int r = 0; r < 5; r++)
+        {
+            point.flux_res[r][k] = 2.00 * (Gxp[r] + Gxn[r] + Gyp[r] + Gyn[r] + Gzn[r]);
+        }
         //
     }
 
