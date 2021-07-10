@@ -20,8 +20,8 @@ contains
 				! point%prim(3,k) = u2_inf
 				! point%prim(4,k) = u3_inf
 				! point%prim(5,k) = pr_inf
-				point%delUp(:,k) = 0.00
-				point%delUn(:,k) = 0.00
+				! point%delUp(:,k) = 0.00
+				! point%delUn(:,k) = 0.00
 !				read(101,*) point%prim(1,k), point%prim(2,k), point%prim(3,k), point%prim(4,k), point%prim(5,k)
 				read(101,*) x1,y1,z1,point%prim(1,k), point%prim(2,k), point%prim(3,k), point%prim(4,k), point%prim(5,k)
 			enddo

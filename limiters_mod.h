@@ -24,9 +24,9 @@ void venkat_limiter(double *qtilde, double *phi, int k)
 		else if (abs(del_neg) > 10e-6)
 		{
 			if (del_neg > 0.00)
-				del_pos = point.qm[1][r][k] - q;
+				del_pos = point.qm[0][r][k] - q;
 			else if (del_neg < 0.00)
-				del_pos = point.qm[2][r][k] - q;
+				del_pos = point.qm[1][r][k] - q;
 			//
 			epsi = VL_CONST * point.min_dist[k];
 			epsi = pow(epsi, 3.00);

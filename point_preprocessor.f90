@@ -22,7 +22,7 @@ contains
 !
 !
 !		OPEN(UNIT=101,FILE="hemisphere-testcase/3d_input_data",FORM="FORMATTED",STATUS="OLD",ACTION="READ")
-		OPEN(UNIT=101,FILE="/home/dhruv/3d_input_data",FORM="FORMATTED",STATUS="OLD",ACTION="READ")
+		OPEN(UNIT=101,FILE="/home/dhruv/3d_new_data",FORM="FORMATTED",STATUS="OLD",ACTION="READ")
 !
 !
 !		read(101,*) max_points
@@ -34,6 +34,7 @@ contains
 			& point%nor(1,k), point%nor(2,k), point%nor(3,k), &
 			& point%nbhs(k), (point%conn(r,k),r=1,point%nbhs(k)), point%min_dist(k)
 		enddo
+		close(101)
 !
 !		Finding the number of interior, wall, outer and other boundary points ..
 !

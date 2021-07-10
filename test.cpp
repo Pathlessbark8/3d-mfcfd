@@ -20,18 +20,13 @@
 #include "interior_flux_dGxpos_mod.h"
 #include "interior_flux_dGyneg_mod.h"
 #include "interior_flux_dGypos_mod.h"
+#include "state_update_mod.h"
+#include "q_lskum_mod.h"
 using namespace std;
 
 int main()
 {
-    double G[5] = {0};
     read_input_point_data();
     initial_conditions();
-    generate_split_stencils();
-    aliasing();
-    compute_conserved_vector();
-    eval_q_variables();
-    eval_q_derivatives();
-    timestep_delt();
-    eval_flux_residual();
+    q_lskum();
 }

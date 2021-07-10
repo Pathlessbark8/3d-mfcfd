@@ -50,47 +50,47 @@ void eval_flux_residual()
         wall_dGz_neg(Gzn, k);
         for (int r = 0; r < 5; r++)
         {
-            point.flux_res[r][k] = 2.00 * (Gxp[r] + Gxn[r] + Gyp[r] + Gyn[r] + Gzn[r]);
+            point.flux_res[r][k] = 2.00 * point.delt[k] * (Gxp[r] + Gxn[r] + Gyp[r] + Gyn[r] + Gzn[r]);
         }
         //
     }
 
-    for (i = 0; i < outer_points; i++)
-    {
-        //
-        k = outer_points_index[i];
-        //
-        outer_dGx_pos(Gxp, k);
-        outer_dGx_neg(Gxn, k);
-        outer_dGy_pos(Gyp, k);
-        outer_dGy_neg(Gyn, k);
-        outer_dGz_pos(Gzp, k);
-        //
-        for (int r = 0; r < 5; r++)
-        {
-            point.flux_res[r][k] = (Gxp[r] + Gxn[r] + Gyp[r] + Gyn[r] + Gzp[r]);
-        }
-        //
-    }
-    //
-    for (i = 0; i < interior_points; i++)
-    {
-        //
-        k = interior_points_index[i];
-        //
-        interior_dGx_pos(Gxp, k);
-        interior_dGx_neg(Gxn, k);
-        interior_dGy_pos(Gyp, k);
-        interior_dGy_neg(Gyn, k);
-        interior_dGz_pos(Gzp, k);
-        interior_dGz_neg(Gzn, k);
-        //
-        //
-        for (int r = 0; r < 5; r++)
-        {
-            point.flux_res[r][k] = (Gxp[r] + Gxn[r] + Gyp[r] + Gyn[r] + Gzn[r] + Gzp[r]);
-        }
-    }
+    // for (i = 0; i < outer_points; i++)
+    // {
+    //     //
+    //     k = outer_points_index[i];
+    //     //
+    //     outer_dGx_pos(Gxp, k);
+    //     outer_dGx_neg(Gxn, k);
+    //     outer_dGy_pos(Gyp, k);
+    //     outer_dGy_neg(Gyn, k);
+    //     outer_dGz_pos(Gzp, k);
+    //     //
+    //     for (int r = 0; r < 5; r++)
+    //     {
+    //         point.flux_res[r][k] = point.delt[k] * (Gxp[r] + Gxn[r] + Gyp[r] + Gyn[r] + Gzp[r]);
+    //     }
+    //     //
+    // }
+    // //
+    // for (i = 0; i < interior_points; i++)
+    // {
+    //     //
+    //     k = interior_points_index[i];
+    //     //
+    //     interior_dGx_pos(Gxp, k);
+    //     interior_dGx_neg(Gxn, k);
+    //     interior_dGy_pos(Gyp, k);
+    //     interior_dGy_neg(Gyn, k);
+    //     interior_dGz_pos(Gzp, k);
+    //     interior_dGz_neg(Gzn, k);
+    //     //
+    //     //
+    //     for (int r = 0; r < 5; r++)
+    //     {
+    //         point.flux_res[r][k] = point.delt[k] * (Gxp[r] + Gxn[r] + Gyp[r] + Gyn[r] + Gzn[r] + Gzp[r]);
+    //     }
+    // }
     //
     //
 }

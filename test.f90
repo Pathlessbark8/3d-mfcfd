@@ -16,21 +16,15 @@ program test
     use initial_conditions_mod
     use interior_flux_dGxneg_mod
     use flux_residual_mod
+    use q_lskum_mod
     implicit none
-
-    double precision G(5)
     integer i,k
     ! open(1,file='test_data.dat',status='old')
     ! open(2,file='fortran_out.dat',status='old')
-    G=0
     call allocate_size()
     call read_input_point_data()
+    print*, wall_points, outer_points, interior_points
+		print*, supersonic_inlet_points, supersonic_outlet_points
     call initial_conditions()
-    call generate_split_stencils()
-    call aliasing()
-    call compute_conserved_vector()
-    call eval_q_variables()
-    call eval_q_derivatives()
-    call timestep_delt()
-    call eval_flux_residual()
+    call q_lskum()
 end program test

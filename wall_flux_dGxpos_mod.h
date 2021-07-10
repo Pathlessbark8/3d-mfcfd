@@ -121,7 +121,7 @@ void wall_dGx_pos(double *G, int i)
         {
             temp[r] = G_k[r] - G_i[r];
         }
-        //
+        
         for (int r = 0; r < 5; r++)
         {
             sum_delx_delf[r] = sum_delx_delf[r] + temp[r] * dels_weights;
