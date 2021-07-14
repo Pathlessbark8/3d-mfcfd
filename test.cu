@@ -27,35 +27,31 @@ using namespace std;
 using namespace std::chrono;
 int main()
 {
+
+    cout<<setprecision(13)<<scientific;
+
     read_input_point_data();
     initial_conditions();
     generate_split_stencils();
-    aliasing();
     //
     points *point_d;
     unsigned long long point_size = sizeof(point);
-    // cudaStream_t stream;
-    // cudaStreamCreateWithFlags(&stream, cudaStreamNonBlocking);
-    //
-    // cudaError_t err = cudaGetLastError(); // add
-    // if (err != cudaSuccess)
-    //     std::cout << "CUDA error: " << cudaGetErrorString(err) << std::endl; // add
-    // cudaProfilerStop();
+    cudaStream_t stream;
+    cudaStreamCreateWithFlags(&stream, cudaStreamNonBlocking);
     //
     cudaMalloc(&point_d, point_size);
-    cudaMemcpy(point_d, &point, point_size, cudaMemcpyHostToDevice);
     cudaDeviceSynchronize();
     auto start = high_resolution_clock::now();
     cout << "Starting CUDA excecution\n";
     //
-    fpi_solver_cuda(point_d);
+    fpi_solver_cuda(point_d,stream);
     //
     cudaDeviceSynchronize();
     auto stop = high_resolution_clock::now();
     auto duration = duration_cast<microseconds>(stop - start);
     cout << "Time Taken :" << duration.count() / 1000000.0 << endl;
     //
-    cudaMemcpy(&point, point_d, point_size, cudaMemcpyDeviceToHost);
+    // cudaMemcpy(&point, point_d, point_size, cudaMemcpyDeviceToHost);
     cudaFree(point_d);
     //
     cout << "Done\n";

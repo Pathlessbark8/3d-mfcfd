@@ -273,7 +273,7 @@ __global__ void wall_dGy_pos_cuda(points &point,double power, double VL_CONST,do
 	//
 	for (int r = 0; r < 5; r++)
 	{
-		point.flux_res[r][i] += 2.00*temp[r] / det;
+		point.flux_res[r][i] += 2.00*point.delt[i]*temp[r] / det;
 	}
 	//
 }

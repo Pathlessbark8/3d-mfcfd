@@ -273,7 +273,7 @@ __global__ void outer_dGy_neg_cuda(points &point,double power, double VL_CONST,d
 	//
 	for (int r = 0; r < 5; r++)
 	{
-		point.flux_res[r][i] += temp[r] / det;
+		point.flux_res[r][i] += temp[r]*point.delt[i] / det;
 	}
 	//
 }

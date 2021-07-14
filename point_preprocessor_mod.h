@@ -21,10 +21,9 @@ void read_input_point_data()
     //
     //
     //
-    //		OPEN(UNIT=101,FILE="hemisphere-testcase/3d_input_data",FORM="FORMATTED",STATUS="OLD",ACTION="READ")
-    //OPEN(UNIT=101,FILE="3d_input_data",FORM="FORMATTED",STATUS="OLD",ACTION="READ")
+    //		
     std::fstream fin;
-    fin.open("/home/dhruv/3d_input_data", std::ios::in);
+    fin.open("/home/dhruv/3d_new_data", std::ios::in);
     //
     for (k = 0; k < max_points; k++)
     {

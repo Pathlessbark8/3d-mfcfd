@@ -55,7 +55,7 @@ void timestep_delt()
     //
 }
 //
-__global__ void timestep_delt_cuda(points &point,int CFL)
+__global__ void timestep_delt_cuda(points &point,double CFL)
 //
 //
 {
