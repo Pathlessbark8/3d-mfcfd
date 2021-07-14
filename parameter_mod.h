@@ -18,7 +18,7 @@
 		double power = 0.00;
 		double VL_CONST = 2.00;
 		double CFL = 0.2;
-		int inner_iterations = 1;
+		int inner_iterations = 0;
 //
 //
 //		Freestream values of the primitive variables ..
