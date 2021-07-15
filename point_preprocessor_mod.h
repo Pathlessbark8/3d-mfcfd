@@ -23,7 +23,7 @@ void read_input_point_data()
     //
     //		
     std::fstream fin;
-    fin.open("/home/dhruv/3d_new_data", std::ios::in);
+    fin.open("3d_new_data", std::ios::in);
     //
     for (k = 0; k < max_points; k++)
     {

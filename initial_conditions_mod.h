@@ -14,7 +14,7 @@ void initial_conditions()
 	//
 	// OPEN(UNIT=101,FILE="stored-solution.dat",FORM="FORMATTED",STATUS="OLD",ACTION="READ")
 	fstream fin;
-	fin.open("/home/dhruv/primal-solution.dat", ios::in);
+	fin.open("primal-solution.dat", ios::in);
 	//
 	for (k = 0; k < max_points; k++)
 	{
