@@ -30,8 +30,8 @@ void q_lskum()
 	for (t = 1; t <= max_iters; t++)
 	{
 		fpi_solver(t);
-		cout << setprecision(13) << t << " " << res_new << " " << residue << endl;
-		fout << setprecision(13) << t << " " << res_new << " " << residue << endl;
+		cout <<scientific<< setprecision(13) << t << " " << res_new << " " << residue << endl;
+		fout << scientific<<setprecision(13) << t << " " << res_new << " " << residue << endl;
 	}
 	fout.close();
 	auto stop = high_resolution_clock::now();

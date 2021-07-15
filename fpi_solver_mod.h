@@ -23,18 +23,8 @@ void fpi_solver(int t)
     //
     eval_q_variables();
     eval_q_derivatives();
-    //
     timestep_delt();
     eval_flux_residual();
-// for(int i=0;i<wall_points;i++)
-//     {
-//         int k= wall_points_index[i];
-//         for(int r=0;r<5;r++)
-//         {
-//             cout<<point.flux_res[r][k]<<" ";
-//         }
-//         cout<<endl;
-//     }
     state_update();
     //
     if (t <= 2)
