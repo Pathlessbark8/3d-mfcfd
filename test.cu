@@ -40,10 +40,12 @@ int main()
     cudaStreamCreateWithFlags(&stream, cudaStreamNonBlocking);
     //
     cudaMalloc(&point_d, point_size);
-    cudaDeviceSynchronize();
+    cudaMemcpy(point_d, &point, point_size, cudaMemcpyHostToDevice);
+    // cudaDeviceSynchronize();
     auto start = high_resolution_clock::now();
     cout << "Starting CUDA excecution\n";
     //
+    cout << setprecision(13);
     fpi_solver_cuda(point_d,stream);
     //
     cudaDeviceSynchronize();

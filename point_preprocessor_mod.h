@@ -23,11 +23,11 @@ void read_input_point_data()
     //
     //		
     std::fstream fin;
-    fin.open("3d_new_data", std::ios::in);
+    fin.open("/home/dhruv/3d-grid-580485.dat", std::ios::in);
     //
     for (k = 0; k < max_points; k++)
     {
-        fin >> counter >> point.status[k] >> point.x[k] >> point.y[k] >> point.z[k];
+        fin >> counter  >> point.x[k] >> point.y[k] >> point.z[k]>> point.status[k]>>point.min_dist[k];
         fin >> point.tan1[0][k] >> point.tan1[1][k] >> point.tan1[2][k];
         fin >> point.tan2[0][k] >> point.tan2[1][k] >> point.tan2[2][k];
         fin >> point.nor[0][k] >> point.nor[1][k] >> point.nor[2][k];
@@ -37,7 +37,7 @@ void read_input_point_data()
             fin >> point.conn[r][k];
             point.conn[r][k]-=1;
         }
-        fin >> point.min_dist[k];
+        // fin >> point.min_dist[k];
     }
     fin.close();
     //
@@ -59,9 +59,16 @@ void read_input_point_data()
         else if (point.status[k] == 2)
             outer_points = outer_points + 1;
         else if (point.status[k] == 6)
+        {
             supersonic_outlet_points = supersonic_outlet_points + 1;
+            cout<<k<<endl;
+        }
         else if (point.status[k] == 5)
+        {
             supersonic_inlet_points = supersonic_inlet_points + 1;
+            cout<<k<<"Here"<<endl;
+        }
+
     }
     //
     //		Allocating the size of the respective points ..

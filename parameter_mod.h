@@ -2,12 +2,12 @@
 #include "math.h"
 
 
-		const int max_points =  26133;
-		int max_iters = 1000;//1000
+		const int max_points =  580485;
+		int max_iters = 10;//1000
 //
 //		Flow conditions ..
 //
-		double Mach = 2.00;
+		double Mach = 0.7;
 		double aoa = 0.00;
 //
 //		Other parameters ..
@@ -17,8 +17,8 @@
 		double theta = aoa*pi/180.00;
 		double power = 0.00;
 		double VL_CONST = 2.00;
-		double CFL = 0.2;
-		int inner_iterations = 1;
+		double CFL = 0.5;
+		int inner_iterations = 0;
 //
 //
 //		Freestream values of the primitive variables ..

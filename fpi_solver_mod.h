@@ -39,6 +39,11 @@ void fpi_solver_cuda( points *point_d,cudaStream_t stream)
     dim3 threads(threads_per_block, 1, 1);
     dim3 grid(ceil((max_points / threads.x) + 1), 1, 1);
 
+    fstream fout,fout_1;
+    fout.open("output_40k.dat",ios::out);
+    fout << setprecision(13);
+    fout_1.open("residue.dat",ios::out);
+    fout_1 << setprecision(13);
     int *wall_points_index_d;
     unsigned long long wall_size = sizeof(wall_points_index);
     cudaMalloc(&wall_points_index_d, wall_size);
@@ -72,7 +77,7 @@ void fpi_solver_cuda( points *point_d,cudaStream_t stream)
     cudaDeviceSynchronize();
     for (int t = 1; t <= max_iters; t++)
     {
-        cudaMemcpy(point_d, &point, point_size, cudaMemcpyHostToDevice);
+        // cudaMemcpy(point_d, &point, point_size, cudaMemcpyHostToDevice);
         eval_q_variables_cuda<<<grid, threads>>>(*point_d);
         eval_q_derivatives_cuda<<<grid, threads>>>(*point_d, power);
         for (int r = 0; r < inner_iterations; r++)
@@ -109,10 +114,10 @@ void fpi_solver_cuda( points *point_d,cudaStream_t stream)
         state_update_outer<<<grid, threads>>>(*point_d, outer_points, outer_points_index_d, u1_inf, u2_inf, u3_inf, rho_inf, pi, pr_inf);
         state_update_interior<<<grid, threads>>>(*point_d, interior_points, interior_points_index_d, sum_res_sqr_d);
         
-        cudaMemcpy(&point, point_d, point_size, cudaMemcpyDeviceToHost);
-        
-        state_update_supersonic_outlet();
-        state_update_supersonic_inlet();
+        // cudaMemcpy(&point, point_d, point_size, cudaMemcpyDeviceToHost);
+        // state_update_supersonic_outlet();
+        // state_update_supersonic_inlet();
+        cudaDeviceSynchronize();
         sum_res_sqr = thrust::reduce(thrust::cuda::par.on(stream), sum_res_sqr_d, sum_res_sqr_d + max_points, (double)0.0, thrust::plus<double>());
         res_new = sqrt(sum_res_sqr) / max_points;
         if (t <= 2)
@@ -124,9 +129,19 @@ void fpi_solver_cuda( points *point_d,cudaStream_t stream)
         {
             residue = log10(res_new / res_old);
         }
-        cout << setprecision(13) << t << " " << res_new << " " << residue << endl;
+        cout << t << " " << res_new << " " << residue<<" "<<sum_res_sqr << endl;
+        fout_1<< t << " " << res_new << " " << residue << endl;
+        if(t%500==0)
+        { 
+            for(int i=0;i<max_points;i++)
+            {
+                fout<<point.prim[0][i]<<" "<<point.prim[1][i]<<" "<<point.prim[2][i]<<" "<<point.prim[3][i]<<" "<<point.prim[4][i]<<endl;
+            }
+        }
     }
     cudaDeviceSynchronize();
+    fout.close();
+    fout_1.close();
     cudaMemcpy(&wall_points_index, wall_points_index_d, wall_size, cudaMemcpyDeviceToHost);
     cudaMemcpy(&outer_points_index, outer_points_index_d, outer_size, cudaMemcpyDeviceToHost);
     cudaMemcpy(&interior_points_index, interior_points_index_d, interior_size, cudaMemcpyDeviceToHost);
