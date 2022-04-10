@@ -3,6 +3,7 @@
 
 
 		const int max_points =  580485;
+		const int max_devices=	32;
 		int max_iters = 10;//1000
 //
 //		Flow conditions ..
@@ -28,5 +29,9 @@
 		double u2_inf = Mach*sin(theta);
 		double u3_inf = 0.00;
 		double pr_inf = 1.00/1.40;
+
+		int numDevices = 1;
+		int partVector[max_points];
+		int numberOfPointsPerDevice[max_devices];
 //
 //

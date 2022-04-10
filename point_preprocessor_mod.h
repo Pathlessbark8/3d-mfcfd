@@ -15,7 +15,7 @@ void read_input_point_data()
 //
 {
     //
-    int k, r, counter;
+    int k, r;
     int interior_count, wall_count, outer_count;
     int supersonic_inlet_count, supersonic_outlet_count;
     //
@@ -27,7 +27,7 @@ void read_input_point_data()
     //
     for (k = 0; k < max_points; k++)
     {
-        fin >> counter  >> point.x[k] >> point.y[k] >> point.z[k]>> point.status[k]>>point.min_dist[k];
+        fin >> point.counter[k]  >> point.x[k] >> point.y[k] >> point.z[k]>> point.status[k]>>point.min_dist[k];
         fin >> point.tan1[0][k] >> point.tan1[1][k] >> point.tan1[2][k];
         fin >> point.tan2[0][k] >> point.tan2[1][k] >> point.tan2[2][k];
         fin >> point.nor[0][k] >> point.nor[1][k] >> point.nor[2][k];

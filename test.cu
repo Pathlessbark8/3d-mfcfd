@@ -34,27 +34,59 @@ int main()
     initial_conditions();
     generate_split_stencils();
     //
-    points *point_d;
-    unsigned long long point_size = sizeof(point);
-    cudaStream_t stream;
-    cudaStreamCreateWithFlags(&stream, cudaStreamNonBlocking);
+    fstream fin;
+    fin.open("partFile.dat",ios::in);
+    fin>>numDevices;
+    int counter;
+    for(int i=0;i<max_points;i++){
+        fin>>point.counter[i]>>partVector[i];
+        numberOfPointsPerDevice[partVector[i]]++;
+    }
+    fin.close();
     //
-    cudaMalloc(&point_d, point_size);
-    cudaMemcpy(point_d, &point, point_size, cudaMemcpyHostToDevice);
+    for(int i=0;i<numDevices;i++){
+        splitPoint[i]=new splitPoints[numberOfPointsPerDevice[i]];
+    }
+    // //
+    memset(numberOfPointsPerDevice, 0, 32);
+    for(int i=0;i<max_points;i++){
+        assign(splitPoint[partVector[i]][numberOfPointsPerDevice[partVector[i]]],i);
+        numberOfPointsPerDevice[partVector[i]]++;
+    }
+    // fstream fout;
+    // fout.open("split.dat",ios::out);
+    // for(int i=0;i<numberOfPointsPerDevice[partVector[1]];++i){
+    //     fout<<splitPoint[1][i].counter<<endl;
+    // }
+    // fout.close();
+    splitPoints *splitPoint_d[max_devices];
+    for(int i=0;i<numDevices;i++){
+        cudaSetDevice(i);
+        cudaMalloc((void**)&splitPoint_d[i],numberOfPointsPerDevice[i]*sizeof(splitPoints));
+        cudaMemcpyAsync(splitPoint_d[i],splitPoint[i],numberOfPointsPerDevice[i]*sizeof(splitPoints),cudaMemcpyHostToDevice);
+    }
+    // //
+    // points *point_d;
+    // unsigned long long point_size = sizeof(point);
+    // cudaStream_t stream;
+    // cudaStreamCreateWithFlags(&stream, cudaStreamNonBlocking);
+    // //
+    // cudaMalloc(&point_d, point_size);
+    // cudaMemcpy(point_d, &point, point_size, cudaMemcpyHostToDevice);
+    // // cudaDeviceSynchronize();
+    // auto start = high_resolution_clock::now();
+    // cout << "Starting CUDA excecution\n";
+    // //
+    // cout << setprecision(13);
+    // fpi_solver_cuda(point_d,stream);
+    // //
     // cudaDeviceSynchronize();
-    auto start = high_resolution_clock::now();
-    cout << "Starting CUDA excecution\n";
-    //
-    cout << setprecision(13);
-    fpi_solver_cuda(point_d,stream);
-    //
-    cudaDeviceSynchronize();
-    auto stop = high_resolution_clock::now();
-    auto duration = duration_cast<microseconds>(stop - start);
-    cout << "Time Taken :" << duration.count() / 1000000.0 << endl;
-    //
-    // cudaMemcpy(&point, point_d, point_size, cudaMemcpyDeviceToHost);
-    cudaFree(point_d);
-    //
-    cout << "Done\n";
+    // auto stop = high_resolution_clock::now();
+    // auto duration = duration_cast<microseconds>(stop - start);
+    // cout << "Time Taken :" << duration.count() / 1000000.0 << endl;
+    // //
+    // // cudaMemcpy(&point, point_d, point_size, cudaMemcpyDeviceToHost);
+    // cudaFree(point_d);
+    // //
+    // cout << "Done\n";
 }
