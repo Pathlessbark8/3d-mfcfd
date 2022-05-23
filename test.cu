@@ -53,7 +53,13 @@ int main()
     auto duration = duration_cast<microseconds>(stop - start);
     cout << "Time Taken :" << duration.count() / 1000000.0 << endl;
     //
-    // cudaMemcpy(&point, point_d, point_size, cudaMemcpyDeviceToHost);
+    cudaMemcpy(&point, point_d, point_size, cudaMemcpyDeviceToHost);
+    fstream fout;
+    fout.open("output_prim.dat", ios::out);
+    for(int i=0;i<max_points;++i){
+        fout<<point.prim[0][i]<<" "<<point.prim[1][i]<<" "<<point.prim[2][i]<<" "<<point.prim[3][i]<<" "<<point.prim[4][i]<<endl;
+    }
+    fout.close();
     cudaFree(point_d);
     //
     cout << "Done\n";
