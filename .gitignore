@@ -2,6 +2,7 @@
 *.out
 *.dat
 *.txt
+!CMakeLists.txt
 dq_var_cpp
 dq_var_fortran
 q_var_fortran
