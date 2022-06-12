@@ -155,3 +155,20 @@ void fpi_solver_cuda( points *point_d,cudaStream_t stream)
     cudaFree(supersonic_outlet_points_index_d);
     cudaFree(sum_res_sqr_d);
 }
+
+void fpi_solver_multi_nccl( splitPoints **splitPoint_d,cudaStream_t *stream)
+{
+
+    dim3 threads(threads_per_block, 1, 1);
+    dim3 grid(ceil((max_points / threads.x) + 1), 1, 1);
+    for (int t = 1; t <= max_iters; ++t)
+    {
+        for(int i=0;i<numDevices;++i){
+            {
+            cudaSetDevice(i);
+            cudaStreamCreate(&stream[i]);
+            eval_q_variables_multi_nccl<<<grid,threads,0,stream[i]>>>(splitPoint_d[i],numberOfPointsPerDevice[i]);
+            }
+        }
+    }
+}

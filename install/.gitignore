@@ -1,1 +1,3 @@
 build/*
+execname
+*.nsys-rep
