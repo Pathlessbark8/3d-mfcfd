@@ -1,0 +1,32 @@
+Determining if the NCCL_VERSION_CODE exist failed with the following output:
+Change Dir: /home/anil/new_3d_code/3d-mfcfd/install/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_6120d/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_6120d.dir/build.make CMakeFiles/cmTC_6120d.dir/build
+gmake[1]: Entering directory '/home/anil/new_3d_code/3d-mfcfd/install/build/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_6120d.dir/CheckSymbolExists.cxx.o
+/apps/spack/opt/spack/linux-rocky8-zen/gcc-8.5.0/nvhpc-22.3-5aq2syegnlfexac6thgm57ts52pgbu7p/Linux_x86_64/22.3/compilers/bin/nvc++  -I/apps/spack/opt/spack/linux-rocky8-zen/gcc-8.5.0/nccl-2.11.4-1-kuhs6rsmpa5fvn7wztruf2ax34if5s6n/include  -MD -MT CMakeFiles/cmTC_6120d.dir/CheckSymbolExists.cxx.o -MF CMakeFiles/cmTC_6120d.dir/CheckSymbolExists.cxx.o.d -o CMakeFiles/cmTC_6120d.dir/CheckSymbolExists.cxx.o -c /home/anil/new_3d_code/3d-mfcfd/install/build/CMakeFiles/CMakeTmp/CheckSymbolExists.cxx
+"/apps/spack/opt/spack/linux-rocky8-zen/gcc-8.5.0/nccl-2.11.4-1-kuhs6rsmpa5fvn7wztruf2ax34if5s6n/include/nccl.h", line 10: catastrophic error: cannot open source file "cuda_runtime.h"
+  #include <cuda_runtime.h>
+                           ^
+
+1 catastrophic error detected in the compilation of "/home/anil/new_3d_code/3d-mfcfd/install/build/CMakeFiles/CMakeTmp/CheckSymbolExists.cxx".
+Compilation terminated.
+gmake[1]: *** [CMakeFiles/cmTC_6120d.dir/build.make:79: CMakeFiles/cmTC_6120d.dir/CheckSymbolExists.cxx.o] Error 2
+gmake[1]: Leaving directory '/home/anil/new_3d_code/3d-mfcfd/install/build/CMakeFiles/CMakeTmp'
+gmake: *** [Makefile:127: cmTC_6120d/fast] Error 2
+
+
+File /home/anil/new_3d_code/3d-mfcfd/install/build/CMakeFiles/CMakeTmp/CheckSymbolExists.cxx:
+/* */
+#include <nccl.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef NCCL_VERSION_CODE
+  return ((int*)(&NCCL_VERSION_CODE))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
