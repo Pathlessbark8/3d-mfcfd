@@ -72,6 +72,8 @@ struct splitPoints{
     int alias;
     int point_with_alias;
     int counter;
+    int number_ghost;
+    int *ghost_points;
 };
 
 //
@@ -103,9 +105,24 @@ void assign(splitPoints &splitPoint,int i){
     splitPoint.alias=point.alias[i];
     splitPoint.point_with_alias=point.point_with_alias[i];
     splitPoint.counter=point.counter[i];
+    //
+    splitPoint.number_ghost=0;
     for(int j=0;j<27;j++){
         splitPoint.conn[j]=point.conn[j][i];
+        if(partVector[splitPoint.conn[j]]!=partVector[splitPoint.counter]){
+            splitPoint.number_ghost++;
+        }
     }
+    if(splitPoint.number_ghost!=0){
+        splitPoint.ghost_points=new int[splitPoint.number_ghost];
+        splitPoint.number_ghost=0;
+        for(int j=0;j<27;j++){
+        if(partVector[splitPoint.conn[j]]!=partVector[splitPoint.counter]){
+            splitPoint.ghost_points[splitPoint.number_ghost++]=splitPoint.conn[j];
+        }
+    }
+    }
+    //
     for(int j=0;j<3;j++){
         splitPoint.tan1[j]=point.tan1[j][i];
         splitPoint.tan2[j]=point.tan2[j][i];

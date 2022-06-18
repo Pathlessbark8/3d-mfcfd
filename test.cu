@@ -24,9 +24,20 @@
 #include <cuda_runtime.h>
 #include "fpi_solver_mod.h"
 #include <nccl.h>
+#include <mpi.h>
+
 // #include "cuPrintf.cu"
 using namespace std;
 using namespace std::chrono;
+
+// #define MPICHECK(cmd) do {                          \
+//     int e = cmd;                                      \
+//     if( e != MPI_SUCCESS ) {                          \
+//       printf("Failed: MPI error %s:%d '%d'\n",        \
+//           __FILE__,__LINE__, e);   \
+//       exit(EXIT_FAILURE);                             \
+//     }                                                 \
+//   } while(0)
 
 #define CUDACHECK(cmd) do {                         \
     cudaError_t err = cmd;                            \
@@ -81,6 +92,10 @@ int main()
         pointCounter[partVector[i]]++;
     }
     //
+    //
+    // int myRank, nRanks;
+    // MPI_Comm_rank(MPI_COMM_WORLD, &myRank);
+    // MPI_Comm_size(MPI_COMM_WORLD, &nRanks);
     //
     comms=new ncclComm_t[numDevices];
     devs=new int[numDevices];
