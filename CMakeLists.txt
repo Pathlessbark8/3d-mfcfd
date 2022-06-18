@@ -12,8 +12,11 @@ include_directories(${CUDA_INCLUDE_DIRS})
 set(LIBS ${LIBS} ${CUDA_LIBRARIES})
 
 find_package(NCCL REQUIRED)
+find_package(MPI REQUIRED)
 include_directories(${NCCL_INCLUDE_DIRS})
+include_directories(${MPI_INCLUDE_DIRS})
 set(LIBS ${LIBS} ${NCCL_LIBRARIES})
+set(LIBS ${LIBS} ${MPI_LIBRARIES})
 
 if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
   set(CMAKE_CUDA_ARCHITECTURES 50)
