@@ -166,7 +166,6 @@ void fpi_solver_multi_nccl( splitPoints **splitPoint_d,cudaStream_t *stream)
         for(int i=0;i<numDevices;++i){
             {
             cudaSetDevice(i);
-            cudaStreamCreate(&stream[i]);
             eval_q_variables_multi_nccl<<<grid,threads,0,stream[i]>>>(splitPoint_d[i],numberOfPointsPerDevice[i]);
             }
         }

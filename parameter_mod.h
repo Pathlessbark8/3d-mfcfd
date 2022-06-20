@@ -39,6 +39,7 @@
 
 		ncclComm_t *comms;
 		int *devs;
+		ncclUniqueId id;
 
 //
 //
