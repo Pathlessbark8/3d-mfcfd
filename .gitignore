@@ -12,3 +12,4 @@ q_var_cpp
 q_var_fortran
 .vscode/settings.json
 3d_new_data
+*.ncu-rep

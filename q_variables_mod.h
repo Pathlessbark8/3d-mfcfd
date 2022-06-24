@@ -89,24 +89,23 @@ __global__ void eval_q_variables_multi_nccl(splitPoints splitPoint[],int max_poi
 	if (k < 0 ){
         return;
     }
-	// cuPrintf("%d\n",k);
-	// 	rho = splitPoint[k].prim[0];
-	// 	u1 = splitPoint[k].prim[1];
-	// 	u2 = splitPoint[k].prim[2];
-	// 	u3 = splitPoint[k].prim[3];
-	// 	pr = splitPoint[k].prim[4];
-	// 	//
-	// 	beta = 0.50 * rho / pr;
-	// 	//
-	// 	splitPoint[k].q[0] = log(rho) + (log(beta) * 2.50) - beta * (u1 * u1 + u2 * u2 + u3 * u3);
-	// 	//
-	// 	two_times_beta = 2.00 * beta;
-	// 	//
-	// 	splitPoint[k].q[1] = two_times_beta * u1;
-	// 	splitPoint[k].q[2] = two_times_beta * u2;
-	// 	splitPoint[k].q[3] = two_times_beta * u3;
-	// 	splitPoint[k].q[4] = -two_times_beta;
-		splitPoint[k].x=234;
+		rho = splitPoint[k].prim[0];
+		u1 = splitPoint[k].prim[1];
+		u2 = splitPoint[k].prim[2];
+		u3 = splitPoint[k].prim[3];
+		pr = splitPoint[k].prim[4];
+		//
+		beta = 0.50 * rho / pr;
+		//
+		splitPoint[k].q[0] = log(rho) + (log(beta) * 2.50) - beta * (u1 * u1 + u2 * u2 + u3 * u3);
+		//
+		two_times_beta = 2.00 * beta;
+		//
+		splitPoint[k].q[1] = two_times_beta * u1;
+		splitPoint[k].q[2] = two_times_beta * u2;
+		splitPoint[k].q[3] = two_times_beta * u3;
+		splitPoint[k].q[4] = -two_times_beta;
+		// splitPoint[k].x=234;
 		//
 	//
 }
