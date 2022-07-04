@@ -10,7 +10,6 @@ void initial_conditions()
 {
 	//
 	int k;
-	double x1, y1, z1;
 	//
 	// fstream fin;
 	// fin.open("primal-solution.dat", ios::in);
