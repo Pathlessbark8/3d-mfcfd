@@ -21,7 +21,7 @@ void q_lskum()
 	int t;
 	//
 	fstream fout;
-	fout.open("residue_cpp.dat", ios::out);
+	fout.open("/home/anil/new_3d_code/3d-mfcfd/temp/inner_3.dat", ios::out);
 	//
 	//
 	generate_split_stencils();
@@ -33,10 +33,11 @@ void q_lskum()
 		cout <<scientific<< setprecision(13) << t << " " << res_new << " " << residue << endl;
 		fout << scientific<<setprecision(13) << t << " " << res_new << " " << residue << endl;
 	}
-	fout.close();
 	auto stop = high_resolution_clock::now();
     auto duration = duration_cast<microseconds>(stop - start);
     cout << "Time Taken :" << duration.count() / 1000000.0 << endl;
+	fout << "Time Taken :" << duration.count() / 1000000.0 << endl;
+	fout.close();
 	//
 	//
 }

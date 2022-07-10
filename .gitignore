@@ -11,3 +11,8 @@ q_var_cpp
 q_var_fortran
 3d_input_data 
 .vscode
+*.nsys-rep
+*.ncu-rep
+*.sqlite
+install/
+temp/

@@ -24,11 +24,11 @@ void read_input_point_data()
     //		OPEN(UNIT=101,FILE="hemisphere-testcase/3d_input_data",FORM="FORMATTED",STATUS="OLD",ACTION="READ")
     //OPEN(UNIT=101,FILE="3d_input_data",FORM="FORMATTED",STATUS="OLD",ACTION="READ")
     std::fstream fin;
-    fin.open("/home/dhruv/3d_new_data", std::ios::in);
+    fin.open("/home/anil/new_3d_code/3d-mfcfd/inputFiles/3d-grid-580485.dat", std::ios::in);
     //
     for (k = 0; k < max_points; k++)
     {
-        fin >> counter >> point.status[k] >> point.x[k] >> point.y[k] >> point.z[k];
+        fin >> counter  >> point.x[k] >> point.y[k] >> point.z[k]>> point.status[k]>>point.min_dist[k];
         fin >> point.tan1[0][k] >> point.tan1[1][k] >> point.tan1[2][k];
         fin >> point.tan2[0][k] >> point.tan2[1][k] >> point.tan2[2][k];
         fin >> point.nor[0][k] >> point.nor[1][k] >> point.nor[2][k];
@@ -36,9 +36,8 @@ void read_input_point_data()
         for (r = 0; r < point.nbhs[k]; r++)
         {
             fin >> point.conn[r][k];
-            point.conn[r][k] -= 1;
+            point.conn[r][k]-=1;
         }
-        fin >> point.min_dist[k];
     }
     fin.close();
     //
