@@ -23,7 +23,7 @@ void read_input_point_data()
     //
     //		
     std::fstream fin;
-    fin.open("/home/dhruv/3d-grid-580485.dat", std::ios::in);
+    fin.open("/home/anil/new_3d_code/3d-mfcfd/inputFiles/3d-grid-580485.dat", std::ios::in);
     //
     for (k = 0; k < max_points; k++)
     {

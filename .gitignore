@@ -12,3 +12,6 @@ q_var_fortran
 .vscode/settings.json
 3d_new_data
 install/
+*.ncu-rep
+*.nsys-rep
+*.sqlite
