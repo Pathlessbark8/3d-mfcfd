@@ -48,15 +48,15 @@ void interior_dGz_pos(double *G, int i)
 	//
 	for (int r = 0; r < 3; r++)
 	{
-		tan1[r] = point.tan1[r][i];
-		tan2[r] = point.tan2[r][i];
-		nor[r] = point.nor[r][i];
+		tan1[r] = point.tan1[i][r];
+		tan2[r] = point.tan2[i][r];
+		nor[r] = point.nor[i][r];
 	}
 	//
 	for (j = 0; j < point.zpos_nbhs[i]; j++)
 	//
 	{
-		k = point.zpos_conn[j][i];
+		k = point.zpos_conn[i][j];
 		//
 		x_k = point.x[k];
 		y_k = point.y[k];
@@ -87,26 +87,26 @@ void interior_dGz_pos(double *G, int i)
 		//
 		for (int r = 0; r < 5; r++)
 		{
-			temp[r] = delx * point.dq[0][r][i] + dely * point.dq[1][r][i] + delz * point.dq[2][r][i];
-			qtilde[r] = point.q[r][i] - 0.50 * temp[r];
+			temp[r] = delx * point.dq[i][0][r] + dely * point.dq[i][1][r] + delz * point.dq[i][2][r];
+			qtilde[r] = point.q[i][r] - 0.50 * temp[r];
 		}
 		venkat_limiter(qtilde, phi, i);
 		for (int r = 0; r < 5; r++)
 		{
-			qtilde[r] = point.q[r][i] - 0.50 * phi[r] * temp[r];
+			qtilde[r] = point.q[i][r] - 0.50 * phi[r] * temp[r];
 		}
 		qtilde_to_primitive(qtilde, prim);
 		flux_Gzp(G_i, tan1, tan2, nor, prim);
 		//
 		for (int r = 0; r < 5; r++)
 		{
-			temp[r] = delx * point.dq[0][r][k] + dely * point.dq[1][r][k] + delz * point.dq[2][r][k];
-			qtilde[r] = point.q[r][k] - 0.50 * temp[r];
+			temp[r] = delx * point.dq[k][0][r] + dely * point.dq[k][1][r] + delz * point.dq[k][2][r];
+			qtilde[r] = point.q[k][r] - 0.50 * temp[r];
 		}
 		venkat_limiter(qtilde, phi, k);
 		for (int r = 0; r < 5; r++)
 		{
-			qtilde[r] = point.q[r][k] - 0.50 * phi[r] * temp[r];
+			qtilde[r] = point.q[k][r] - 0.50 * phi[r] * temp[r];
 		}
 		qtilde_to_primitive(qtilde, prim);
 		flux_Gzp(G_k, tan1, tan2, nor, prim);
@@ -180,6 +180,12 @@ __global__ void interior_dGz_pos_cuda(points &point,int power, double VL_CONST,d
 	sum_dely_delz = 0.00;
 	sum_delz_delx = 0.00;
 	//
+	for(int i=0;i<5;i++)
+	{
+		sum_delx_delf[i] = 0.00;
+		sum_dely_delf[i] = 0.00;
+		sum_delz_delf[i] = 0.00;
+	}
 	//
 	x_i = point.x[i];
 	y_i = point.y[i];
@@ -187,20 +193,25 @@ __global__ void interior_dGz_pos_cuda(points &point,int power, double VL_CONST,d
 	//
 	for (int r = 0; r < 3; r++)
 	{
-		tan1[r] = point.tan1[r][i];
-		tan2[r] = point.tan2[r][i];
-		nor[r] = point.nor[r][i];
+		tan1[r] = point.tan1[i][r];
+		tan2[r] = point.tan2[i][r];
+		nor[r] = point.nor[i][r];
 	}
 	//
 	for (j = 0; j < point.zpos_nbhs[i]; j++)
 	//
 	{
-		k = point.zpos_conn[j][i];
+		k = point.zpos_conn[i][j];
 		//
 		x_k = point.x[k];
 		y_k = point.y[k];
 		z_k = point.z[k];
 		//
+		// if(ind==10){
+		// 		// printf("%d %d %f %f %f\n",i,r,point.dq[i][0][r] ,point.dq[i][1][r] ,point.dq[i][2][r] );
+		// 		// printf("%d %d %f %f\n",i,r,temp[r],qtilde[r]);
+		// 		printf("%d %d %f %f %f %f %f %f\n",i,k,x_i,y_i,z_i,x_k,y_k,z_k);
+		// }
 		delx = x_k - x_i;
 		dely = y_k - y_i;
 		delz = z_k - z_i;
@@ -226,26 +237,32 @@ __global__ void interior_dGz_pos_cuda(points &point,int power, double VL_CONST,d
 		//
 		for (int r = 0; r < 5; r++)
 		{
-			temp[r] = delx * point.dq[0][r][i] + dely * point.dq[1][r][i] + delz * point.dq[2][r][i];
-			qtilde[r] = point.q[r][i] - 0.50 * temp[r];
+			temp[r] = delx * point.dq[i][0][r] + dely * point.dq[i][1][r] + delz * point.dq[i][2][r];
+			qtilde[r] = point.q[i][r] - 0.50 * temp[r];
+			// if(ind==10){
+			// 	// printf("%d %d %f %f %f\n",i,r,point.dq[i][0][r] ,point.dq[i][1][r] ,point.dq[i][2][r] );
+			// 	// printf("%d %d %f %f\n",i,r,temp[r],qtilde[r]);
+			// 					printf("%d %d %f %f %f\n",i,r,delx,dely,delz);
+
+			// }
 		}
 		venkat_limiter_cuda(point,qtilde, phi, i,VL_CONST);
 		for (int r = 0; r < 5; r++)
 		{
-			qtilde[r] = point.q[r][i] - 0.50 * phi[r] * temp[r];
+			qtilde[r] = point.q[i][r] - 0.50 * phi[r] * temp[r];
 		}
 		qtilde_to_primitive_cuda(qtilde, prim);
 		flux_Gzp_cuda(G_i, tan1, tan2, nor, prim, pi);
 		//
 		for (int r = 0; r < 5; r++)
 		{
-			temp[r] = delx * point.dq[0][r][k] + dely * point.dq[1][r][k] + delz * point.dq[2][r][k];
-			qtilde[r] = point.q[r][k] - 0.50 * temp[r];
+			temp[r] = delx * point.dq[k][0][r] + dely * point.dq[k][1][r] + delz * point.dq[k][2][r];
+			qtilde[r] = point.q[k][r] - 0.50 * temp[r];
 		}
 		venkat_limiter_cuda(point,qtilde, phi, k,VL_CONST);
 		for (int r = 0; r < 5; r++)
 		{
-			qtilde[r] = point.q[r][k] - 0.50 * phi[r] * temp[r];
+			qtilde[r] = point.q[k][r] - 0.50 * phi[r] * temp[r];
 		}
 		qtilde_to_primitive_cuda(qtilde, prim);
 		flux_Gzp_cuda(G_k, tan1, tan2, nor, prim, pi);
@@ -253,13 +270,27 @@ __global__ void interior_dGz_pos_cuda(points &point,int power, double VL_CONST,d
 		for (int r = 0; r < 5; r++)
 		{
 			temp[r] = G_k[r] - G_i[r];
+			if(ind==10){
+				// printf("%d %d %f %f %f\n",i,r,point.dq[i][0][r] ,point.dq[i][1][r] ,point.dq[i][2][r] );
+				// printf("%d %d %f %f\n",i,r,G_k[r],G_i[r]);
+			}
 		}
 		//
 		for (int r = 0; r < 5; r++)
 		{
+			if(ind==10){
+				// printf("%d %d %f %f %f\n",i,r,point.dq[i][0][r] ,point.dq[i][1][r] ,point.dq[i][2][r] );
+				// printf("%d %d %f %f %f %f\n",i,r,temp[r],sum_delx_delf[r],sum_dely_delf[r],sum_delz_delf[r]);
+				// printf("%d %d %f %f %f %f\n",i,r,temp[r],dels_weights,dels_weights,deln_weights);
+
+			}
 			sum_delx_delf[r] = sum_delx_delf[r] + temp[r] * dels_weights;
 			sum_dely_delf[r] = sum_dely_delf[r] + temp[r] * delt_weights;
 			sum_delz_delf[r] = sum_delz_delf[r] + temp[r] * deln_weights;
+			// if(ind==10){
+			// 	// printf("%d %d %f %f %f\n",i,r,point.dq[i][0][r] ,point.dq[i][1][r] ,point.dq[i][2][r] );
+			// 	printf("%d %d %f %f %f %f\n",i,r,temp[r],sum_delx_delf[r],sum_dely_delf[r],sum_delz_delf[r]);
+			// }
 		}
 		//
 	}
@@ -275,7 +306,11 @@ __global__ void interior_dGz_pos_cuda(points &point,int power, double VL_CONST,d
 	//
 	for (int r = 0; r < 5; r++)
 	{
-		point.flux_res[r][i] += temp[r]*point.delt[i] / det;
+		point.flux_res[i][r] += temp[r]*point.delt[i]/det;
+		// if(ind==10){
+		// 		// printf("%d %d %f %f %f\n",i,r,point.dq[i][0][r] ,point.dq[i][1][r] ,point.dq[i][2][r] );
+		// 		printf("%d %d %f\n",i,r,point.delt[i]);
+		// 	}
 	}
 	//
 }

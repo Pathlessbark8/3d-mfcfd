@@ -80,11 +80,11 @@ void fpi_solver_cuda( points *point_d,cudaStream_t stream)
         // cudaMemcpy(point_d, &point, point_size, cudaMemcpyHostToDevice);
         eval_q_variables_cuda<<<grid, threads>>>(*point_d);
         eval_q_derivatives_cuda<<<grid, threads>>>(*point_d, power);
-        for (int r = 0; r < inner_iterations; r++)
-        {
-            q_inner_loop_cuda<<<grid, threads>>>(*point_d, power);
-            update_inner_loop_cuda<<<grid, threads>>>(*point_d);
-        }
+        // // for (int r = 0; r < inner_iterations; r++)
+        // // {
+        // //     q_inner_loop_cuda<<<grid, threads>>>(*point_d, power);
+        // //     update_inner_loop_cuda<<<grid, threads>>>(*point_d);
+        // // }
 
         timestep_delt_cuda<<<grid, threads>>>(*point_d, CFL);
 
@@ -93,32 +93,33 @@ void fpi_solver_cuda( points *point_d,cudaStream_t stream)
         wall_dGy_pos_cuda<<<grid, threads>>>(*point_d, power, VL_CONST, pi, wall_points, wall_points_index_d);
         wall_dGy_neg_cuda<<<grid, threads>>>(*point_d, power, VL_CONST, pi, wall_points, wall_points_index_d);
         wall_dGz_neg_cuda<<<grid, threads>>>(*point_d, power, VL_CONST, pi, wall_points, wall_points_index_d);
-        // // //
+        // // // // // // //
         outer_dGx_pos_cuda<<<grid, threads>>>(*point_d, power, VL_CONST, pi, outer_points, outer_points_index_d);
         outer_dGx_neg_cuda<<<grid, threads>>>(*point_d, power, VL_CONST, pi, outer_points, outer_points_index_d);
         outer_dGy_pos_cuda<<<grid, threads>>>(*point_d, power, VL_CONST, pi, outer_points, outer_points_index_d);
         outer_dGy_neg_cuda<<<grid, threads>>>(*point_d, power, VL_CONST, pi, outer_points, outer_points_index_d);
         outer_dGz_pos_cuda<<<grid, threads>>>(*point_d, power, VL_CONST, pi, outer_points, outer_points_index_d);
-        //
+        // // // //
         interior_dGx_pos_cuda<<<grid, threads>>>(*point_d, power, VL_CONST, pi, interior_points, interior_points_index_d);
         interior_dGx_neg_cuda<<<grid, threads>>>(*point_d, power, VL_CONST, pi, interior_points, interior_points_index_d);
         interior_dGy_pos_cuda<<<grid, threads>>>(*point_d, power, VL_CONST, pi, interior_points, interior_points_index_d);
         interior_dGy_neg_cuda<<<grid, threads>>>(*point_d, power, VL_CONST, pi, interior_points, interior_points_index_d);
         interior_dGz_pos_cuda<<<grid, threads>>>(*point_d, power, VL_CONST, pi, interior_points, interior_points_index_d);
         interior_dGz_neg_cuda<<<grid, threads>>>(*point_d, power, VL_CONST, pi, interior_points, interior_points_index_d);
-        // //
-        //
-        //
-        // //
+        // // // //
+        // // //
+        // // //
+        // // // //
         state_update_wall<<<grid, threads>>>(*point_d, wall_points, wall_points_index_d, sum_res_sqr_d);
         state_update_outer<<<grid, threads>>>(*point_d, outer_points, outer_points_index_d, u1_inf, u2_inf, u3_inf, rho_inf, pi, pr_inf);
         state_update_interior<<<grid, threads>>>(*point_d, interior_points, interior_points_index_d, sum_res_sqr_d);
         
-        // cudaMemcpy(&point, point_d, point_size, cudaMemcpyDeviceToHost);
         // state_update_supersonic_outlet();
         // state_update_supersonic_inlet();
         cudaDeviceSynchronize();
         sum_res_sqr = thrust::reduce(thrust::cuda::par.on(stream), sum_res_sqr_d, sum_res_sqr_d + max_points, (double)0.0, thrust::plus<double>());
+        // cudaMemcpy(&point, point_d, point_size, cudaMemcpyDeviceToHost);
+
         res_new = sqrt(sum_res_sqr) / max_points;
         if (t <= 2)
         {
@@ -131,13 +132,15 @@ void fpi_solver_cuda( points *point_d,cudaStream_t stream)
         }
         cout << t << " " << res_new << " " << residue<<" "<<sum_res_sqr << endl;
         fout_1<< t << " " << res_new << " " << residue << endl;
-        if(t%500==0)
-        { 
-            for(int i=0;i<max_points;i++)
-            {
-                fout<<point.prim[0][i]<<" "<<point.prim[1][i]<<" "<<point.prim[2][i]<<" "<<point.prim[3][i]<<" "<<point.prim[4][i]<<endl;
-            }
-        }
+        // if(t%500==0)
+        // { 
+            // for(int i=28890;i<28900;i++)
+            // {
+            //     // cout<<point.dq[i][0][0]<<" "<<point.dq[i][0][1]<<" "<<point.dq[i][0][2]<<" "<<point.dq[i][0][3]<<" "<<point.dq[i][0][4]<<endl;
+            //     cout<<point.flux_res[i][0]<<" "<<point.flux_res[i][1]<<" "<<point.flux_res[i][2]<<" "<<point.flux_res[i][3]<<" "<<point.flux_res[i][4]<<endl;
+            //     // cout<<point.q[i][0]<<" "<<point.q[i][1]<<" "<<point.q[i][2]<<" "<<point.q[i][3]<<" "<<point.q[i][4]<<endl;
+            // }
+        // }
     }
     cudaDeviceSynchronize();
     fout.close();

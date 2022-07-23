@@ -16,17 +16,17 @@ void initial_conditions()
 	//
 	for (k = 0; k < max_points; k++)
 	{
-		point.prim[0][k] = rho_inf;
-		point.prim[1][k] = u1_inf;
-		point.prim[2][k] = u2_inf;
-		point.prim[3][k] = u3_inf;
-		point.prim[4][k] = pr_inf;
+		point.prim[k][0] = rho_inf;
+		point.prim[k][1] = u1_inf;
+		point.prim[k][2] = u2_inf;
+		point.prim[k][3] = u3_inf;
+		point.prim[k][4] = pr_inf;
 		// for (int r = 0; r < 5; r++)
 		// {
-		// 	point.delUp[r][k] = 0.00;
-		// 	point.delUn[r][k] = 0.00;
+		// 	point.delUp[k][r] = 0.00;
+		// 	point.delUn[k][r] = 0.00;
 		// }
-		// fin >> x1 >> y1 >> z1 >> point.prim[0][k] >> point.prim[1][k] >> point.prim[2][k] >> point.prim[3][k] >> point.prim[4][k];
+		// fin >> x1 >> y1 >> z1 >> point.prim[k][0] >> point.prim[k][1] >> point.prim[k][2] >> point.prim[k][3] >> point.prim[k][4];
 	}
 	// fin.close();
 	//

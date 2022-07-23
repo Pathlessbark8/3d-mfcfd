@@ -9,6 +9,7 @@
 #include "q_derivatives_mod.h"
 #include "qvariables_to_primitive_variables_mod.h"
 #include "limiters_mod.h"
+#include<stdlib.h>
 
 //	This subroutine evaluates the interior flux derivative dGz_neg
 
@@ -48,15 +49,15 @@ void interior_dGz_neg(double *G, int i)
 	//
 	for (int r = 0; r < 3; r++)
 	{
-		tan1[r] = point.tan1[r][i];
-		tan2[r] = point.tan2[r][i];
-		nor[r] = point.nor[r][i];
+		tan1[r] = point.tan1[i][r];
+		tan2[r] = point.tan2[i][r];
+		nor[r] = point.nor[i][r];
 	}
 	//
 	for (j = 0; j < point.zneg_nbhs[i]; j++)
 	//
 	{
-		k = point.zneg_conn[j][i];
+		k = point.zneg_conn[i][j];
 		//
 		x_k = point.x[k];
 		y_k = point.y[k];
@@ -87,26 +88,26 @@ void interior_dGz_neg(double *G, int i)
 		//
 		for (int r = 0; r < 5; r++)
 		{
-			temp[r] = delx * point.dq[0][r][i] + dely * point.dq[1][r][i] + delz * point.dq[2][r][i];
-			qtilde[r] = point.q[r][i] - 0.50 * temp[r];
+			temp[r] = delx * point.dq[i][0][r] + dely * point.dq[i][1][r] + delz * point.dq[i][2][r];
+			qtilde[r] = point.q[i][r] - 0.50 * temp[r];
 		}
 		venkat_limiter(qtilde, phi, i);
 		for (int r = 0; r < 5; r++)
 		{
-			qtilde[r] = point.q[r][i] - 0.50 * phi[r] * temp[r];
+			qtilde[r] = point.q[i][r] - 0.50 * phi[r] * temp[r];
 		}
 		qtilde_to_primitive(qtilde, prim);
 		flux_Gzn(G_i, tan1, tan2, nor, prim);
 		//
 		for (int r = 0; r < 5; r++)
 		{
-			temp[r] = delx * point.dq[0][r][k] + dely * point.dq[1][r][k] + delz * point.dq[2][r][k];
-			qtilde[r] = point.q[r][k] - 0.50 * temp[r];
+			temp[r] = delx * point.dq[k][0][r] + dely * point.dq[k][1][r] + delz * point.dq[k][2][r];
+			qtilde[r] = point.q[k][r] - 0.50 * temp[r];
 		}
 		venkat_limiter(qtilde, phi, k);
 		for (int r = 0; r < 5; r++)
 		{
-			qtilde[r] = point.q[r][k] - 0.50 * phi[r] * temp[r];
+			qtilde[r] = point.q[k][r] - 0.50 * phi[r] * temp[r];
 		}
 		qtilde_to_primitive(qtilde, prim);
 		flux_Gzn(G_k, tan1, tan2, nor, prim);
@@ -188,20 +189,23 @@ __global__ void interior_dGz_neg_cuda(points &point,double power, double VL_CONS
 	//
 	for (int r = 0; r < 3; r++)
 	{
-		tan1[r] = point.tan1[r][i];
-		tan2[r] = point.tan2[r][i];
-		nor[r] = point.nor[r][i];
+		tan1[r] = point.tan1[i][r];
+		tan2[r] = point.tan2[i][r];
+		nor[r] = point.nor[i][r];
 	}
 	//
 	for (j = 0; j < point.zneg_nbhs[i]; j++)
 	//
 	{
-		k = point.zneg_conn[j][i];
+		k = point.zneg_conn[i][j];
 		//
 		x_k = point.x[k];
 		y_k = point.y[k];
 		z_k = point.z[k];
 		//
+		// if(ind==1){
+		// 	printf("%d %d %f %f %f %f %f %f\n",k,point.zneg_nbhs[i],x_i,y_i,z_i,x_k,y_k,z_k);
+		// }
 		delx = x_k - x_i;
 		dely = y_k - y_i;
 		delz = z_k - z_i;
@@ -227,26 +231,30 @@ __global__ void interior_dGz_neg_cuda(points &point,double power, double VL_CONS
 		//
 		for (int r = 0; r < 5; r++)
 		{
-			temp[r] = delx * point.dq[0][r][i] + dely * point.dq[1][r][i] + delz * point.dq[2][r][i];
-			qtilde[r] = point.q[r][i] - 0.50 * temp[r];
+			temp[r] = delx * point.dq[i][0][r] + dely * point.dq[i][1][r] + delz * point.dq[i][2][r];
+			qtilde[r] = point.q[i][r] - 0.50 * temp[r];
+			if(ind==1){
+				// printf("%d %d %f %f %f\n",i,r,point.dq[i][0][r] ,point.dq[i][1][r] ,point.dq[i][2][r] );
+				// printf("%d %d %f\n",i,r,temp[r]);
+			}
 		}
 		venkat_limiter_cuda(point,qtilde, phi, i,VL_CONST);
 		for (int r = 0; r < 5; r++)
 		{
-			qtilde[r] = point.q[r][i] - 0.50 * phi[r] * temp[r];
+			qtilde[r] = point.q[i][r] - 0.50 * phi[r] * temp[r];
 		}
 		qtilde_to_primitive_cuda(qtilde, prim);
 		flux_Gzn_cuda(G_i, tan1, tan2, nor, prim,pi);
 		//
 		for (int r = 0; r < 5; r++)
 		{
-			temp[r] = delx * point.dq[0][r][k] + dely * point.dq[1][r][k] + delz * point.dq[2][r][k];
-			qtilde[r] = point.q[r][k] - 0.50 * temp[r];
+			temp[r] = delx * point.dq[k][0][r] + dely * point.dq[k][1][r] + delz * point.dq[k][2][r];
+			qtilde[r] = point.q[k][r] - 0.50 * temp[r];
 		}
 		venkat_limiter_cuda(point,qtilde, phi, k,VL_CONST);
 		for (int r = 0; r < 5; r++)
 		{
-			qtilde[r] = point.q[r][k] - 0.50 * phi[r] * temp[r];
+			qtilde[r] = point.q[k][r] - 0.50 * phi[r] * temp[r];
 		}
 		qtilde_to_primitive_cuda(qtilde, prim);
 		flux_Gzn_cuda(G_k, tan1, tan2, nor, prim,pi);
@@ -276,7 +284,15 @@ __global__ void interior_dGz_neg_cuda(points &point,double power, double VL_CONS
 	//
 	for (int r = 0; r < 5; r++)
 	{
-		point.flux_res[r][i] += temp[r]*point.delt[i] / det;
+		// if(ind==100){
+		// 		// printf("%d %d %f %f %f\n",i,r,point.dq[i][0][r] ,point.dq[i][1][r] ,point.dq[i][2][r] );
+		// 		printf("%d %d %f\n",i,r,det);
+		// 	}
+		point.flux_res[i][r] += temp[r]*point.delt[i] / det;
+		// if(ind==1000){
+		// 		// printf("%d %d %f %f %f\n",i,r,point.dq[i][0][r] ,point.dq[i][1][r] ,point.dq[i][2][r] );
+		// 		printf("%d %d %f\n",i,r,point.flux_res[i][r]);
+		// 	}
 	}
 	//
 }

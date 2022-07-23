@@ -14,7 +14,7 @@ void conserved_to_primitive(int k, double *U)
 	double U2_rot, U3_rot, U4_rot;
 	//
 	//
-	point.prim[0][k] = U[0];
+	point.prim[k][0] = U[0];
 	temp = 1.00 / U[0];
 	//
 	//
@@ -23,18 +23,18 @@ void conserved_to_primitive(int k, double *U)
 	U4_rot = U[3];
 	//
 	//
-	U[1] = point.tan1[0][k] * U2_rot + point.tan2[0][k] * U3_rot + point.nor[0][k] * U4_rot;
-	U[2] = point.tan1[1][k] * U2_rot + point.tan2[1][k] * U3_rot + point.nor[1][k] * U4_rot;
-	U[3] = point.tan1[2][k] * U2_rot + point.tan2[2][k] * U3_rot + point.nor[2][k] * U4_rot;
+	U[1] = point.tan1[k][0] * U2_rot + point.tan2[k][0] * U3_rot + point.nor[k][0] * U4_rot;
+	U[2] = point.tan1[k][1] * U2_rot + point.tan2[k][1] * U3_rot + point.nor[k][1] * U4_rot;
+	U[3] = point.tan1[k][2] * U2_rot + point.tan2[k][2] * U3_rot + point.nor[k][2] * U4_rot;
 	//
 	//
-	point.prim[1][k] = temp * U[1];
-	point.prim[2][k] = temp * U[2];
-	point.prim[3][k] = temp * U[3];
+	point.prim[k][1] = temp * U[1];
+	point.prim[k][2] = temp * U[2];
+	point.prim[k][3] = temp * U[3];
 	//
-	temp = point.prim[1][k] * point.prim[1][k] + point.prim[2][k] * point.prim[2][k] + point.prim[3][k] * point.prim[3][k];
+	temp = point.prim[k][1] * point.prim[k][1] + point.prim[k][2] * point.prim[k][2] + point.prim[k][3] * point.prim[k][3];
 
-	point.prim[4][k] = 0.40 * (U[4] - 0.50 * point.prim[0][k] * temp);
+	point.prim[k][4] = 0.40 * (U[4] - 0.50 * point.prim[k][0] * temp);
 	//
 	//
 }
@@ -48,7 +48,7 @@ __device__ void conserved_to_primitive_cuda(points &point,int k, double *U)
 	double U2_rot, U3_rot, U4_rot;
 	//
 	//
-	point.prim[0][k] = U[0];
+	point.prim[k][0] = U[0];
 	temp = 1.00 / U[0];
 	//
 	//
@@ -57,18 +57,18 @@ __device__ void conserved_to_primitive_cuda(points &point,int k, double *U)
 	U4_rot = U[3];
 	//
 	//
-	U[1] = point.tan1[0][k] * U2_rot + point.tan2[0][k] * U3_rot + point.nor[0][k] * U4_rot;
-	U[2] = point.tan1[1][k] * U2_rot + point.tan2[1][k] * U3_rot + point.nor[1][k] * U4_rot;
-	U[3] = point.tan1[2][k] * U2_rot + point.tan2[2][k] * U3_rot + point.nor[2][k] * U4_rot;
+	U[1] = point.tan1[k][0] * U2_rot + point.tan2[k][0] * U3_rot + point.nor[k][0] * U4_rot;
+	U[2] = point.tan1[k][1] * U2_rot + point.tan2[k][1] * U3_rot + point.nor[k][1] * U4_rot;
+	U[3] = point.tan1[k][2] * U2_rot + point.tan2[k][2] * U3_rot + point.nor[k][2] * U4_rot;
 	//
 	//
-	point.prim[1][k] = temp * U[1];
-	point.prim[2][k] = temp * U[2];
-	point.prim[3][k] = temp * U[3];
+	point.prim[k][1] = temp * U[1];
+	point.prim[k][2] = temp * U[2];
+	point.prim[k][3] = temp * U[3];
 	//
-	temp = point.prim[1][k] * point.prim[1][k] + point.prim[2][k] * point.prim[2][k] + point.prim[3][k] * point.prim[3][k];
+	temp = point.prim[k][1] * point.prim[k][1] + point.prim[k][2] * point.prim[k][2] + point.prim[k][3] * point.prim[k][3];
 
-	point.prim[4][k] = 0.40 * (U[4] - 0.50 * point.prim[0][k] * temp);
+	point.prim[k][4] = 0.40 * (U[4] - 0.50 * point.prim[k][0] * temp);
 	//
 	//
 }

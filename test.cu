@@ -33,7 +33,15 @@ int main()
     read_input_point_data();
     initial_conditions();
     generate_split_stencils();
-    //
+
+    // cout<<"Testing"<<endl;
+    // for (int j = 0; j < point.zpos_nbhs[21]; j++)
+	// //
+	// {
+    //     int k = point.zpos_conn[21][j];
+    //     cout<<21<<" "<<j<<" "<<k<<endl;
+    // }
+    
     points *point_d;
     unsigned long long point_size = sizeof(point);
     cudaStream_t stream;
@@ -41,7 +49,13 @@ int main()
     //
     cudaMalloc(&point_d, point_size);
     cudaMemcpy(point_d, &point, point_size, cudaMemcpyHostToDevice);
-    // cudaDeviceSynchronize();
+    // for (int j = 0; j < point.zpos_nbhs[21]; j++)
+	// //
+	// {
+    //     int k = point.zpos_conn[21][j];
+    //     cout<<k<<endl;
+    // }
+    cudaDeviceSynchronize();
     auto start = high_resolution_clock::now();
     cout << "Starting CUDA excecution\n";
     //
@@ -52,14 +66,15 @@ int main()
     auto stop = high_resolution_clock::now();
     auto duration = duration_cast<microseconds>(stop - start);
     cout << "Time Taken :" << duration.count() / 1000000.0 << endl;
-    //
+    
     cudaMemcpy(&point, point_d, point_size, cudaMemcpyDeviceToHost);
-    fstream fout;
-    fout.open("output_prim.dat", ios::out);
-    for(int i=0;i<max_points;++i){
-        fout<<point.prim[0][i]<<" "<<point.prim[1][i]<<" "<<point.prim[2][i]<<" "<<point.prim[3][i]<<" "<<point.prim[4][i]<<endl;
-    }
-    fout.close();
+   
+    // fstream fout;
+    // fout.open("output_prim.dat", ios::out);
+    // for(int i=0;i<max_points;++i){
+    //     fout<<point.prim[i][0]<<" "<<point.prim[i][1]<<" "<<point.prim[i][2]<<" "<<point.prim[i][3]<<" "<<point.prim[i][4]<<endl;
+    // }
+    // fout.close();
     cudaFree(point_d);
     //
     cout << "Done\n";

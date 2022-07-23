@@ -31,7 +31,7 @@ void state_update()
 		temp = U[0];
 		for (int r = 0; r < 5; r++)
 		{
-			U[r] = U[r] - point.flux_res[r][k];
+			U[r] = U[r] - point.flux_res[k][r];
 		}
 		U[3] = 0.00;
 		//
@@ -43,7 +43,7 @@ void state_update()
 		}
 		sum_res_sqr = sum_res_sqr + res_sqr;
 		//
-		//                                        print*, i, k, point.flux_res[r][k]
+		//                                        print*, i, k, point.flux_res[k][r]
 		conserved_to_primitive(k, U);
 		//
 	}
@@ -56,7 +56,7 @@ void state_update()
 		temp = U[0];
 		for (int r = 0; r < 5; r++)
 		{
-			U[r] = U[r] - point.flux_res[r][k];
+			U[r] = U[r] - point.flux_res[k][r];
 		}
 		//
 
@@ -72,7 +72,7 @@ void state_update()
 		temp = U[0];
 		for (int r = 0; r < 5; r++)
 		{
-			U[r] = U[r] - point.flux_res[r][k];
+			U[r] = U[r] - point.flux_res[k][r];
 		}
 		//
 		res_sqr = (U[0] - temp) * (U[0] - temp);
@@ -93,7 +93,7 @@ void state_update()
 		k = supersonic_outlet_points_index[i];
 		for (int r = 0; r < point.nbhs[k]; r++)
 		{
-			nbh = point.conn[r][k];
+			nbh = point.conn[k][r];
 			dx = point.x[nbh] - point.x[k];
 			dy = point.y[nbh] - point.y[k];
 			dz = point.z[nbh] - point.z[k];
@@ -106,7 +106,7 @@ void state_update()
 		}
 		for (int r = 0; r < 5; r++)
 		{
-			point.prim[r][k] = point.prim[r][p];
+			point.prim[k][r] = point.prim[p][r];
 		}
 	}
 	//
@@ -116,7 +116,7 @@ void state_update()
 		k = supersonic_inlet_points_index[i];
 		for (r = 0; r < point.nbhs[k]; r++)
 		{
-			nbh = point.conn[r][k];
+			nbh = point.conn[k][r];
 			dx = point.x[nbh] - point.x[k];
 			dy = point.y[nbh] - point.y[k];
 			dz = point.z[nbh] - point.z[k];
@@ -129,7 +129,7 @@ void state_update()
 		}
 		for (int r = 0; r < 5; r++)
 		{
-			point.prim[r][k] = point.prim[r][p];
+			point.prim[k][r] = point.prim[p][r];
 		}
 	}
 	res_new = sqrt(sum_res_sqr) / max_points;
@@ -137,124 +137,124 @@ void state_update()
 	//
 }
 
-__global__ void state_update_cuda(points &point, int wall_points, int outer_points, int interior_points, int supersonic_outlet_points, int supersonic_inlet_points, int *wall_points_index, int *outer_points_index, int *interior_points_index, int *supersonic_outlet_points_index, int *supersonic_inlet_points_index, double *sum_res_sqr, double u1_inf, double u2_inf, double u3_inf, double rho_inf, double pi, double pr_inf)
-//
-//
-{
-	//
-	int k, nbh, p, r;
-	double U[5], temp, min_dist;
-	double res_sqr;
-	double dx, dy, dz, ds;
-	//
-	int i = blockIdx.x * blockDim.x + threadIdx.x;
-	if (i < 0 || i >= max_points)
-	{
-		return;
-	}
-	//
-	if (i < wall_points)
-	{
-		//
-		k = wall_points_index[i];
-		primitive_to_conserved_cuda(point, k, U);
-		temp = U[0];
-		for (int r = 0; r < 5; r++)
-		{
-			U[r] = U[r] - point.flux_res[r][k];
-		}
-		U[3] = 0.00;
-		//
-		res_sqr = (U[0] - temp) * (U[0] - temp);
-		sum_res_sqr[k] = res_sqr;
-		//                                        print*, i, k, point.flux_res[r][k]
-		conserved_to_primitive_cuda(point, k, U);
-		//
-	}
-	//
-	if (i < outer_points)
-	{
-		//
-		k = outer_points_index[i];
-		conserved_vector_Ubar_cuda(point, k, U, u1_inf, u2_inf, u3_inf, rho_inf, pi, pr_inf);
-		temp = U[0];
-		for (int r = 0; r < 5; r++)
-		{
-			U[r] = U[r] - point.flux_res[r][k];
-		}
-		//
+// __global__ void state_update_cuda(points &point, int wall_points, int outer_points, int interior_points, int supersonic_outlet_points, int supersonic_inlet_points, int *wall_points_index, int *outer_points_index, int *interior_points_index, int *supersonic_outlet_points_index, int *supersonic_inlet_points_index, double *sum_res_sqr, double u1_inf, double u2_inf, double u3_inf, double rho_inf, double pi, double pr_inf)
+// //
+// //
+// {
+// 	//
+// 	int k, nbh, p, r;
+// 	double U[5], temp, min_dist;
+// 	double res_sqr;
+// 	double dx, dy, dz, ds;
+// 	//
+// 	int i = blockIdx.x * blockDim.x + threadIdx.x;
+// 	if (i < 0 || i >= max_points)
+// 	{
+// 		return;
+// 	}
+// 	//
+// 	if (i < wall_points)
+// 	{
+// 		//
+// 		k = wall_points_index[i];
+// 		primitive_to_conserved_cuda(point, k, U);
+// 		temp = U[0];
+// 		for (int r = 0; r < 5; r++)
+// 		{
+// 			U[r] = U[r] - point.flux_res[k][r];
+// 		}
+// 		U[3] = 0.00;
+// 		//
+// 		res_sqr = (U[0] - temp) * (U[0] - temp);
+// 		sum_res_sqr[k] = res_sqr;
+// 		//                                        print*, i, k, point.flux_res[k][r]
+// 		conserved_to_primitive_cuda(point, k, U);
+// 		//
+// 	}
+// 	//
+// 	if (i < outer_points)
+// 	{
+// 		//
+// 		k = outer_points_index[i];
+// 		conserved_vector_Ubar_cuda(point, k, U, u1_inf, u2_inf, u3_inf, rho_inf, pi, pr_inf);
+// 		temp = U[0];
+// 		for (int r = 0; r < 5; r++)
+// 		{
+// 			U[r] = U[r] - point.flux_res[k][r];
+// 		}
+// 		//
 
-		conserved_to_primitive_cuda(point, k, U);
-		//
-	}
-	//
-	if (i < interior_points)
-	{
-		//
-		k = interior_points_index[i];
-		primitive_to_conserved_cuda(point, k, U);
-		temp = U[0];
-		for (int r = 0; r < 5; r++)
-		{
-			U[r] = U[r] - point.flux_res[r][k];
-		}
-		//
-		res_sqr = (U[0] - temp) * (U[0] - temp);
-		sum_res_sqr[k] = res_sqr;
-		//
-		conserved_to_primitive_cuda(point, k, U);
-		//
-	}
-	//
-	if (i < supersonic_outlet_points)
-	{
-		min_dist = 100000.00;
-		k = supersonic_outlet_points_index[i];
-		for (int r = 0; r < point.nbhs[k]; r++)
-		{
-			nbh = point.conn[r][k];
-			dx = point.x[nbh] - point.x[k];
-			dy = point.y[nbh] - point.y[k];
-			dz = point.z[nbh] - point.z[k];
-			ds = sqrt(dx * dx + dy * dy + dz * dz);
-			if (ds < min_dist && point.status[nbh] != 1)
-			{
-				min_dist = ds;
-				p = nbh;
-			}
-		}
-		for (int r = 0; r < 5; r++)
-		{
-			point.prim[r][k] = point.prim[r][p];
-		}
-	}
-	//
-	if (i < supersonic_inlet_points)
-	{
-		min_dist = 100000.00;
-		k = supersonic_inlet_points_index[i];
-		for (r = 0; r < point.nbhs[k]; r++)
-		{
-			nbh = point.conn[r][k];
-			dx = point.x[nbh] - point.x[k];
-			dy = point.y[nbh] - point.y[k];
-			dz = point.z[nbh] - point.z[k];
-			ds = sqrt(dx * dx + dy * dy + dz * dz);
-			if (ds < min_dist && point.status[nbh] != 1)
-			{
-				min_dist = ds;
-				p = nbh;
-			}
-		}
-		for (int r = 0; r < 5; r++)
-		{
-			point.prim[r][k] = point.prim[r][p];
-		}
-	}
+// 		conserved_to_primitive_cuda(point, k, U);
+// 		//
+// 	}
+// 	//
+// 	if (i < interior_points)
+// 	{
+// 		//
+// 		k = interior_points_index[i];
+// 		primitive_to_conserved_cuda(point, k, U);
+// 		temp = U[0];
+// 		for (int r = 0; r < 5; r++)
+// 		{
+// 			U[r] = U[r] - point.flux_res[k][r];
+// 		}
+// 		//
+// 		res_sqr = (U[0] - temp) * (U[0] - temp);
+// 		sum_res_sqr[k] = res_sqr;
+// 		//
+// 		conserved_to_primitive_cuda(point, k, U);
+// 		//
+// 	}
+// 	//
+// 	if (i < supersonic_outlet_points)
+// 	{
+// 		min_dist = 100000.00;
+// 		k = supersonic_outlet_points_index[i];
+// 		for (int r = 0; r < point.nbhs[k]; r++)
+// 		{
+// 			nbh = point.conn[k][r];
+// 			dx = point.x[nbh] - point.x[k];
+// 			dy = point.y[nbh] - point.y[k];
+// 			dz = point.z[nbh] - point.z[k];
+// 			ds = sqrt(dx * dx + dy * dy + dz * dz);
+// 			if (ds < min_dist && point.status[nbh] != 1)
+// 			{
+// 				min_dist = ds;
+// 				p = nbh;
+// 			}
+// 		}
+// 		for (int r = 0; r < 5; r++)
+// 		{
+// 			point.prim[k][r] = point.prim[p][r];
+// 		}
+// 	}
+// 	//
+// 	if (i < supersonic_inlet_points)
+// 	{
+// 		min_dist = 100000.00;
+// 		k = supersonic_inlet_points_index[i];
+// 		for (r = 0; r < point.nbhs[k]; r++)
+// 		{
+// 			nbh = point.conn[k][r];
+// 			dx = point.x[nbh] - point.x[k];
+// 			dy = point.y[nbh] - point.y[k];
+// 			dz = point.z[nbh] - point.z[k];
+// 			ds = sqrt(dx * dx + dy * dy + dz * dz);
+// 			if (ds < min_dist && point.status[nbh] != 1)
+// 			{
+// 				min_dist = ds;
+// 				p = nbh;
+// 			}
+// 		}
+// 		for (int r = 0; r < 5; r++)
+// 		{
+// 			point.prim[k][r] = point.prim[p][r];
+// 		}
+// 	}
 
-	//
-	//
-}
+// 	//
+// 	//
+// }
 //
 
 __global__ void state_update_wall(points &point, int wall_points, int *wall_points_index, double *sum_res_sqr)
@@ -273,13 +273,13 @@ __global__ void state_update_wall(points &point, int wall_points, int *wall_poin
 	temp = U[0];
 	for (int r = 0; r < 5; r++)
 	{
-		U[r] = U[r] - point.flux_res[r][k];
+		U[r] = U[r];// - point.flux_res[k][r];
 	}
 	U[3] = 0.00;
 	//
 	res_sqr = (U[0] - temp) * (U[0] - temp);
 	sum_res_sqr[k] = res_sqr;
-	//                                        print*, i, k, point.flux_res[r][k]
+	//                                        print*, i, k, point.flux_res[k][r]
 	conserved_to_primitive_cuda(point, k, U);
 }
 //
@@ -299,7 +299,7 @@ __global__ void state_update_outer(points &point, int outer_points, int *outer_p
 	// temp = U[0];
 	for (int r = 0; r < 5; r++)
 	{
-		U[r] = U[r] - point.flux_res[r][k];
+		U[r] = U[r] - point.flux_res[k][r];
 	}
 	//
 
@@ -323,7 +323,7 @@ __global__ void state_update_interior(points &point, int interior_points, int *i
 	temp = U[0];
 	for (int r = 0; r < 5; r++)
 	{
-		U[r] = U[r] - point.flux_res[r][k];
+		U[r] = U[r] - point.flux_res[k][r];
 	}
 	//
 	res_sqr = (U[0] - temp) * (U[0] - temp);
@@ -345,7 +345,7 @@ void state_update_supersonic_outlet()
 		k = supersonic_outlet_points_index[i];
 		for (int r = 0; r < point.nbhs[k]; r++)
 		{
-			nbh = point.conn[r][k];
+			nbh = point.conn[k][r];
 			dx = point.x[nbh] - point.x[k];
 			dy = point.y[nbh] - point.y[k];
 			dz = point.z[nbh] - point.z[k];
@@ -358,7 +358,7 @@ void state_update_supersonic_outlet()
 		}
 		for (int r = 0; r < 5; r++)
 		{
-			point.prim[r][k] = point.prim[r][p];
+			point.prim[k][r] = point.prim[p][r];
 		}
 	}
 }
@@ -376,7 +376,7 @@ void state_update_supersonic_inlet()
 		k = supersonic_inlet_points_index[i];
 		for (r = 0; r < point.nbhs[k]; r++)
 		{
-			nbh = point.conn[r][k];
+			nbh = point.conn[k][r];
 			dx = point.x[nbh] - point.x[k];
 			dy = point.y[nbh] - point.y[k];
 			dz = point.z[nbh] - point.z[k];
@@ -389,7 +389,7 @@ void state_update_supersonic_inlet()
 		}
 		for (int r = 0; r < 5; r++)
 		{
-			point.prim[r][k] = point.prim[r][p];
+			point.prim[k][r] = point.prim[p][r];
 		}
 	}
 }

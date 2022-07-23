@@ -31,7 +31,10 @@ void get_interior_point_neighbours(int i)
     //
     for (r = 0; r < point.nbhs[i]; r++)
     {
-        k = point.conn[r][i];
+        k = point.conn[i][r];
+        // if(i==21){
+        //         printf("%d %d \n",i,k);
+        // }
         xk = point.x[k];
         yk = point.y[k];
         zk = point.z[k];
@@ -40,50 +43,53 @@ void get_interior_point_neighbours(int i)
         dely = yk - yi;
         delz = zk - zi;
         //
-        dels = delx * point.tan1[0][i] + dely * point.tan1[1][i] + delz * point.tan1[2][i];
-        delt = delx * point.tan2[0][i] + dely * point.tan2[1][i] + delz * point.tan2[2][i];
-        deln = delx * point.nor[0][i] + dely * point.nor[1][i] + delz * point.nor[2][i];
+        dels = delx * point.tan1[i][0] + dely * point.tan1[i][1] + delz * point.tan1[i][2];
+        delt = delx * point.tan2[i][0] + dely * point.tan2[i][1] + delz * point.tan2[i][2];
+        deln = delx * point.nor[i][0] + dely * point.nor[i][1] + delz * point.nor[i][2];
         //
         if (dels <= 0.00)
         {
             point.xpos_nbhs[i] = point.xpos_nbhs[i] + 1;
             count = point.xpos_nbhs[i];
-            point.xpos_conn[count-1][i] = k;
+            point.xpos_conn[i][count-1] = k;
         }
         //
         if (dels > 0.00)
         {
             point.xneg_nbhs[i] = point.xneg_nbhs[i] + 1;
             count = point.xneg_nbhs[i];
-            point.xneg_conn[count-1][i] = k;
+            point.xneg_conn[i][count-1] = k;
         }
         //
         if (delt <= 0.00)
         {
             point.ypos_nbhs[i] = point.ypos_nbhs[i] + 1;
             count = point.ypos_nbhs[i];
-            point.ypos_conn[count-1][i] = k;
+            point.ypos_conn[i][count-1] = k;
         }
         //
         if (delt > 0.00)
         {
             point.yneg_nbhs[i] = point.yneg_nbhs[i] + 1;
             count = point.yneg_nbhs[i];
-            point.yneg_conn[count-1][i] = k;
+            point.yneg_conn[i][count-1] = k;
         }
         //
         if (deln <= 0.00)
         {
             point.zpos_nbhs[i] = point.zpos_nbhs[i] + 1;
             count = point.zpos_nbhs[i];
-            point.zpos_conn[count-1][i] = k;
+            point.zpos_conn[i][count-1] = k;
+            // if(i==21){
+            //     printf("%d %d %d\n",i,count-1,k);
+            // }
         }
         //
         if (deln > 0.00)
         {
             point.zneg_nbhs[i] = point.zneg_nbhs[i] + 1;
             count = point.zneg_nbhs[i];
-            point.zneg_conn[count-1][i] = k;
+            point.zneg_conn[i][count-1] = k;
         }
         //
     }
@@ -100,7 +106,7 @@ void get_wall_point_neighbours(int i)
     int k, r, count;
     double xi, yi, zi, xk, yk, zk;
     double delx, dely, delz;
-    double dels, delt, deln;
+    double dels, delt;
     //
     xi = point.x[i];
     yi = point.y[i];
@@ -114,7 +120,7 @@ void get_wall_point_neighbours(int i)
     //
     for (r = 0; r < point.nbhs[i]; r++)
     {
-        k = point.conn[r][i];
+        k = point.conn[i][r];
         xk = point.x[k];
         yk = point.y[k];
         zk = point.z[k];
@@ -123,42 +129,42 @@ void get_wall_point_neighbours(int i)
         dely = yk - yi;
         delz = zk - zi;
         //
-        dels = delx * point.tan1[0][i] + dely * point.tan1[1][i] + delz * point.tan1[2][i];
-        delt = delx * point.tan2[0][i] + dely * point.tan2[1][i] + delz * point.tan2[2][i];
-        deln = delx * point.nor[0][i] + dely * point.nor[1][i] + delz * point.nor[2][i];
+        dels = delx * point.tan1[i][0] + dely * point.tan1[i][1] + delz * point.tan1[i][2];
+        delt = delx * point.tan2[i][0] + dely * point.tan2[i][1] + delz * point.tan2[i][2];
+        // deln = delx * point.nor[i][0] + dely * point.nor[i][1] + delz * point.nor[i][2];
         //
         //
         if (dels <= 0.00)
         {
             point.xpos_nbhs[i] = point.xpos_nbhs[i] + 1;
             count = point.xpos_nbhs[i];
-            point.xpos_conn[count-1][i] = k;
+            point.xpos_conn[i][count-1] = k;
         }
         //
         if (dels >= 0.00)
         {
             point.xneg_nbhs[i] = point.xneg_nbhs[i] + 1;
             count = point.xneg_nbhs[i];
-            point.xneg_conn[count-1][i] = k;
+            point.xneg_conn[i][count-1] = k;
         }
         //
         if (delt <= 0.00)
         {
             point.ypos_nbhs[i] = point.ypos_nbhs[i] + 1;
             count = point.ypos_nbhs[i];
-            point.ypos_conn[count-1][i] = k;
+            point.ypos_conn[i][count-1] = k;
         }
         //
         if (delt >= 0.00)
         {
             point.yneg_nbhs[i] = point.yneg_nbhs[i] + 1;
             count = point.yneg_nbhs[i];
-            point.yneg_conn[count-1][i] = k;
+            point.yneg_conn[i][count-1] = k;
         }
         //
         point.zneg_nbhs[i] = point.zneg_nbhs[i] + 1;
         count = point.zneg_nbhs[i];
-        point.zneg_conn[count-1][i] = k;
+        point.zneg_conn[i][count-1] = k;
     }
     //
     //
@@ -174,7 +180,7 @@ void get_outer_point_neighbours(int i)
     int k, r, count;
     double xi, yi, zi, xk, yk, zk;
     double delx, dely, delz;
-    double dels, delt, deln;
+    double dels, delt;
     //
     xi = point.x[i];
     yi = point.y[i];
@@ -188,7 +194,7 @@ void get_outer_point_neighbours(int i)
     //
     for (r = 0; r < point.nbhs[i]; r++)
     {
-        k = point.conn[r][i];
+        k = point.conn[i][r];
         xk = point.x[k];
         yk = point.y[k];
         zk = point.z[k];
@@ -197,41 +203,51 @@ void get_outer_point_neighbours(int i)
         dely = yk - yi;
         delz = zk - zi;
         //
-        dels = delx * point.tan1[0][i] + dely * point.tan1[1][i] + delz * point.tan1[2][i];
-        delt = delx * point.tan2[0][i] + dely * point.tan2[1][i] + delz * point.tan2[2][i];
-        deln = delx * point.nor[0][i] + dely * point.nor[1][i] + delz * point.nor[2][i];
+        dels = delx * point.tan1[i][0] + dely * point.tan1[i][1] + delz * point.tan1[i][2];
+        delt = delx * point.tan2[i][0] + dely * point.tan2[i][1] + delz * point.tan2[i][2];
+        // deln = delx * point.nor[i][0] + dely * point.nor[i][1] + delz * point.nor[i][2];
         //
         if (dels <= 0.00)
         {
             point.xpos_nbhs[i] = point.xpos_nbhs[i] + 1;
             count = point.xpos_nbhs[i];
-            point.xpos_conn[count-1][i] = k;
+            point.xpos_conn[i][count-1] = k;
         }
         //
         if (dels >= 0.00)
         {
             point.xneg_nbhs[i] = point.xneg_nbhs[i] + 1;
             count = point.xneg_nbhs[i];
-            point.xneg_conn[count-1][i] = k;
+            point.xneg_conn[i][count-1] = k;
         }
         //
         if (delt <= 0.00)
         {
             point.ypos_nbhs[i] = point.ypos_nbhs[i] + 1;
             count = point.ypos_nbhs[i];
-            point.ypos_conn[count-1][i] = k;
+            point.ypos_conn[i][count-1] = k;
         }
         //
         if (delt >= 0.00)
         {
             point.yneg_nbhs[i] = point.yneg_nbhs[i] + 1;
             count = point.yneg_nbhs[i];
-            point.yneg_conn[count-1][i] = k;
+            point.yneg_conn[i][count-1] = k;
         }
         //
+
         point.zpos_nbhs[i] = point.zpos_nbhs[i] + 1;
         count = point.zpos_nbhs[i];
-        point.zpos_conn[count-1][i] = k;
+        // if(i==20){
+        //     cout<<count<<endl;
+        // }
+        // if(&point.zpos_conn[21][0]==&point.zpos_conn[i][count-1]){
+        //     cout<<"Issue\n";
+        //     cout<<i<<" "<<count-1<<endl;
+        // }
+        // auto ptr1 = &point.zpos_conn[i][count-1];
+        // auto ptr2 = point.zpos_conn[i]
+        point.zpos_conn[i][count-1] = k;
     }
     //
     //
@@ -251,12 +267,26 @@ void generate_split_stencils()
         i = interior_points_index[k];
         get_interior_point_neighbours(i);
     }
+    // cout<<"After Interior\n";
+    // for (int j = 0; j < point.zpos_nbhs[21]; j++)
+	// //
+	// {
+    //     int k = point.zpos_conn[21][j];
+    //     cout<<21<<" "<<j<<" "<<k<<endl;
+    // }
     //
     for (k = 0; k < wall_points; k++)
     {
         i = wall_points_index[k];
         get_wall_point_neighbours(i);
     }
+    // cout<<"After Wall\n";
+    // for (int j = 0; j < point.zpos_nbhs[21]; j++)
+	// //
+	// {
+    //     int k = point.zpos_conn[21][j];
+    //     cout<<21<<" "<<j<<" "<<k<<endl;
+    // }
     //
     for (k = 0; k < outer_points; k++)
     {
@@ -264,6 +294,13 @@ void generate_split_stencils()
         get_outer_point_neighbours(i);
     }
     //
+    // cout<<"After Outer\n";
+    // for (int j = 0; j < point.zpos_nbhs[21]; j++)
+	// //
+	// {
+    //     int k = point.zpos_conn[21][j];
+    //     cout<<21<<" "<<j<<" "<<k<<endl;
+    // }
 }
 //
 //

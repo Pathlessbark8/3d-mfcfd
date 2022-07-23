@@ -16,7 +16,7 @@ void venkat_limiter(double *qtilde, double *phi, int k)
 	//
 	for (r = 0; r < 5; r++)
 	{
-		q = point.q[r][k];
+		q = point.q[k][r];
 		del_neg = qtilde[r] - q;
 		//
 		if (abs(del_neg) <= 10e-6)
@@ -24,9 +24,9 @@ void venkat_limiter(double *qtilde, double *phi, int k)
 		else if (abs(del_neg) > 10e-6)
 		{
 			if (del_neg > 0.00)
-				del_pos = point.qm[0][r][k] - q;
+				del_pos = point.qm[k][0][r] - q;
 			else if (del_neg < 0.00)
-				del_pos = point.qm[1][r][k] - q;
+				del_pos = point.qm[k][1][r] - q;
 			//
 			epsi = VL_CONST * point.min_dist[k];
 			epsi = pow(epsi, 3.00);
@@ -60,7 +60,7 @@ __device__ void venkat_limiter_cuda(points &point,double *qtilde, double *phi, i
 	//
 	for (r = 0; r < 5; r++)
 	{
-		q = point.q[r][k];
+		q = point.q[k][r];
 		del_neg = qtilde[r] - q;
 		//
 		if (abs(del_neg) <= 10e-6)
@@ -68,9 +68,9 @@ __device__ void venkat_limiter_cuda(points &point,double *qtilde, double *phi, i
 		else if (abs(del_neg) > 10e-6)
 		{
 			if (del_neg > 0.00)
-				del_pos = point.qm[0][r][k] - q;
+				del_pos = point.qm[k][0][r] - q;
 			else if (del_neg < 0.00)
-				del_pos = point.qm[1][r][k] - q;
+				del_pos = point.qm[k][1][r] - q;
 			//
 			epsi = VL_CONST * point.min_dist[k];
 			epsi = pow(epsi, 3.00);

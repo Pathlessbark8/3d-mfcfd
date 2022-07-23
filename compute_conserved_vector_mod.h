@@ -18,17 +18,17 @@ void compute_conserved_vector()
 	//
 	for (k = 0; k < max_points; k++)
 	{
-		point.U[0][k] = point.prim[0][k];
-		temp1 = point.prim[0][k] * point.prim[1][k];
-		temp2 = point.prim[0][k] * point.prim[2][k];
-		temp3 = point.prim[0][k] * point.prim[3][k];
+		point.U[k][0] = point.prim[k][0];
+		temp1 = point.prim[k][0] * point.prim[k][1];
+		temp2 = point.prim[k][0] * point.prim[k][2];
+		temp3 = point.prim[k][0] * point.prim[k][3];
 		//
-		point.U[1][k] = temp1 * point.tan1[0][k] + temp2 * point.tan1[1][k] + temp3 * point.tan1[2][k];
-		point.U[2][k] = temp1 * point.tan2[0][k] + temp2 * point.tan2[1][k] + temp3 * point.tan2[2][k];
-		point.U[3][k] = temp1 * point.nor[0][k] + temp2 * point.nor[1][k] + temp3 * point.nor[2][k];
+		point.U[k][1] = temp1 * point.tan1[k][0] + temp2 * point.tan1[k][1] + temp3 * point.tan1[k][2];
+		point.U[k][2] = temp1 * point.tan2[k][0] + temp2 * point.tan2[k][1] + temp3 * point.tan2[k][2];
+		point.U[k][3] = temp1 * point.nor[k][0] + temp2 * point.nor[k][1] + temp3 * point.nor[k][2];
 		//
-		temp1 = point.prim[1][k] * point.prim[1][k] + point.prim[2][k] * point.prim[2][k] + point.prim[3][k] * point.prim[3][k];
-		point.U[4][k] = 2.50 * point.prim[4][k] + 0.50 * point.U[0][k] * temp1;
+		temp1 = point.prim[k][1] * point.prim[k][1] + point.prim[k][2] * point.prim[k][2] + point.prim[k][3] * point.prim[k][3];
+		point.U[k][4] = 2.50 * point.prim[k][4] + 0.50 * point.U[k][0] * temp1;
 	}
 	//
 }
@@ -48,16 +48,16 @@ __global__ void compute_conserved_vector_cuda(points &point)
 	{
 		return;
 	}
-	point.U[0][k] = point.prim[0][k];
-	temp1 = point.prim[0][k] * point.prim[1][k];
-	temp2 = point.prim[0][k] * point.prim[2][k];
-	temp3 = point.prim[0][k] * point.prim[3][k];
+	point.U[k][0] = point.prim[k][0];
+	temp1 = point.prim[k][0] * point.prim[k][1];
+	temp2 = point.prim[k][0] * point.prim[k][2];
+	temp3 = point.prim[k][0] * point.prim[k][3];
 	//
-	point.U[1][k] = temp1 * point.tan1[0][k] + temp2 * point.tan1[1][k] + temp3 * point.tan1[2][k];
-	point.U[2][k] = temp1 * point.tan2[0][k] + temp2 * point.tan2[1][k] + temp3 * point.tan2[2][k];
-	point.U[3][k] = temp1 * point.nor[0][k] + temp2 * point.nor[1][k] + temp3 * point.nor[2][k];
+	point.U[k][1] = temp1 * point.tan1[k][0] + temp2 * point.tan1[k][1] + temp3 * point.tan1[k][2];
+	point.U[k][2] = temp1 * point.tan2[k][0] + temp2 * point.tan2[k][1] + temp3 * point.tan2[k][2];
+	point.U[k][3] = temp1 * point.nor[k][0] + temp2 * point.nor[k][1] + temp3 * point.nor[k][2];
 	//
-	temp1 = point.prim[1][k] * point.prim[1][k] + point.prim[2][k] * point.prim[2][k] + point.prim[3][k] * point.prim[3][k];
-	point.U[4][k] = 2.50 * point.prim[4][k] + 0.50 * point.U[0][k] * temp1;
+	temp1 = point.prim[k][1] * point.prim[k][1] + point.prim[k][2] * point.prim[k][2] + point.prim[k][3] * point.prim[k][3];
+	point.U[k][4] = 2.50 * point.prim[k][4] + 0.50 * point.U[k][0] * temp1;
 	//
 }
