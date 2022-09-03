@@ -246,16 +246,6 @@ void fpi_solver_multi_nccl(splitPoints *splitPoint_d, int localRank, transferPoi
         }
     }
     ncclGroupEnd();
-    // for(int i=0;i<nRanks;++i){
-    //     if (i != myRank)
-    //     {
-    //         NCCLCHECK(ncclSend(sendPointer[i], sendPoints[i] * sizeof(transferPoints), ncclChar, i, comm, stream));
-    //         NCCLCHECK(ncclRecv(receivePointer[i], receivePoints[i] * sizeof(transferPoints), ncclChar, i, comm, stream));
-    //     }
-    //     // CUDACHECK(cudaMalloc(&globalToGhostIndex_d[i], max_points * sizeof(int)));
-    //     // NCCLCHECK(ncclAllReduce(globalToGhostIndex_temp[i], globalToGhostIndex_d[i], max_points, ncclInt, ncclSum, comm, stream));
-    // }
-    // NCCLCHECK(ncclAllReduce(globalToGhostIndex_temp, globalToGhostIndex_d, max_points, ncclInt, ncclSum, comm, stream));
 
     int *globalToLocalIndex_d;
     CUDACHECK(cudaMalloc(&globalToLocalIndex_d, max_points * sizeof(int)));
@@ -280,7 +270,6 @@ void fpi_solver_multi_nccl(splitPoints *splitPoint_d, int localRank, transferPoi
     // printf("cudaProfilerStop\n");
     for (int t = 1; t <= max_iters; ++t)
     {
-        // CUDACHECK(cudaMemcpy(splitPoint_d, splitPoint, numberOfPointsPerDevice * sizeof(splitPoints), cudaMemcpyHostToDevice));
         eval_q_variables_multi_nccl<<<grid, threads>>>(myRank, splitPoint_d, numberOfPointsPerDevice, sendBuffer_d);
         ncclGroupStart();
         for (int i = 0; i < nRanks; ++i)
@@ -319,22 +308,7 @@ void fpi_solver_multi_nccl(splitPoints *splitPoint_d, int localRank, transferPoi
             ncclGroupEnd();
         }
         timestep_delt_multi_nccl<<<grid, threads>>>(myRank, splitPoint_d, CFL, numberOfPointsPerDevice, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d, sendBuffer_d);
-        // CUDACHECK(cudaMemcpy(splitPoint, splitPoint_d, numberOfPointsPerDevice * sizeof(splitPoints), cudaMemcpyDeviceToHost));
-        // if(myRank==1)
-        // cout<<"HOST "<<splitPoint[5150].min_dist<<endl;
-        // CUDACHECK(cudaMemcpy(splitPoint_d, splitPoint, numberOfPointsPerDevice * sizeof(splitPoints), cudaMemcpyHostToDevice));
 
-        
-        // ncclGroupStart();
-        // for (int i = 0; i < nRanks; ++i)
-        // {
-        //     if (i != myRank)
-        //     {
-        //         NCCLCHECK(ncclSend(sendPointer[i], sendPoints[i] * sizeof(transferPoints), ncclChar, i, comm, stream));
-        //         NCCLCHECK(ncclRecv(receivePointer[i], receivePoints[i] * sizeof(transferPoints), ncclChar, i, comm, stream));
-        //     }
-        // }
-        // ncclGroupEnd();
         wall_dGx_pos_multi_nccl<<<grid, threads>>>(myRank, splitPoint_d, power, VL_CONST, pi, wallPointsLocal, wallPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
         wall_dGx_neg_multi_nccl<<<grid, threads>>>(myRank, splitPoint_d, power, VL_CONST, pi, wallPointsLocal, wallPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
         wall_dGy_pos_multi_nccl<<<grid, threads>>>(splitPoint_d, power, VL_CONST, pi, wallPointsLocal, wallPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
@@ -361,7 +335,6 @@ void fpi_solver_multi_nccl(splitPoints *splitPoint_d, int localRank, transferPoi
         cudaDeviceSynchronize();
         sum_res_sqr = thrust::reduce(thrust::cuda::par.on(stream), sum_res_sqr_d, sum_res_sqr_d + local_points, (double)0.0, thrust::plus<double>());
 
-        // cout << myRank << " " << sum_res_sqr << endl;
         MPI_Barrier(MPI_COMM_WORLD);
         if (myRank == 0)
         {
@@ -371,7 +344,6 @@ void fpi_solver_multi_nccl(splitPoints *splitPoint_d, int localRank, transferPoi
         {
             MPICHECK(MPI_Reduce(&sum_res_sqr, &sum_res_sqr, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD));
         }
-        // // NCCLCHECK(ncclReduce(&sum_res_sqr, &sum_res_sqr, 1, ncclDouble, ncclSum, 0, comm,stream));
         if (myRank == 0)
         {
             res_new = sqrt(sum_res_sqr) / max_points;
@@ -386,19 +358,6 @@ void fpi_solver_multi_nccl(splitPoints *splitPoint_d, int localRank, transferPoi
             }
             cout << t << " " << res_new << " " << residue << " " << sum_res_sqr << endl;
         }
-        // CUDACHECK(cudaMemcpy(splitPoint, splitPoint_d, numberOfPointsPerDevice * sizeof(splitPoints), cudaMemcpyDeviceToHost));
-        // CUDACHECK(cudaMemcpy(globalToLocalIndex, globalToLocalIndex_d, max_points * sizeof(int), cudaMemcpyDeviceToHost));
-        // if (myRank == 1)
-        // {
-        //     cout << "kahfhdal" << endl;
-        //     cout << myRank << " " << splitPoint[5150].globalIndex << endl;
-        //     // cout<<myRank<<" "<<splitPoint[6081].numberOfLocalxnegNbhs<<endl;
-        //     cout << myRank << " " << splitPoint[5150].numberOfGhostxposNbhs << " " << splitPoint[6081].numberOfLocalxposNbhs << endl;
-        //     for (int r = 0; r < 5; r++)
-        //     {
-        //         cout << "TEST " << splitPoint[5150].flux_res[r] << endl;
-        //     }
-        // }
     }
     cudaMemcpy(&wallPointsLocalIndex, wallPointsLocalIndex_d, wall_size, cudaMemcpyDeviceToHost);
     cudaMemcpy(&outerPointsLocalIndex, outerPointsLocalIndex_d, outer_size, cudaMemcpyDeviceToHost);
@@ -412,5 +371,4 @@ void fpi_solver_multi_nccl(splitPoints *splitPoint_d, int localRank, transferPoi
     cudaFree(supersonicInletPointsLocalIndex_d);
     cudaFree(supersonicOutletPointsLocalIndex_d);
     cudaFree(sum_res_sqr_d);
-    cout << "Here\n";
 }

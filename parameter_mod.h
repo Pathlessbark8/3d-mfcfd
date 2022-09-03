@@ -5,7 +5,7 @@
 
 		const int max_points =  580485;
 		const int max_partitions=7;
-		int max_iters = 1;//1000
+		int max_iters = 10;//1000
 //
 //		Flow conditions ..
 //

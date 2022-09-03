@@ -284,10 +284,6 @@ __global__ void outer_dGx_pos_multi_nccl(int myRank,splitPoints *splitPoint, dou
         return;
     }  
     int i=outerPointsLocalIndex[ind];
-    // if(ind==outerPointsLocal-1){
-    //     printf("%d\n",i);
-    //     printf("Global Index=%d\n",splitPoint[i].globalIndex);
-    // }
 	int j,k;
     double prim[5];
     double x_i, y_i, z_i, x_k, y_k, z_k;
@@ -481,9 +477,6 @@ __global__ void outer_dGx_pos_multi_nccl(int myRank,splitPoints *splitPoint, dou
     for (int r = 0; r < 5; r++)
     {
        splitPoint[i].flux_res[r] = temp[r]*splitPoint[i].delt / det;
-        // if(myRank==0 && i==34011){
-        //     printf("splitPoint[%d].flux_res[%d]=%f\n",i,r,splitPoint[i].flux_res[r]);
-        // }
     }
     //
 }

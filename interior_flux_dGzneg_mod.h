@@ -489,12 +489,6 @@ __global__ void interior_dGz_neg_multi_nccl(splitPoints *splitPoint, double powe
     for (int r = 0; r < 5; r++)
     {
        splitPoint[i].flux_res[r] += temp[r]*splitPoint[i].delt / det;
-		// if(splitPoint[i].globalIndex==531991){
-        //     printf("splitPoint[%d].delt=%.15f\n",i,splitPoint[i].delt);
-        //     printf("det=%.15f\n",det);
-        //     printf("splitPoint[%d].flux_res[%d]=%.15f\n",i,r,splitPoint[i].flux_res[r]);
-        //     printf("temp[%d]=%.15f\n",r,temp[r]);
-		// }
 	}
     //
 }

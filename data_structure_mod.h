@@ -9,7 +9,7 @@ struct points
     //		geometry based attributes ..
     //
     double x[max_points], y[max_points], z[max_points];
-    //		double  nor_neigh
+    //	
     double tan1[3][max_points], tan2[3][max_points], nor[3][max_points];
     int status[max_points];
     int nbhs[max_points];
@@ -160,18 +160,14 @@ void findNatureOfLocalPoints(splitPoints &splitPoint){
         else if (splitPoint.status== 6)
         {
             supersonicOutletPointsLocal = supersonicOutletPointsLocal + 1;
-            // cout<<k<<endl;
         }
         else if (splitPoint.status== 5)
         {
             supersonicInletPointsLocal = supersonicInletPointsLocal + 1;
-            // cout<<k<<"Here"<<endl;
         }
 }
 
 void allocateSizeForNatureOfLocalPoints(){
-    // cout<<"Verification : "<<myRank<<" : "<<interiorPointsLocal<<" "<<wallPointsLocal<<" "<<outerPointsLocal<<" "<<interiorPointsLocal+wallPointsLocal+outerPointsLocal<<endl;
-
     interiorPointsLocalIndex=new int[interiorPointsLocal];
     wallPointsLocalIndex=new int[wallPointsLocal];
     outerPointsLocalIndex=new int[outerPointsLocal];
@@ -218,9 +214,6 @@ void assign(splitPoints &splitPoint,int i,int myRank){
     splitPoint.x=point.x[i];
     splitPoint.y=point.y[i];
     splitPoint.z=point.z[i];
-    // if(i==442481){
-    //       cout<<"BIUHASDUCHUISHC "<<splitPoint.globalIndex<<" "<<splitPoint.x<<" "<<splitPoint.y<<" "<<splitPoint.z<<endl;
-    // }
     splitPoint.status=point.status[i];
     splitPoint.nbhs=point.nbhs[i];
     splitPoint.min_dist=point.min_dist[i];  
@@ -235,10 +228,6 @@ void assign(splitPoints &splitPoint,int i,int myRank){
         }
     }
     splitPoint.numberOfLocalNbhs=splitPoint.nbhs-splitPoint.numberOfGhostNbhs;
-    // if(myRank==1 && i==25993){
-    //     cout<<"Verification : "<<splitPoint.numberOfGhostNbhs<<" "<<splitPoint.numberOfLocalNbhs<<endl;
-    // }
-    // printf("HERE %d %d\n",splitPoint.numberOfGhostNbhs,splitPoint.numberOfLocalNbhs); //Point with Global Index 430334 has 18 Ghost nbhs and 6 Local Nbhs
     if(splitPoint.numberOfGhostNbhs!=0){
         splitPoint.numberOfGhostNbhs=0;
     }
@@ -252,11 +241,6 @@ void assign(splitPoints &splitPoint,int i,int myRank){
             splitPoint.localNbhs[splitPoint.numberOfLocalNbhs++]=splitPoint.conn[j];
         }
     }
-    // if(i==430334)
-    // printf("HERE %d %d\n",splitPoint.numberOfGhostNbhs,splitPoint.numberOfLocalNbhs);
-    //
-
-
     for(int j=0;j<3;j++){
         splitPoint.tan1[j]=point.tan1[j][i];
         splitPoint.tan2[j]=point.tan2[j][i];

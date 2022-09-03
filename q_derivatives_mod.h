@@ -583,23 +583,13 @@ __global__ void eval_q_derivatives_multi_nccl(int myRank,splitPoints *splitPoint
     {
         splitPoint[i].qm[0][k] = splitPoint[i].q[k]; // q_maximum ..
         splitPoint[i].qm[1][k] = splitPoint[i].q[k]; // q_minimum ..
-        // if(i==6081 && myRank==1){
-        //     printf("splitPoint[%d].qm[0][%d] = %.15f\n",i,k,splitPoint[i].qm[0][k]);
-        //     printf("splitPoint[%d].qm[1][%d] = %.15f\n",i,k,splitPoint[i].qm[1][k]);
-        // }
     }
 
         for (k = 0; k < splitPoint[i].numberOfLocalNbhs ; k++)
         //
         {
             int globalIndex = splitPoint[i].localNbhs[k];
-            // if(i==0){
-            //     printf("nbh is :%d \n",nbh);
-            // }
             nbh=globalToLocalIndex[globalIndex];
-            // if(i==0){
-            //     printf("nbh is :%d \n",nbh);
-            // }
             
             for (r = 0; r < 5; r++)
             {
@@ -621,18 +611,6 @@ __global__ void eval_q_derivatives_multi_nccl(int myRank,splitPoints *splitPoint
             dely = y_k - y_i;
             delz = z_k - z_i;
             //
-            // if(i==285282 && myRank==0){
-            // printf("Local nbh =%d\n",globalIndex);
-            // printf("Local index =%d\n",nbh);
-            // printf("delx = %f\n", delx);
-            // printf("dely = %f\n", dely);
-            // printf("delz = %f\n", delz);
-            // //
-            // printf("x_k = %f\n", x_k);
-            // printf("y_k = %f\n", y_k);
-            // printf("z_k = %f\n", z_k);
-            // }
-            //
             dist = sqrt(delx * delx + dely * dely + delz * delz);
             weights = 1.00 / (pow(dist, power));
             //
@@ -647,22 +625,10 @@ __global__ void eval_q_derivatives_multi_nccl(int myRank,splitPoints *splitPoint
             for (r = 0; r < 5; r++)
             {
                 temp[r] = (splitPoint[nbh].q[r] - splitPoint[i].q[r]);
-                // if(i==6081 && myRank==1)
-                // printf("%d temp[%d] is :%f \n",globalIndex,r,temp[r]);
-                // if(i==195059 && myRank==1 && globalIndex==19595){
-                // // printf("%d temp[%d] is :%f \n",nbh,r,temp[r]);
-                // printf("splitPoint[%d].q[%d] is :%.15f \n",splitPoint[nbh].globalIndex,r,splitPoint[nbh].q[r]);
-                // printf("splitPoint[%d].q[%d] is :%.15f \n",i,r,splitPoint[i].q[r]);
-                // }
+
                 sum_delx_delq[r] = sum_delx_delq[r] + weights * delx * temp[r];
                 sum_dely_delq[r] = sum_dely_delq[r] + weights * dely * temp[r];
                 sum_delz_delq[r] = sum_delz_delq[r] + weights * delz * temp[r];
-                // if(splitPoint[i].globalIndex==421000 && globalIndex==19595){
-                //     printf("Local k= %d\n",globalIndex);
-                //     printf("sum_delx_delq[%d] is :%.15f \n",r,sum_delx_delq[r]);
-                //     printf("sum_dely_delq[%d] is :%.15f \n",r,sum_dely_delq[r]);
-                //     printf("sum_delz_delq[%d] is :%.15f \n",r,sum_delz_delq[r]);
-                // }
             }
             
         }
@@ -670,25 +636,15 @@ __global__ void eval_q_derivatives_multi_nccl(int myRank,splitPoints *splitPoint
         for (k = 0; k < splitPoint[i].numberOfGhostNbhs ; k++)
         
         {
-            // if(i==197248 )
-            //     printf("i is :%d \n",splitPoint[i].globalIndex);
             nbh = splitPoint[i].ghostNbhs[k];
-            // if(i==197248 )
-            //     printf("nbh is :%d \n",nbh);
             int device=partVector[nbh];
-            // if(i==197248 )
-            //     printf("partVector is :%d \n",device);
             int ghostIndex=globalToGhostIndex[device][nbh];
-            // if(i==197248 )
-            // printf("Local Index is :%d \n",localIndex);
             //
             for (r = 0; r < 5; r++)
             {
                 if (receiveBuffer[device][ghostIndex].q[r] > splitPoint[i].qm[0][r])
                 {
                     splitPoint[i].qm[0][r] = receiveBuffer[device][ghostIndex].q[r];
-                //     // splitPoint[i].qm[0][r] = 0.0;
-
                 }
                 if (receiveBuffer[device][ghostIndex].q[r] < splitPoint[i].qm[1][r])
                 {
@@ -704,19 +660,6 @@ __global__ void eval_q_derivatives_multi_nccl(int myRank,splitPoints *splitPoint
             dely = y_k - y_i;
             delz = z_k - z_i;
             //
-            // if(i==285282 && myRank==0){
-            // printf("Ghost nbh =%d\n",nbh);
-            // printf("GlobalIndex =%d\n",receiveBuffer[device][ghostIndex].globalIndex);
-            // printf("device =%d\n",device);
-            // printf("ghostIndex =%d\n",ghostIndex);
-            // printf("delx = %f\n", delx);
-            // printf("dely = %f\n", dely);
-            // printf("delz = %f\n", delz);
-            // //
-            // printf("x_k = %f\n", x_k);
-            // printf("y_k = %f\n", y_k);
-            // printf("z_k = %f\n", z_k);
-            // }
             dist = sqrt(delx * delx + dely * dely + delz * delz);
             weights = 1.00 / (pow(dist, power));
             //
@@ -731,35 +674,20 @@ __global__ void eval_q_derivatives_multi_nccl(int myRank,splitPoints *splitPoint
             for (r = 0; r < 5; r++)
             {
                 temp[r] = (receiveBuffer[device][ghostIndex].q[r] - splitPoint[i].q[r]);
-                // if(i==195059 && myRank==1){
-                // // printf("%d temp[%d] is :%f \n",nbh,r,temp[r]);
-                // printf("recvBuffer[%d][%d].q[%d] is :%.15f \n",device,ghostIndex,r,receiveBuffer[device][ghostIndex].q[r]);
-                // printf("splitPoint[%d].q[%d] is :%.15f \n",i,r,splitPoint[i].q[r]);
-                // }
                 sum_delx_delq[r] = sum_delx_delq[r] + weights * delx * temp[r];
                 sum_dely_delq[r] = sum_dely_delq[r] + weights * dely * temp[r];
                 sum_delz_delq[r] = sum_delz_delq[r] + weights * delz * temp[r];
-                // if(splitPoint[i].globalIndex==421000){
-                //     printf("Ghost k= %d\n",nbh);
-                //     printf("sum_delx_delq[%d] is :%.15f \n",r,sum_delx_delq[r]);
-                //     printf("sum_dely_delq[%d] is :%.15f \n",r,sum_dely_delq[r]);
-                //     printf("sum_delz_delq[%d] is :%.15f \n",r,sum_delz_delq[r]);
-                // }
             }
             
         }
         //
         det = sum_delx_sqr * (sum_dely_sqr * sum_delz_sqr - sum_dely_delz * sum_dely_delz) - sum_delx_dely * (sum_delx_dely * sum_delz_sqr - sum_dely_delz * sum_delz_delx) + sum_delz_delx * (sum_delx_dely * sum_dely_delz - sum_dely_sqr * sum_delz_delx);
         //
-        // if(splitPoint[i].globalIndex==421000)
-        // printf("%d det is :%.15f \n",i,det);
         one_by_det = 1.00 / det;
         //
         for (k = 0; k < 5; k++)
         {
             temp[k]= sum_delx_delq[k] * (sum_dely_sqr * sum_delz_sqr - sum_dely_delz * sum_dely_delz) - sum_dely_delq[k] * (sum_delx_dely * sum_delz_sqr - sum_delz_delx * sum_dely_delz) + sum_delz_delq[k] * (sum_delx_dely * sum_dely_delz - sum_delz_delx * sum_dely_sqr);
-            // if(i==6081 && myRank==1)
-            //     printf("%d temp[%d] is :%.15f \n",i,k,temp[k]);
         }
         
         for (k = 0; k < 5; k++)
@@ -785,14 +713,7 @@ __global__ void eval_q_derivatives_multi_nccl(int myRank,splitPoints *splitPoint
         {
             splitPoint[i].dq[2][k] = temp[k] * one_by_det;
         }
-        // if(i==5150 && myRank==1){
-        //     for(int r=0;r<5;r++){
-        //         printf("q[%d] is :%.15f \n",i,splitPoint[i].q[r]);
-        //         printf("dq[0][%d] is :%.15f \n",i,splitPoint[i].dq[0][r]);
-        //         printf("dq[1][%d] is :%.15f \n",i,splitPoint[i].dq[1][r]);
-        //         printf("dq[2][%d] is :%.15f \n",i,splitPoint[i].dq[2][r]);
-        //     }
-        // }
+        //
         if(splitPoint[i].isGhost){
 			for(int t=0;t<splitPoint[i].numberOfPartitionsToSendTo;++t){
 				for(int r=0;r<5;++r){

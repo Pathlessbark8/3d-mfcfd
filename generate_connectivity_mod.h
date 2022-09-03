@@ -333,9 +333,6 @@ __global__ void generate_split_stencils_interior_multi_nccl(splitPoints *splitPo
             splitPoint[i].numberOfLocalxposNbhs = splitPoint[i].numberOfLocalxposNbhs + 1;
             count = splitPoint[i].numberOfLocalxposNbhs;
             splitPoint[i].localxpos_conn[count-1] = k;
-            // if(splitPoint[i].globalIndex==529172){
-            //     printf("Local xpos_conn[%d]=%d\n",count-1,k);
-            // }
         }
         //
         if (dels > 0.00)
@@ -437,9 +434,6 @@ __global__ void generate_split_stencils_interior_multi_nccl(splitPoints *splitPo
             splitPoint[i].ghostzneg_conn[count-1] = k;
         }
     }
-    // if(splitPoint[i].globalIndex==529172){
-    //     printf("Local nbhs %d Ghost nbhs %d\n",splitPoint[i].numberOfLocalxposNbhs,splitPoint[i].numberOfGhostxposNbhs);
-    // }
 }
 
 __global__ void generate_split_stencils_wall_multi_nccl(int myRank,splitPoints *splitPoint, int *wallPointsLocalIndex, int wallPointsLocal,int*partVector,int *globalToLocalIndex,int **globalToGhostIndex,transferPoints ** receiveBuffer)
@@ -455,10 +449,6 @@ __global__ void generate_split_stencils_wall_multi_nccl(int myRank,splitPoints *
 		return;
 	}
     i = wallPointsLocalIndex[t];
-    // if(t==wallPointsLocal-1){
-    // printf("Global Index=%d\n",splitPoint[i].globalIndex);
-    // printf("i=%d\n",i);
-    // }
     //
     int r, count;
     double xi, yi, zi, xk, yk, zk;
@@ -545,15 +535,6 @@ __global__ void generate_split_stencils_wall_multi_nccl(int myRank,splitPoints *
         yk = receiveBuffer[device][ghostIndex].y;
         zk = receiveBuffer[device][ghostIndex].z;
         //
-        // if(myRank==1 && i==6081 && k==529172){
-        //     printf("xk=%.15f\n",xk);
-        //     printf("yk=%.15f\n",yk);
-        //     printf("zk=%.15f\n",zk);
-        //     printf("globalIndex=%d\n",receiveBuffer[device][ghostIndex].globalIndex);
-        //     printf("k=%d\n",k);
-        //     printf("device=%d\n",device);
-        //     printf("ghostIndex=%d\n",ghostIndex);
-        // }
         delx = xk - xi;
         dely = yk - yi;
         delz = zk - zi;
@@ -567,9 +548,6 @@ __global__ void generate_split_stencils_wall_multi_nccl(int myRank,splitPoints *
             splitPoint[i].numberOfGhostxposNbhs = splitPoint[i].numberOfGhostxposNbhs + 1;
             count = splitPoint[i].numberOfGhostxposNbhs;
             splitPoint[i].ghostxpos_conn[count-1] = k;
-            if(splitPoint[i].globalIndex==529172){
-                printf("Ghostxpos_conn[%d]=%d\n",count-1,k);
-            }
         }
         //
         if (dels > 0.00)
@@ -746,14 +724,3 @@ __global__ void generate_split_stencils_outer_multi_nccl(splitPoints *splitPoint
     }
 }
 
-    // for (k = 0; k < wallPointsLocal; k++)
-    // {
-    //     i = wallPointsLocalIndex[k];
-    //     get_wall_point_neighbours(i);
-    // }
-    // //
-    // for (k = 0; k < outerPointsLocal; k++)
-    // {
-    //     i = outerPointsLocalIndex[k];
-    //     get_outer_point_neighbours(i);
-    // }

@@ -414,20 +414,11 @@ __global__ void state_update_wall_multi_nccl(int myRank,splitPoints *splitPoint,
 	for (int r = 0; r < 5; r++)
 	{
 		U[r] = U[r] - splitPoint[k].flux_res[r];
-		// if(splitPoint[k].globalIndex==19595){
-		// 	printf("End splitPoint[%d].flux_res[%d] = %.15f\n",k,r, splitPoint[k].flux_res[r]);
-		// 	printf("splitPoint[%d].prim[%d] = %.15f\n",k,r, splitPoint[k].prim[r]);
-		// 	printf("U[%d] = %.15f\n",r,U[r]);
-		// }
 	}
 	U[3] = 0.00;
 	//
 	res_sqr = (U[0] - temp) * (U[0] - temp);
-	// if(res_sqr!=res_sqr && k==6081 && myRank==1){
-	// 	printf("U[0] = %f\n",splitPoint[k].flux_res[0]);
-	// 	// printf("temp = %f\n",temp);
-	// 	printf("k = %d\n",k);
-	// }
+
 	sum_res_sqr[k] = res_sqr;
 	//                                        print*, i, k, point.flux_res[r][k]
 	conserved_to_primitive_multi_nccl(splitPoint, k, U);
@@ -450,11 +441,6 @@ __global__ void state_update_interior_multi_nccl(splitPoints *splitPoint, int in
 	for (int r = 0; r < 5; r++)
 	{
 		U[r] = U[r] - splitPoint[k].flux_res[r];
-		// if(splitPoint[k].globalIndex==531991){
-		// 	printf("End splitPoint[%d].flux_res[%d] = %.15f\n",k,r, splitPoint[k].flux_res[r]);
-		// 	printf("splitPoint[%d].prim[%d] = %.15f\n",k,r, splitPoint[k].prim[r]);
-		// 	printf("U[%d] = %.15f\n",r,U[r]);
-		// }
 	}
 	//
 	res_sqr = (U[0] - temp) * (U[0] - temp);

@@ -253,27 +253,6 @@ static void getHostName(char* hostname, int maxlen) {
 int main(int argc, char* argv[])
 {
 
-  printf("Compile time check:\n");
-  #if defined(MPIX_CUDA_AWARE_SUPPORT) && MPIX_CUDA_AWARE_SUPPORT
-      printf("This MPI library has CUDA-aware support.\n", MPIX_CUDA_AWARE_SUPPORT);
-  #elif defined(MPIX_CUDA_AWARE_SUPPORT) && !MPIX_CUDA_AWARE_SUPPORT
-      printf("This MPI library does not have CUDA-aware support.\n");
-  #else
-      printf("This MPI library cannot determine if there is CUDA-aware support.\n");
-  #endif /* MPIX_CUDA_AWARE_SUPPORT */
-   
-      printf("Run time check:\n");
-  #if defined(MPIX_CUDA_AWARE_SUPPORT)
-      if (1 == MPIX_Query_cuda_support()) {
-          printf("This MPI library has CUDA-aware support.\n");
-      } else {
-          printf("This MPI library does not have CUDA-aware support.\n");
-      }
-  #else /* !defined(MPIX_CUDA_AWARE_SUPPORT) */
-      printf("This MPI library cannot determine if there is CUDA-aware support.\n");
-  #endif /* MPIX_CUDA_AWARE_SUPPORT */
-
-
     //MAIN CODE BEGINS
     cout<<setprecision(13)<<scientific;
 
@@ -288,7 +267,31 @@ int main(int argc, char* argv[])
     MPICHECK(MPI_Comm_rank(MPI_COMM_WORLD, &myRank));
     MPICHECK(MPI_Comm_size(MPI_COMM_WORLD, &nRanks));
     //
-    cout<<nRanks<<endl;
+
+    //CHECK IF MPI LIBRARY HAD CUDA SUPPORT
+    if(myRank==0){
+      printf("Compile time check:\n");
+      #if defined(MPIX_CUDA_AWARE_SUPPORT) && MPIX_CUDA_AWARE_SUPPORT
+          printf("This MPI library has CUDA-aware support.\n", MPIX_CUDA_AWARE_SUPPORT);
+      #elif defined(MPIX_CUDA_AWARE_SUPPORT) && !MPIX_CUDA_AWARE_SUPPORT
+          printf("This MPI library does not have CUDA-aware support.\n");
+      #else
+          printf("This MPI library cannot determine if there is CUDA-aware support.\n");
+      #endif /* MPIX_CUDA_AWARE_SUPPORT */
+      
+          printf("Run time check:\n");
+      #if defined(MPIX_CUDA_AWARE_SUPPORT)
+          if (1 == MPIX_Query_cuda_support()) {
+              printf("This MPI library has CUDA-aware support.\n");
+          } else {
+              printf("This MPI library does not have CUDA-aware support.\n");
+          }
+      #else /* !defined(MPIX_CUDA_AWARE_SUPPORT) */
+          printf("This MPI library cannot determine if there is CUDA-aware support.\n");
+      #endif /* MPIX_CUDA_AWARE_SUPPORT */
+
+      cout<<"Total Number of Proccess are "<<nRanks<<endl;
+    }
     //
     // HASHING HOSTNAME TO GET LOCALRANKS
     uint64_t hostHashs[nRanks];
@@ -301,7 +304,9 @@ int main(int argc, char* argv[])
       if (hostHashs[p] == hostHashs[myRank]) localRank++;
     }
   
-
+    if(myRank==0){
+      cout<<"Reading from File\n";
+    }
     //READ POINTS FOR EACH DEVICE FROM FILE
     fstream fin;
     fin.open("/home/anil/new_3d_code/3d-mfcfd/inputFiles/filesFor"+to_string(nRanks)+"Devices/Device"+to_string(myRank)+".dat",ios::in);
@@ -314,64 +319,41 @@ int main(int argc, char* argv[])
     {
         globalToGhostIndex[i]=new int[max_points];
     }
-    // partVector=new int [max_points];
-    // ghostToGlobalIndex=new int *[nRanks];
+
     for(int i=0;i<local_points;i++){
         fin>>localToGlobalIndex[i];
         fin>>partVector[localToGlobalIndex[i]];
         globalToLocalIndex[localToGlobalIndex[i]]=i;
-        // if(localToGlobalIndex[i]==442481){
-        //   cout<<globalToLocalIndex[localToGlobalIndex[i]]<<" serhghtsdfghs \n";
-        // }
-        // if(partVector[i]==myRank)
-        // {
-        //   numberOfPointsPerDevice++;
-        // }
         numberOfPointsPerDevice++;
     }
-    MPICHECK(MPI_Allreduce(MPI_IN_PLACE, &partVector, max_points, MPI_INT, MPI_SUM, MPI_COMM_WORLD));
-    // cout<<"CHECK : "<<globalToLocalIndex[432]<<endl;
-    //
-    ////ALLOCATING MEMORY FOR POINTS
+
+    //Share Partition Value across Proccesses
+    MPICHECK(MPI_Allreduce(MPI_IN_PLACE, &partVector, max_points, MPI_INT, MPI_SUM, MPI_COMM_WORLD));    
+
+    //ALLOCATING MEMORY FOR POINTS
     splitPoint=new splitPoints[numberOfPointsPerDevice];
-    //
+
+    if(myRank==0){
+      cout<<"Determining Nature of Points\n";
+    }
     //ASSIGNING POINTS FOR EACH DEVICE AND CALCULATING NATURE OF POINTS ON EACH PARTITION
-    cout<<"Initialising....\n";
     for(int i=0;i<local_points;i++){
-      // if(localToGlobalIndex[i]==442481){
-      //   cout<<"Local Index is "<<i<<endl;
-      // }
       assign(splitPoint[i],localToGlobalIndex[i],myRank);
-      // if(localToGlobalIndex[i]==442481){
-      //     cout<<"BIUHASDUCHUISHC "<<splitPoint[199977].globalIndex<<" "<<splitPoint[199977].x<<" "<<splitPoint[199977].y<<" "<<splitPoint[285282].z<<endl;
-      // }
       findNatureOfLocalPoints(splitPoint[i]);
     }
-    // cout<<"BIUHASDUC÷HUISHC "<<splitPoint[199977].globalIndex<<" "<<splitPoint[199977].x<<" "<<splitPoint[199977].y<<" "<<splitPoint[199977].z<<endl;
     allocateSizeForNatureOfLocalPoints();
     for(int i=0;i<local_points;i++){
       assignNatureOfLocalPoints(splitPoint[i],i);
     }
 
-    // if(myRank==1){
-    //   cout<<"Number Of Local Nbhs : "<<splitPoint[6081].numberOfGhostxposNbhs<<" "<<splitPoint[6081].numberOfLocalxposNbhs<<endl;
-    // }
-
-    // cout<<"Verification : "<<myRank<<" : "<<interiorPointsLocal<<" "<<wallPointsLocal<<" "<<outerPointsLocal<<" "<<interiorPointsLocal+wallPointsLocal+outerPointsLocal<<endl;
-    //
-    // cout<< " CHECK : "<< splitPoint[258].globalIndex<<endl;
-    //
+    //Initialising the Send Buffer
     sendBuffer=new transferPoints*[nRanks];
     int points_on_gpu_to_send_to;
     int total_points_to_send=0;
     for(int i=0;i<nRanks;i++){
         fin>>points_on_gpu_to_send_to;
-        // ghostToGlobalIndex[i]=new int[points_on_gpu_to_send_to];
         total_points_to_send+=points_on_gpu_to_send_to;
-        cout<<points_on_gpu_to_send_to<<endl;
         sendBuffer[i]=new transferPoints[points_on_gpu_to_send_to];
-        // if(myRank==0)
-        //   cout<<i<<" "<<points_on_gpu_to_send_to<<endl;
     }
     
     int currDevice=0;
@@ -379,8 +361,8 @@ int main(int argc, char* argv[])
     for(int i=0;i<nRanks;i++){
         sendPoints[i]=0;
     }
-    cout<<endl;
 
+    //Populating the Send Buffer with Data
     for(int i=0;i<total_points_to_send;++i){
         fin>>currDevice;
         fin>>setprecision(13)>>sendBuffer[currDevice][sendPoints[currDevice]].globalIndex>>sendBuffer[currDevice][sendPoints[currDevice]].x>>sendBuffer[currDevice][sendPoints[currDevice]].y>>sendBuffer[currDevice][sendPoints[currDevice]].z;
@@ -389,38 +371,13 @@ int main(int argc, char* argv[])
         splitPoint[currIndex].ghostIndex[splitPoint[currIndex].numberOfPartitionsToSendTo]=sendPoints[currDevice];
         splitPoint[currIndex].partitions[splitPoint[currIndex].numberOfPartitionsToSendTo]=currDevice;
         splitPoint[currIndex].numberOfPartitionsToSendTo++;
-        // if(sendBuffer[currDevice][sendPoints[currDevice]].globalIndex==430334){
-        //   cout<<"kjhedfjkehfjewhjf "<<sendPoints[currDevice];
-        // }
-        // if(sendBuffer[currDevice][sendPoints[currDevice]].globalIndex == 529172){
-        //   cout<<"sioefhisdhfisdhflsdhflkshdlfksdlkf "<<sendPoints[currDevice]<<endl;
-        // }
-        // globalToGhostIndex[sendBuffer[currDevice][sendPoints[currDevice]].globalIndex]=sendPoints[currDevice];
-        // if(sendBuffer[currDevice][sendPoints[currDevice]].globalIndex == 529172){
-        //   cout<<"sioefhisdhfisdhflsdhflkshdlfksdlkf "<<globalToGhostIndex[sendBuffer[currDevice][sendPoints[currDevice]].globalIndex]<<endl;
-        //   cout<<sendBuffer[currDevice][sendPoints[currDevice]].x<<" "<<sendBuffer[currDevice][sendPoints[currDevice]].y<<" "<<sendBuffer[currDevice][sendPoints[currDevice]].z<<endl;
-        // }
         globalToGhostIndex[currDevice][sendBuffer[currDevice][sendPoints[currDevice]].globalIndex]=sendPoints[currDevice];
-        // if(sendBuffer[currDevice][sendPoints[currDevice]].globalIndex == 333830){
-        //   cout<<"sioefhisdhfisdhflsdhflkshdlfksdlkf "<<globalToGhostIndex[currDevice][sendBuffer[currDevice][sendPoints[currDevice]].globalIndex]<<endl;
-        //   cout<<sendBuffer[currDevice][sendPoints[currDevice]].x<<" "<<sendBuffer[currDevice][sendPoints[currDevice]].y<<" "<<sendBuffer[currDevice][sendPoints[currDevice]].z<<endl;
-        // }
-        sendPoints[currDevice]++;
-        
+        sendPoints[currDevice]++;   
     }
-    // if(myRank==0){
-    //   cout<<"o;iwhfis;dhafidsahfisdhflshdfkdash "<<globalToGhostIndex[1][333830]<<endl;
-    // }
     fin.close();
-    // if(myRank==0){
-    //   cout<<"o;iwhfis;dhafidsahfisdhflshdfkdash "<<globalToGhostIndex[1][333830]<<endl;
-    // }
     
     cout<<"Number of Points in Process "<<myRank<<" are: "<<numberOfPointsPerDevice<<endl;
-    //
-    //
-    cout<<"HI1\n";
-    // //
+
     //Sharing Size across All Processes
     int *receivePoints=new int[nRanks];
     for(int i=0;i<nRanks;i++){
@@ -438,11 +395,6 @@ int main(int argc, char* argv[])
         MPICHECK(MPI_Recv(receivePoints+i , 1, MPI_INT, i, 0, MPI_COMM_WORLD,MPI_STATUS_IGNORE));
       }
     }
-    // cout<<myRank<<" "<<sendPoints[0]<<" "<<sendPoints[1]<<" "<<sendPoints[2]<<" "<<sendPoints[3]<<endl;
-    // cout<<myRank<<" "<<receivePoints[0]<<" "<<receivePoints[1]<<" "<<receivePoints[2]<<" "<<receivePoints[3]<<endl;
-
-    cout<<myRank<<" "<<sendPoints[0]<<" "<<sendPoints[1]<<endl;
-    cout<<myRank<<" "<<receivePoints[0]<<" "<<receivePoints[1]<<endl;
 
     receiveBuffer=new transferPoints*[nRanks];
     for(int i=0;i<nRanks;i++){
@@ -466,36 +418,20 @@ int main(int argc, char* argv[])
 
     // MPI_Type_create_struct(nitems, blocklengths, offsets, types, &mpi_transferPoints);
     // MPI_Type_commit(&mpi_transferPoints);
-
-    // for(int i=0;i<nRanks;i++){
-    //   if(i!=myRank){
-    //     MPICHECK(MPI_Send(sendBuffer[i] , sendPoints[i], MPI_BYTE, i, 0, MPI_COMM_WORLD));
-    //     MPICHECK(MPI_Recv(receiveBuffer[myRank] , receivePoints[myRank], MPI_BYTE, myRank, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE));
-    //   }
-    // }
-
-    // if(myRank==0){
-    // cout<<myRank<<" "<<sendBuffer[1][0].x<<" "<<sendPoints[1]<<endl;
-    // // cout<<myRank<<" "<<receiveBuffer[0]<<" "<<receivePoints[1]<<endl;
-    // }
-    cout<<"HI2\n";
-    // cout<<partVector
-    cout<<numDevices<<endl;
     // //
+
     int totalPointsToSend=0;
     for(int i=0;i<nRanks;i++){
       totalPointsToSend+=sendPoints[i];
     }
-    cout<<"localRank: "<<localRank<<endl;
-    cout<<myRank<<" "<<totalPointsToSend<<endl;
 
-
+    //Initialising and transfering memory to device Pointers
     splitPoints *splitPoint_d;
+
     int *globalToLocalIndex_temp;
     int **globalToGhostIndex_send,**globalToGhostIndex_receive;
     int **globalToGhostIndexSendPointer=(int**)malloc(sizeof(int*)*nRanks);
     int** globalToGhostIndexReceivePointer=(int**)malloc(sizeof(int*)*nRanks);
-
     int *partVector_d;
 
     transferPoints** sendBuffer_d,** receiveBuffer_d;
@@ -508,54 +444,40 @@ int main(int argc, char* argv[])
     for(int i = 0; i < nRanks; i++)
     {
       transferPoints *darray;
-      cudaMalloc(&darray, sizeof(transferPoints) * sendPoints[i]);
-      cudaMemcpy(darray,sendBuffer[i], sendPoints[i] * sizeof(transferPoints), cudaMemcpyHostToDevice);
-      cudaMemcpy(&sendBuffer_d[i], &darray, sizeof(transferPoints*), cudaMemcpyHostToDevice);
+      CUDACHECK(cudaMalloc(&darray, sizeof(transferPoints) * sendPoints[i]));
+      CUDACHECK(cudaMemcpy(darray,sendBuffer[i], sendPoints[i] * sizeof(transferPoints), cudaMemcpyHostToDevice));
+      CUDACHECK(cudaMemcpy(&sendBuffer_d[i], &darray, sizeof(transferPoints*), cudaMemcpyHostToDevice));
       memcpy(&sendPointer[i],&darray,sizeof(transferPoints*));
-      // cudaFree(darray);
-      // cudaMalloc(&sendBuffer_d[i],sizeof(transferPoints) * sendPoints[i]);
-      // cudaMemcpy(sendBuffer_d[i],sendBuffer[i], sendPoints[i] * sizeof(transferPoints), cudaMemcpyHostToDevice);
     }
 
-    // transferPoints** receiveBuffer_d;
     CUDACHECK(cudaMalloc(&receiveBuffer_d,sizeof(transferPoints*)*nRanks));
     for(int i = 0; i < nRanks; i++)
     {
       transferPoints *darray;
-      cudaMalloc(&darray, sizeof(transferPoints) * receivePoints[i]);
-      // cout<<"darray "<<&darray<<endl;
-      // cudaMemcpy(darray,sendBuffer[i], sendPoints[i] * sizeof(transferPoints), cudaMemcpyHostToDevice);
-      cudaMemcpy(&receiveBuffer_d[i], &darray, sizeof(transferPoints*), cudaMemcpyHostToDevice);
+      CUDACHECK(cudaMalloc(&darray, sizeof(transferPoints) * receivePoints[i]));
+      CUDACHECK(cudaMemcpy(&receiveBuffer_d[i], &darray, sizeof(transferPoints*), cudaMemcpyHostToDevice));
       memcpy(&receivePointer[i],&darray,sizeof(transferPoints*));
-      // cout<<"darray "<<&receivePointer[i]<<endl;
-      // cudaFree(darray);
     }
 
     CUDACHECK(cudaMalloc(&globalToGhostIndex_send, nRanks * sizeof(int*)));
     for(int i = 0; i < nRanks; i++)
     {
       int *darray;
-      cudaMalloc(&darray, sizeof(int) * max_points);
-      cudaMemcpy(darray,globalToGhostIndex[i], sizeof(int) * max_points, cudaMemcpyHostToDevice);
-      cudaMemcpy(&globalToGhostIndex_send[i], &darray, sizeof(int*), cudaMemcpyHostToDevice);
+      CUDACHECK(cudaMalloc(&darray, sizeof(int) * max_points));
+      CUDACHECK(cudaMemcpy(darray,globalToGhostIndex[i], sizeof(int) * max_points, cudaMemcpyHostToDevice));
+      CUDACHECK(cudaMemcpy(&globalToGhostIndex_send[i], &darray, sizeof(int*), cudaMemcpyHostToDevice));
       memcpy(&globalToGhostIndexSendPointer[i],&darray,sizeof(int*));
     }
-   
 
     CUDACHECK(cudaMalloc(&globalToGhostIndex_receive, nRanks * sizeof(int*)));
     for(int i = 0; i < nRanks; i++)
     {
         int *darray;
-        cudaMalloc(&darray, sizeof(int) * max_points);
-        cudaMemcpy(&globalToGhostIndex_receive[i], &darray, sizeof(int*), cudaMemcpyHostToDevice);
+        CUDACHECK(cudaMalloc(&darray, sizeof(int) * max_points));
+        CUDACHECK(cudaMemcpy(&globalToGhostIndex_receive[i], &darray, sizeof(int*), cudaMemcpyHostToDevice));
         memcpy(&globalToGhostIndexReceivePointer[i],&darray,sizeof(int*));
     }
 
-    // CUDACHECK(cudaStreamCreate(&s[0]));
-        // CUDACHECK(cudaSetDevice(i));
-    // if(myRank==1){
-    //   cout<<"o;iwhfis;dhafidsahfisdhflshdfkdash "<<globalToGhostIndex[529172]<<endl;
-    // }
     CUDACHECK(cudaMalloc(&splitPoint_d, numberOfPointsPerDevice * sizeof(splitPoints)));
     CUDACHECK(cudaMemcpy(splitPoint_d, splitPoint, numberOfPointsPerDevice * sizeof(splitPoints), cudaMemcpyHostToDevice));
     CUDACHECK(cudaMalloc(&globalToLocalIndex_temp, max_points * sizeof(int)));
@@ -565,103 +487,63 @@ int main(int argc, char* argv[])
     
     // //
    
-    // cout<<"STUCK "<<myRank<<endl;
-    cout<<"HI3\n";
-    if (myRank == 0) ncclGetUniqueId(&id);
-    MPI_Barrier(MPI_COMM_WORLD);
-    cout<<"Hiiiii\n";
+    
+    if (myRank == 0) {
+      cout<<"Getting NCCL Unique ID\n";
+      NCCLCHECK(ncclGetUniqueId(&id));
+    }
+    MPICHECK(MPI_Barrier(MPI_COMM_WORLD));
 
     MPICHECK(MPI_Bcast((void *)&id, sizeof(id), MPI_BYTE, 0, MPI_COMM_WORLD));
     // //
-    cout<<"Hiiiii\n";
-    // //
+    if(myRank==0){
+      cout<<"ID Succesfully Broadcasted\n";
+    }
+
+    // Initialising NCCL Communicator and CUDA stream
     ncclComm_t comm;
     NCCLCHECK(ncclCommInitRank(&comm, nRanks, id, myRank));
-    cout<<"Rank "<<myRank<<" Device "<<localRank<<endl;
-
     cudaStream_t stream;
-    // cudaStreamCreateWithFlags(stream, cudaStreamNonBlocking);
-    // int count;
-    // ncclCommCount(comm, &count);
-    // cout<<myRank <<" Commcount "<<count<<endl; 
 
-    // ncclCommCuDevice(comm, &count);
-    // cout<<myRank <<" CuDevice "<<count<<endl;
+    if(myRank==0){
+      cout<<"Beginning Solver\n";
+    }
 
-    // ncclCommUserRank(comm, &count);
-    // cout<<myRank <<" Comm user "<<count<<endl;
-    // for (int i=0; i<numDevices; i++)
-    //   CUDACHECK(cudaDeviceSynchronize());
-    cout<<"HI4\n";
     auto start = high_resolution_clock::now();
-    // // //
-    // cout<<"BIUHASDUCHUISHC "<<splitPoint[199977].globalIndex<<" "<<splitPoint[199977].x<<" "<<splitPoint[199977].y<<" "<<splitPoint[199977].z<<endl;
-
+    // 
     fpi_solver_multi_nccl(splitPoint_d,localRank,sendBuffer_d,receiveBuffer_d,nRanks,myRank,sendPoints,receivePoints,comm,stream,sendPointer,receivePointer,globalToLocalIndex_temp,globalToGhostIndex_receive,globalToGhostIndexSendPointer,globalToGhostIndexReceivePointer,partVector_d);
-    // //
+    // 
     auto stop = high_resolution_clock::now();
-    cout<<"Copying memory back to Host\n";
-    //
+    if(myRank==0){
+      cout<<"Copying memory back to Host\n";
+    }
     CUDACHECK(cudaMemcpy(splitPoint, splitPoint_d, numberOfPointsPerDevice * sizeof(splitPoints), cudaMemcpyDeviceToHost));
 
     
     // TO COPY BACK THE SEND BUFFER TO HOST (POINTER TO POINTER METHOD)
-    transferPoints *darray;
-    for (int i = 0; i <nRanks; i++){
-      cudaMalloc(&darray, sizeof(transferPoints) * sendPoints[i]);
-      cudaMemcpy(&darray, &sendBuffer_d[i], sizeof(transferPoints*), cudaMemcpyDeviceToHost);
-      cudaMemcpy(sendBuffer[i], darray, sizeof(transferPoints) * sendPoints[i], cudaMemcpyDeviceToHost);
-      cudaFree(darray);
-    }
-
     // transferPoints *darray;
-    for (int i = 0; i <nRanks; i++){
-      cudaMalloc(&darray, sizeof(transferPoints) * receivePoints[i]);
-      cudaMemcpy(&darray, &receiveBuffer_d[i], sizeof(transferPoints*), cudaMemcpyDeviceToHost);
-      cudaMemcpy(receiveBuffer[i], darray, sizeof(transferPoints) * receivePoints[i], cudaMemcpyDeviceToHost);
-      // cudaFree(darray);
-    }
-
-    // int *tempArray;
     // for (int i = 0; i <nRanks; i++){
-    //   cudaMalloc(&tempArray, sizeof(int) * max_points);
+    //   cudaMalloc(&darray, sizeof(transferPoints) * sendPoints[i]);
+    //   cudaMemcpy(&darray, &sendBuffer_d[i], sizeof(transferPoints*), cudaMemcpyDeviceToHost);
+    //   cudaMemcpy(sendBuffer[i], darray, sizeof(transferPoints) * sendPoints[i], cudaMemcpyDeviceToHost);
+    //   cudaFree(darray);
+    // }
+
+    // for (int i = 0; i <nRanks; i++){
+    //   cudaMalloc(&darray, sizeof(transferPoints) * receivePoints[i]);
     //   cudaMemcpy(&darray, &receiveBuffer_d[i], sizeof(transferPoints*), cudaMemcpyDeviceToHost);
     //   cudaMemcpy(receiveBuffer[i], darray, sizeof(transferPoints) * receivePoints[i], cudaMemcpyDeviceToHost);
-    //   // cudaFree(darray);
     // }
 
-    // if(myRank==0){
-    // cout<<myRank<<" "<<sendBuffer[1][1].globalIndex<<" "<<sendBuffer[1][1].x<<endl;
-    // for(int r=0;r<5;r++){
-    //   cout<<"TEST "<<sendBuffer[1][1].q[r]<<endl;
-    // }
-    // }
-
-    cout<<"Deallocating memory and Destroying Communicators\n";
-    // if(myRank==1){
-    // cout<<myRank<<" "<<receiveBuffer[0][1].globalIndex<<" "<<receiveBuffer[0][1].x<<endl;
-    // for(int r=0;r<5;r++){
-    //   cout<<"TEST recv buffer "<<receiveBuffer[0][1].q[r]<<endl;
-    // }
-    // }
-    // cout<< " CHECK : "<< splitPoint[258].globalIndex<<endl;
-    cout<<"HI7\n";
-    // if(myRank==1){
-    //   cout<<"kahfhdal"<<endl;
-    //   cout<<myRank<<" "<<splitPoint[6081].globalIndex<<endl;
-    //   // cout<<myRank<<" "<<splitPoint[6081].numberOfLocalxnegNbhs<<endl;
-    //   cout<<myRank<<" "<<splitPoint[6081].numberOfGhostxnegNbhs<<endl;
-    //   for(int r=0;r<5;r++){
-    //     cout<<"TEST "<<splitPoint[6081].dq[0][r]<<endl;
-    //   }
-    // }
-    // // //
+    if(myRank==0){
+      cout<<"Deallocating memory and Destroying Communicators\n";
+    }
+    // 
     CUDACHECK(cudaFree(splitPoint_d));
-    // // //
-    ncclCommDestroy(comm);
+    // 
+    NCCLCHECK(ncclCommDestroy(comm));
     MPI_Finalize();
-    cout << "Done with process "<<myRank<<endl;
-    
+    //
     auto duration = duration_cast<microseconds>(stop - start);
-    cout << "Time Taken :" << duration.count() / 1000000.0 << endl;
+    cout << "Done with process "<<myRank<< ". Time Taken by was:" << duration.count() / 1000000.0 << endl;
 }

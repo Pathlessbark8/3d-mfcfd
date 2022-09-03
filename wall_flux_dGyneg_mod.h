@@ -489,11 +489,6 @@ __global__ void wall_dGy_neg_multi_nccl(int myRank,splitPoints *splitPoint, doub
     for (int r = 0; r < 5; r++)
     {
         splitPoint[i].flux_res[r] += 2.00 *splitPoint[i].delt* temp[r] / det;
-		// if(myRank==1 && i==5150){
-        //     printf("delt=%.15f\n",splitPoint[i].delt);
-        //     printf("det=%.15f\n",det);
-        //     printf("splitPoint[%d].flux_res[%d]=%.15f\n",i,r,splitPoint[i].flux_res[r]);
-        // }
     }
     
 }

@@ -319,12 +319,6 @@ __global__ void wall_dGx_neg_multi_nccl(int myRank,splitPoints *splitPoint, doub
         nor[r] = splitPoint[i].nor[r];
     }
     //
-	// if(i==6081 && myRank==1){
-	// 	printf("numberOfLocalxnegNbhs %d\n",splitPoint[i].numberOfLocalxnegNbhs);
-	// 	printf("numberOfGhostxnegNbhs %d\n",splitPoint[i].numberOfGhostxnegNbhs);
-	// 	printf("numberOfLocalxnegNbhs %d\n",splitPoint[i].numberOfLocalNbhs);
-	// 	printf("numberOfGhostxnegNbhs %d\n",splitPoint[i].numberOfGhostNbhs);
-	// }
     for (j = 0; j < splitPoint[i].numberOfLocalxnegNbhs; j++)
     //
     {
@@ -388,10 +382,6 @@ __global__ void wall_dGx_neg_multi_nccl(int myRank,splitPoints *splitPoint, doub
         for (int r = 0; r < 5; r++)
         {
             temp[r] = G_k[r] - G_i[r];
-			// if(i==6081 && myRank==1){
-			// 	printf("k = %d",nbh);
-			// 	printf("Local G_k[%d] %f G_i[%d] %f temp[%d] %f\n",r,G_k[r],r,G_i[r],r,temp[r]);
-			// }
         }
         //
         for (int r = 0; r < 5; r++)
@@ -403,9 +393,6 @@ __global__ void wall_dGx_neg_multi_nccl(int myRank,splitPoints *splitPoint, doub
         //
     }
     //
-	// if(i==6081){
-	// 	printf("splitPoint[i].numberOfGhostxnegNbhs %d\n",splitPoint[i].numberOfGhostxnegNbhs);
-	// }
     for (j = 0; j < splitPoint[i].numberOfGhostxnegNbhs; j++)
     //
     {
@@ -420,18 +407,6 @@ __global__ void wall_dGx_neg_multi_nccl(int myRank,splitPoints *splitPoint, doub
         delx = x_k - x_i;
         dely = y_k - y_i;
         delz = z_k - z_i;
-        //
-		// if(myRank==1 && i==6081){
-		// 	printf("Global Point %d\n", splitPoint[i].globalIndex);
-        //     printf("count =%d %d\n", splitPoint[i].numberOfLocalxnegNbhs,splitPoint[i].numberOfGhostxnegNbhs);
-        //     printf("nbh = %d\n",receiveBuffer[device][ghostIndex].globalIndex);
-        //     printf("delx = %.15f\n",delx);
-        //     printf("dely = %.15f\n",dely);
-        //     printf("delz = %.15f\n",delz);
-        //     printf("x_k = %.15f\n",x_k);
-        //     printf("y_k = %.15f\n",y_k);
-        //     printf("z_k = %.15f\n",z_k);
-        // }
 		//
         dels = delx * tan1[0] + dely * tan1[1] + delz * tan1[2];
         delt = delx * tan2[0] + dely * tan2[1] + delz * tan2[2];
@@ -470,18 +445,11 @@ __global__ void wall_dGx_neg_multi_nccl(int myRank,splitPoints *splitPoint, doub
         {
             temp[r] = delx * receiveBuffer[device][ghostIndex].dq[0][r] + dely * receiveBuffer[device][ghostIndex].dq[1][r] + delz * receiveBuffer[device][ghostIndex].dq[2][r];
             qtilde[r] = receiveBuffer[device][ghostIndex].q[r] - 0.50 * temp[r];
-			// if(myRank==1 && i==6081)
-            // printf("temp[%d]= %.15f %.15f %.15f %.15f\n",r,temp[r],receiveBuffer[device][ghostIndex].dq[0][r],receiveBuffer[device][ghostIndex].dq[1][r],receiveBuffer[device][ghostIndex].dq[2][r]);
         }
         venkat_limiter_multi_nccl_ghost(receiveBuffer, qtilde, phi, device,ghostIndex, VL_CONST);
         for (int r = 0; r < 5; r++)
         {
             qtilde[r] = receiveBuffer[device][ghostIndex].q[r] - 0.50 * phi[r] * temp[r];
-			// if(i==6081 && myRank==1){
-			// 	// printf("qtilde[%d] %.15f point[%d] %.15f phi[%d] %.15f temp[%d] %.15f \n",r,qtilde[r],k,receiveBuffer[device][ghostIndex].q[r],r,phi[r],r,temp[r]);
-			// 	printf("receiveBuffer[%d][%d].qm[0][%d]= %.15f\n",device,k,r,receiveBuffer[device][ghostIndex].qm[0][r]);
-			// 	printf("receiveBuffer[%d][%d].qm[1][%d]= %.15f\n",device,k,r,receiveBuffer[device][ghostIndex].qm[1][r]);
-			// }
         }
         qtilde_to_primitive_cuda(qtilde, prim);
         flux_Gwxn_cuda(G_k, tan1, tan2, nor, prim, pi);
@@ -489,10 +457,6 @@ __global__ void wall_dGx_neg_multi_nccl(int myRank,splitPoints *splitPoint, doub
         for (int r = 0; r < 5; r++)
         {
             temp[r] = G_k[r] - G_i[r];
-			// if(i==6081 && myRank==1){
-			// 	printf("k = %d ",k);
-			// 	printf("Ghost G_k[%d] %.15f G_i[%d] %.15f temp[%d] %.15f\n",r,G_k[r],r,G_i[r],r,temp[r]);
-			// }
         }
         //
         for (int r = 0; r < 5; r++)
@@ -514,11 +478,6 @@ __global__ void wall_dGx_neg_multi_nccl(int myRank,splitPoints *splitPoint, doub
     for (int r = 0; r < 5; r++)
     {
         splitPoint[i].flux_res[r] += 2.00 *splitPoint[i].delt* temp[r] / det;
-		// if(myRank==1 && i==6081){
-        //     printf("splitPoint[%d].delt=%.15f\n",i,splitPoint[i].delt);
-        //     printf("det=%.15f\n",det);
-        //     printf("splitPoint[%d].flux_res[%d]=%.15f\n",i,r,splitPoint[i].flux_res[r]);
-        // }
     }
     
 }
