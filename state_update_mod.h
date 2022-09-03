@@ -393,3 +393,94 @@ void state_update_supersonic_inlet()
 		}
 	}
 }
+
+
+// MULTI GPU FUNCTIONS
+
+__global__ void state_update_wall_multi_nccl(int myRank,splitPoints *splitPoint, int wallPointsLocal, int *wallPointsLocalIndex, double *sum_res_sqr)
+{
+	int k;
+	double U[5], temp;
+	double res_sqr;
+	//
+	int i = blockIdx.x * blockDim.x + threadIdx.x;
+	if (i < 0 || i >= wallPointsLocal)
+	{
+		return;
+	}
+	k = wallPointsLocalIndex[i];
+	primitive_to_conserved_multi_nccl(splitPoint, k, U);
+	temp = U[0];
+	for (int r = 0; r < 5; r++)
+	{
+		U[r] = U[r] - splitPoint[k].flux_res[r];
+		// if(splitPoint[k].globalIndex==19595){
+		// 	printf("End splitPoint[%d].flux_res[%d] = %.15f\n",k,r, splitPoint[k].flux_res[r]);
+		// 	printf("splitPoint[%d].prim[%d] = %.15f\n",k,r, splitPoint[k].prim[r]);
+		// 	printf("U[%d] = %.15f\n",r,U[r]);
+		// }
+	}
+	U[3] = 0.00;
+	//
+	res_sqr = (U[0] - temp) * (U[0] - temp);
+	// if(res_sqr!=res_sqr && k==6081 && myRank==1){
+	// 	printf("U[0] = %f\n",splitPoint[k].flux_res[0]);
+	// 	// printf("temp = %f\n",temp);
+	// 	printf("k = %d\n",k);
+	// }
+	sum_res_sqr[k] = res_sqr;
+	//                                        print*, i, k, point.flux_res[r][k]
+	conserved_to_primitive_multi_nccl(splitPoint, k, U);
+}
+
+__global__ void state_update_interior_multi_nccl(splitPoints *splitPoint, int interiorPointsLocal, int *interiorPointsLocalIndex, double *sum_res_sqr)
+{
+	int k;
+	double U[5], temp;
+	double res_sqr;
+	//
+	int i = blockIdx.x * blockDim.x + threadIdx.x;
+	if (i < 0 || i >= interiorPointsLocal)
+	{
+		return;
+	}
+	k = interiorPointsLocalIndex[i];
+	primitive_to_conserved_multi_nccl(splitPoint, k, U);
+	temp = U[0];
+	for (int r = 0; r < 5; r++)
+	{
+		U[r] = U[r] - splitPoint[k].flux_res[r];
+		// if(splitPoint[k].globalIndex==531991){
+		// 	printf("End splitPoint[%d].flux_res[%d] = %.15f\n",k,r, splitPoint[k].flux_res[r]);
+		// 	printf("splitPoint[%d].prim[%d] = %.15f\n",k,r, splitPoint[k].prim[r]);
+		// 	printf("U[%d] = %.15f\n",r,U[r]);
+		// }
+	}
+	//
+	res_sqr = (U[0] - temp) * (U[0] - temp);
+	sum_res_sqr[k] = res_sqr;
+	//
+	conserved_to_primitive_multi_nccl(splitPoint, k, U);
+}
+
+__global__ void state_update_outer_multi_nccl(splitPoints *splitPoint, int outerPointsLocal, int *outerPointsLocalIndex, double u1_inf, double u2_inf, double u3_inf, double rho_inf, double pi, double pr_inf)
+{
+	int k;
+	double U[5];
+	//
+	int i = blockIdx.x * blockDim.x + threadIdx.x;
+	if (i < 0 || i >= outerPointsLocal)
+	{
+		return;
+	}
+	k = outerPointsLocalIndex[i];
+	conserved_vector_Ubar_multi_cuda(splitPoint, k, U, u1_inf, u2_inf, u3_inf, rho_inf, pi, pr_inf);
+	// temp = U[0];
+	for (int r = 0; r < 5; r++)
+	{
+		U[r] = U[r] - splitPoint[k].flux_res[r];
+	}
+	//
+
+	conserved_to_primitive_multi_nccl(splitPoint, k, U);
+}

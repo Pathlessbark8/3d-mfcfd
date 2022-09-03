@@ -15,3 +15,4 @@ q_var_fortran
 *.ncu-rep
 *.nsys-rep
 *.sqlite
+Different_inner_iterations/

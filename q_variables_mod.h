@@ -1,5 +1,6 @@
 #pragma once
 #include "data_structure_mod.h"
+#include <stdio.h>
 // #include "cuPrintf.cu"
 
 void eval_q_variables()
@@ -71,24 +72,26 @@ __global__ void eval_q_variables_cuda(points &point)
 }
 //
 
-__global__ void eval_q_variables_multi_nccl(splitPoints splitPoint[],int max_points_on_device)
+__global__ void eval_q_variables_multi_nccl(int myRank,splitPoints *splitPoint,int max_points_on_device,transferPoints **sendBuffer)
 
 {
 
 	double rho, u1, u2, u3, pr, beta;
 	double two_times_beta;
-	//
+	// //
 	int bx = blockIdx.x;
     int tx = threadIdx.x;
     int k = bx * blockDim.x + tx;
 
-	if(k>=max_points_on_device){
+	if(k<0 || k>=max_points_on_device){
 		return;
 	}
-	// splitPoint[0].x=2987;
-	if (k < 0 ){
-        return;
-    }
+	// if(k==0){
+    // 	printf("Thread ID: %d \n", tx);
+	// 	printf("Block ID: %d \n", bx);
+	// 	printf("Block Dim: %d \n", blockDim.x);
+	// 	printf("K : %d \n", k);	
+	// }
 		rho = splitPoint[k].prim[0];
 		u1 = splitPoint[k].prim[1];
 		u2 = splitPoint[k].prim[2];
@@ -98,6 +101,7 @@ __global__ void eval_q_variables_multi_nccl(splitPoints splitPoint[],int max_poi
 		beta = 0.50 * rho / pr;
 		//
 		splitPoint[k].q[0] = log(rho) + (log(beta) * 2.50) - beta * (u1 * u1 + u2 * u2 + u3 * u3);
+		rho=log(rho) + (log(beta) * 2.50) - beta * (u1 * u1 + u2 * u2 + u3 * u3);
 		//
 		two_times_beta = 2.00 * beta;
 		//
@@ -105,7 +109,29 @@ __global__ void eval_q_variables_multi_nccl(splitPoints splitPoint[],int max_poi
 		splitPoint[k].q[2] = two_times_beta * u2;
 		splitPoint[k].q[3] = two_times_beta * u3;
 		splitPoint[k].q[4] = -two_times_beta;
-		// splitPoint[k].x=234;
+		// splitPoint[k].x=23.4;
 		//
-	//
+		// if(splitPoint[k].globalIndex==19595){
+        //     for(int r=0;r<5;r++){
+        //         printf("q[%d] is :%.15f \n",k,splitPoint[k].prim[r]);
+        //     }
+		// }
+	// if(splitPoint[k].globalIndex==432){
+		// printf("q is : %f \n",splitPoint[k].q[0]);
+		// printf("Partition Index is : %d \n",splitPoint[k].numberOfPartitionsToSendTo);
+		// printf("ghost Index is : %d \n",splitPoint[k].ghostIndex);
+		if(splitPoint[k].isGhost){
+			for(int t=0;t<splitPoint[k].numberOfPartitionsToSendTo;++t){
+				sendBuffer[splitPoint[k].partitions[t]][splitPoint[k].ghostIndex[t]].min_dist=splitPoint[k].min_dist;
+				for(int r=0;r<5;++r){
+					// printf("Partition Index and ghostIndex are : %d %d \n",splitPoint[k].partitions[t],splitPoint[k].ghostIndex[t]);
+					sendBuffer[splitPoint[k].partitions[t]][splitPoint[k].ghostIndex[t]].q[r]=splitPoint[k].q[r];
+					sendBuffer[splitPoint[k].partitions[t]][splitPoint[k].ghostIndex[t]].prim[r]=splitPoint[k].prim[r];
+					// sendBuffer[splitPoint[k].partitions[t]][splitPoint[k].ghostIndex[t]].dq[0][r]=200;
+					// printf("Global Index : %f \n",sendBuffer[splitPoint[k].partitions[t]][splitPoint[k].ghostIndex[t]].q[r]);
+					// sendBuffer[1][0];
+				}
+			}
+		}
+	// }
 }

@@ -4,7 +4,7 @@
 
 
 		const int max_points =  580485;
-		const int max_devices=	32;
+		const int max_partitions=7;
 		int max_iters = 1;//1000
 //
 //		Flow conditions ..
@@ -20,7 +20,7 @@
 		double power = 0.00;
 		double VL_CONST = 2.00;
 		double CFL = 0.5;
-		int inner_iterations = 0;
+		int inner_iterations = 3;
 //
 //
 //		Freestream values of the primitive variables ..
@@ -31,14 +31,14 @@
 		double u3_inf = 0.00;
 		double pr_inf = 1.00/1.40;
 
+		
 		int numDevices = 1;
 		int partVector[max_points];
-		int numberOfPointsPerDevice[max_devices];
+		long long numberOfPointsPerDevice;
+		int local_points=0;
 
 //      Variables Required for NCCL
 
-		ncclComm_t *comms;
-		int *devs;
 		ncclUniqueId id;
 
 //

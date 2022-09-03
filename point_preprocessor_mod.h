@@ -61,12 +61,12 @@ void read_input_point_data()
         else if (point.status[k] == 6)
         {
             supersonic_outlet_points = supersonic_outlet_points + 1;
-            cout<<k<<endl;
+            // cout<<k<<endl;
         }
         else if (point.status[k] == 5)
         {
             supersonic_inlet_points = supersonic_inlet_points + 1;
-            cout<<k<<"Here"<<endl;
+            // cout<<k<<"Here"<<endl;
         }
 
     }

@@ -1,5 +1,6 @@
 #pragma once
 #include "parameter_mod.h"
+
 //
 //
 struct points
@@ -71,11 +72,54 @@ struct splitPoints{
     double delt;
     int alias;
     int point_with_alias;
-    int counter;
-    int number_ghost;
-    int *ghost_points;
+    int numberOfGhostNbhs;
+    int numberOfLocalNbhs;
+    int ghostNbhs[27];
+    int localNbhs[27];
+    int numberOfLocalxposNbhs;
+    int numberOfLocalxnegNbhs;
+    int numberOfLocalyposNbhs;
+    int numberOfLocalynegNbhs;
+    int numberOfLocalzposNbhs;
+    int numberOfLocalznegNbhs;
+    int numberOfGhostxposNbhs;
+    int numberOfGhostxnegNbhs;
+    int numberOfGhostyposNbhs;
+    int numberOfGhostynegNbhs;
+    int numberOfGhostzposNbhs;
+    int numberOfGhostznegNbhs;
+    int localxpos_conn[22],localxneg_conn[22];
+    int localypos_conn[22],localyneg_conn[22];
+    int localzpos_conn[22],localzneg_conn[22];
+    int ghostxpos_conn[22],ghostxneg_conn[22];
+    int ghostypos_conn[22],ghostyneg_conn[22];
+    int ghostzpos_conn[22],ghostzneg_conn[22];
+    bool isGhost;
+    int globalIndex;
+    int ghostIndex[max_partitions];
+    int numberOfPartitionsToSendTo;
+    int partitions[max_partitions];
 };
 
+
+struct transferPoints{
+    int globalIndex;
+    double x,y,z;
+    double q[5];
+    double dq[3][5];
+    double prim[5];
+    double delt;
+    double qm[2][5];
+    double min_dist;
+};
+
+transferPoints **sendBuffer;
+transferPoints **receiveBuffer;
+
+int globalToLocalIndex[max_points]={0};
+int **globalToGhostIndex;
+int *localToGlobalIndex;
+int **ghostToGlobalIndex;
 //
 //
 int interior_points, wall_points, outer_points;
@@ -87,42 +131,132 @@ int outer_points_index[max_points];
 int supersonic_outlet_points_index[max_points];
 int supersonic_inlet_points_index[max_points];
 //
+
+// For the parallel version
+int interiorPointsLocal=0, wallPointsLocal=0, outerPointsLocal=0;
+int supersonicInletPointsLocal=0, supersonicOutletPointsLocal=0;
+int *interiorPointsLocalIndex;
+int *wallPointsLocalIndex;
+int *outerPointsLocalIndex;
+int *supersonicOutletPointsLocalIndex;
+int *supersonicInletPointsLocalIndex;
+//
+//
 double res_old, res_new, max_res, residue;
 int max_res_point;
 
 int threads_per_block = 128;
 double sum_res_sqr=0;
 //
-splitPoints *splitPoint[max_devices];
+splitPoints *splitPoint;
 
-void assign(splitPoints &splitPoint,int i){
+void findNatureOfLocalPoints(splitPoints &splitPoint){
+    if (splitPoint.status == 0)
+            interiorPointsLocal = interiorPointsLocal + 1;
+        else if (splitPoint.status == 1)
+            wallPointsLocal = wallPointsLocal + 1;
+        else if (splitPoint.status == 2)
+            outerPointsLocal = outerPointsLocal + 1;
+        else if (splitPoint.status== 6)
+        {
+            supersonicOutletPointsLocal = supersonicOutletPointsLocal + 1;
+            // cout<<k<<endl;
+        }
+        else if (splitPoint.status== 5)
+        {
+            supersonicInletPointsLocal = supersonicInletPointsLocal + 1;
+            // cout<<k<<"Here"<<endl;
+        }
+}
+
+void allocateSizeForNatureOfLocalPoints(){
+    // cout<<"Verification : "<<myRank<<" : "<<interiorPointsLocal<<" "<<wallPointsLocal<<" "<<outerPointsLocal<<" "<<interiorPointsLocal+wallPointsLocal+outerPointsLocal<<endl;
+
+    interiorPointsLocalIndex=new int[interiorPointsLocal];
+    wallPointsLocalIndex=new int[wallPointsLocal];
+    outerPointsLocalIndex=new int[outerPointsLocal];
+    supersonicOutletPointsLocalIndex=new int[supersonicOutletPointsLocal];
+    supersonicInletPointsLocalIndex=new int[supersonicInletPointsLocal];
+    interiorPointsLocal=0;
+    wallPointsLocal=0;
+    outerPointsLocal=0;
+    supersonicOutletPointsLocal=0;
+    supersonicInletPointsLocal=0;
+}
+
+void assignNatureOfLocalPoints(splitPoints &splitPoint,int k){
+    if (splitPoint.status == 0)
+        {
+            interiorPointsLocalIndex[interiorPointsLocal] = k;
+            // cout<<"Verify "<<k<<endl;
+            interiorPointsLocal = interiorPointsLocal + 1;
+        }
+        else if (splitPoint.status == 1)
+        { 
+            wallPointsLocalIndex[wallPointsLocal] = k;
+            wallPointsLocal = wallPointsLocal + 1;
+        }
+        else if (splitPoint.status == 2)
+        {
+            outerPointsLocalIndex[outerPointsLocal] = k;
+            outerPointsLocal = outerPointsLocal + 1;
+        }
+        else if (splitPoint.status == 6)
+        {
+            supersonicOutletPointsLocalIndex[supersonicOutletPointsLocal] = k;
+            supersonicOutletPointsLocal = supersonicOutletPointsLocal + 1;
+        }
+        else if (splitPoint.status == 5)
+        {
+            supersonicInletPointsLocalIndex[supersonicInletPointsLocal] = k;
+            supersonicInletPointsLocal = supersonicInletPointsLocal + 1;
+        }
+}
+
+void assign(splitPoints &splitPoint,int i,int myRank){
+    splitPoint.globalIndex=i;
     splitPoint.x=point.x[i];
     splitPoint.y=point.y[i];
     splitPoint.z=point.z[i];
+    // if(i==442481){
+    //       cout<<"BIUHASDUCHUISHC "<<splitPoint.globalIndex<<" "<<splitPoint.x<<" "<<splitPoint.y<<" "<<splitPoint.z<<endl;
+    // }
     splitPoint.status=point.status[i];
     splitPoint.nbhs=point.nbhs[i];
     splitPoint.min_dist=point.min_dist[i];  
     splitPoint.alias=point.alias[i];
     splitPoint.point_with_alias=point.point_with_alias[i];
-    splitPoint.counter=point.counter[i];
     //
-    splitPoint.number_ghost=0;
-    for(int j=0;j<27;j++){
+    splitPoint.numberOfGhostNbhs=0;
+    for(int j=0;j<point.nbhs[i];j++){
         splitPoint.conn[j]=point.conn[j][i];
-        if(partVector[splitPoint.conn[j]]!=partVector[splitPoint.counter]){
-            splitPoint.number_ghost++;
+        if(partVector[splitPoint.conn[j]]!=partVector[i]){
+            splitPoint.numberOfGhostNbhs++;
         }
     }
-    if(splitPoint.number_ghost!=0){
-        splitPoint.ghost_points=new int[splitPoint.number_ghost];
-        splitPoint.number_ghost=0;
-        for(int j=0;j<27;j++){
-        if(partVector[splitPoint.conn[j]]!=partVector[splitPoint.counter]){
-            splitPoint.ghost_points[splitPoint.number_ghost++]=splitPoint.conn[j];
+    splitPoint.numberOfLocalNbhs=splitPoint.nbhs-splitPoint.numberOfGhostNbhs;
+    // if(myRank==1 && i==25993){
+    //     cout<<"Verification : "<<splitPoint.numberOfGhostNbhs<<" "<<splitPoint.numberOfLocalNbhs<<endl;
+    // }
+    // printf("HERE %d %d\n",splitPoint.numberOfGhostNbhs,splitPoint.numberOfLocalNbhs); //Point with Global Index 430334 has 18 Ghost nbhs and 6 Local Nbhs
+    if(splitPoint.numberOfGhostNbhs!=0){
+        splitPoint.numberOfGhostNbhs=0;
+    }
+
+    splitPoint.numberOfLocalNbhs=0;
+    for(int j=0;j<point.nbhs[i];j++){
+        if(partVector[splitPoint.conn[j]]!=partVector[i]){
+            splitPoint.ghostNbhs[splitPoint.numberOfGhostNbhs++]=splitPoint.conn[j];
+        }
+        else{
+            splitPoint.localNbhs[splitPoint.numberOfLocalNbhs++]=splitPoint.conn[j];
         }
     }
-    }
+    // if(i==430334)
+    // printf("HERE %d %d\n",splitPoint.numberOfGhostNbhs,splitPoint.numberOfLocalNbhs);
     //
+
+
     for(int j=0;j<3;j++){
         splitPoint.tan1[j]=point.tan1[j][i];
         splitPoint.tan2[j]=point.tan2[j][i];
@@ -145,7 +279,10 @@ void assign(splitPoints &splitPoint,int i){
         splitPoint.temp[2][j]=point.temp[2][j][i];
     }
     splitPoint.delt=point.delt[i];
+    splitPoint.isGhost=false;
+    splitPoint.numberOfPartitionsToSendTo=0;
 }
+
 //
 
 //
