@@ -17,9 +17,9 @@ void conserved_vector_Ubar(int k, double *Ubar)
     //
     //
     //
-    u1_inf_rot = u1_inf * point.tan1[0][k] + u2_inf * point.tan1[1][k] + u3_inf * point.tan1[2][k];
-    u2_inf_rot = u1_inf * point.tan2[0][k] + u2_inf * point.tan2[1][k] + u3_inf * point.tan2[2][k];
-    u3_inf_rot = u1_inf * point.nor[0][k] + u2_inf * point.nor[1][k] + u3_inf * point.nor[2][k];
+    u1_inf_rot = u1_inf * point.tan1[k][0] + u2_inf * point.tan1[k][1] + u3_inf * point.tan1[k][2];
+    u2_inf_rot = u1_inf * point.tan2[k][0] + u2_inf * point.tan2[k][1] + u3_inf * point.tan2[k][2];
+    u3_inf_rot = u1_inf * point.nor[k][0] + u2_inf * point.nor[k][1] + u3_inf * point.nor[k][2];
     //
     rho_e_inf = pr_inf * 2.50 + 0.5 * rho_inf * (u1_inf_rot * u1_inf_rot + u2_inf_rot * u2_inf_rot + u3_inf_rot * u3_inf_rot);
     //
@@ -28,15 +28,15 @@ void conserved_vector_Ubar(int k, double *Ubar)
     B3_inf = exp(-S3 * S3) / (2 * sqrt(pi * beta));
     A3n_inf = 0.5 * (1 - erf(S3));
     //
-    rho = point.prim[0][k];
-    u1 = point.prim[1][k];
-    u2 = point.prim[2][k];
-    u3 = point.prim[3][k];
-    pr = point.prim[4][k];
+    rho = point.prim[k][0];
+    u1 = point.prim[k][1];
+    u2 = point.prim[k][2];
+    u3 = point.prim[k][3];
+    pr = point.prim[k][4];
     //
-    u1_rot = u1 * point.tan1[0][k] + u2 * point.tan1[1][k] + u3 * point.tan1[2][k];
-    u2_rot = u1 * point.tan2[0][k] + u2 * point.tan2[1][k] + u3 * point.tan2[2][k];
-    u3_rot = u1 * point.nor[0][k] + u2 * point.nor[1][k] + u3 * point.nor[2][k];
+    u1_rot = u1 * point.tan1[k][0] + u2 * point.tan1[k][1] + u3 * point.tan1[k][2];
+    u2_rot = u1 * point.tan2[k][0] + u2 * point.tan2[k][1] + u3 * point.tan2[k][2];
+    u3_rot = u1 * point.nor[k][0] + u2 * point.nor[k][1] + u3 * point.nor[k][2];
     //
     rho_e = pr * 2.50 + 0.5 * rho * (u1_rot * u1_rot + u2_rot * u2_rot + u3_rot * u3_rot);
     //
@@ -74,9 +74,9 @@ __device__ void conserved_vector_Ubar_cuda(points &point,int k, double *Ubar,dou
     //
     //
     //
-    u1_inf_rot = u1_inf * point.tan1[0][k] + u2_inf * point.tan1[1][k] + u3_inf * point.tan1[2][k];
-    u2_inf_rot = u1_inf * point.tan2[0][k] + u2_inf * point.tan2[1][k] + u3_inf * point.tan2[2][k];
-    u3_inf_rot = u1_inf * point.nor[0][k] + u2_inf * point.nor[1][k] + u3_inf * point.nor[2][k];
+    u1_inf_rot = u1_inf * point.tan1[k][0] + u2_inf * point.tan1[k][1] + u3_inf * point.tan1[k][2];
+    u2_inf_rot = u1_inf * point.tan2[k][0] + u2_inf * point.tan2[k][1] + u3_inf * point.tan2[k][2];
+    u3_inf_rot = u1_inf * point.nor[k][0] + u2_inf * point.nor[k][1] + u3_inf * point.nor[k][2];
     //
     rho_e_inf = pr_inf * 2.50 + 0.5 * rho_inf * (u1_inf_rot * u1_inf_rot + u2_inf_rot * u2_inf_rot + u3_inf_rot * u3_inf_rot);
     //
@@ -85,15 +85,15 @@ __device__ void conserved_vector_Ubar_cuda(points &point,int k, double *Ubar,dou
     B3_inf = exp(-S3 * S3) / (2 * sqrt(pi * beta));
     A3n_inf = 0.5 * (1 - erf(S3));
     //
-    rho = point.prim[0][k];
-    u1 = point.prim[1][k];
-    u2 = point.prim[2][k];
-    u3 = point.prim[3][k];
-    pr = point.prim[4][k];
+    rho = point.prim[k][0];
+    u1 = point.prim[k][1];
+    u2 = point.prim[k][2];
+    u3 = point.prim[k][3];
+    pr = point.prim[k][4];
     //
-    u1_rot = u1 * point.tan1[0][k] + u2 * point.tan1[1][k] + u3 * point.tan1[2][k];
-    u2_rot = u1 * point.tan2[0][k] + u2 * point.tan2[1][k] + u3 * point.tan2[2][k];
-    u3_rot = u1 * point.nor[0][k] + u2 * point.nor[1][k] + u3 * point.nor[2][k];
+    u1_rot = u1 * point.tan1[k][0] + u2 * point.tan1[k][1] + u3 * point.tan1[k][2];
+    u2_rot = u1 * point.tan2[k][0] + u2 * point.tan2[k][1] + u3 * point.tan2[k][2];
+    u3_rot = u1 * point.nor[k][0] + u2 * point.nor[k][1] + u3 * point.nor[k][2];
     //
     rho_e = pr * 2.50 + 0.5 * rho * (u1_rot * u1_rot + u2_rot * u2_rot + u3_rot * u3_rot);
     //

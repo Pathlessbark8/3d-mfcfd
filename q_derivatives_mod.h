@@ -47,23 +47,23 @@ void eval_q_derivatives()
         //
         for (k = 0; k < 5; k++)
         {
-            point.qm[0][k][i] = point.q[k][i]; // q_maximum ..
-            point.qm[1][k][i] = point.q[k][i]; // q_minimum ..
+            point.qm[i][0][k] = point.q[i][k]; // q_maximum ..
+            point.qm[i][1][k] = point.q[i][k]; // q_minimum ..
         }
         for (k = 0; k < point.nbhs[i]; k++)
         //
         {
-            nbh = point.conn[k][i];
+            nbh = point.conn[i][k];
             //
             for (r = 0; r < 5; r++)
             {
-                if (point.q[r][nbh] > point.qm[0][r][i])
+                if (point.q[nbh][r] > point.qm[i][0][r])
                 {
-                    point.qm[0][r][i] = point.q[r][nbh];
+                    point.qm[i][0][r] = point.q[nbh][r];
                 }
-                if (point.q[r][nbh] < point.qm[1][r][i])
+                if (point.q[nbh][r] < point.qm[i][1][r])
                 {
-                    point.qm[1][r][i] = point.q[r][nbh];
+                    point.qm[i][1][r] = point.q[nbh][r];
                 }
             }
             //
@@ -88,7 +88,7 @@ void eval_q_derivatives()
             //
             for (r = 0; r < 5; r++)
             {
-                temp[r] = (point.q[r][nbh] - point.q[r][i]);
+                temp[r] = (point.q[nbh][r] - point.q[i][r]);
 
                 sum_delx_delq[r] = sum_delx_delq[r] + weights * delx * temp[r];
                 sum_dely_delq[r] = sum_dely_delq[r] + weights * dely * temp[r];
@@ -108,7 +108,7 @@ void eval_q_derivatives()
         //
         for (k = 0; k < 5; k++)
         {
-            point.dq[0][k][i] = temp[k] * one_by_det;
+            point.dq[i][0][k] = temp[k] * one_by_det;
         }
         //
         for (k = 0; k < 5; k++)
@@ -118,7 +118,7 @@ void eval_q_derivatives()
         //
         for (k = 0; k < 5; k++)
         {
-            point.dq[1][k][i] = temp[k] * one_by_det;
+            point.dq[i][1][k] = temp[k] * one_by_det;
         }
         //
         for (k = 0; k < 5; k++)
@@ -127,7 +127,7 @@ void eval_q_derivatives()
         }
         for (k = 0; k < 5; k++)
         {
-            point.dq[2][k][i] = temp[k] * one_by_det;
+            point.dq[i][2][k] = temp[k] * one_by_det;
         }
         //
         //
@@ -170,7 +170,7 @@ void q_inner_loop()
         for (k = 0; k < point.nbhs[i]; k++)
         //
         {
-            nbh = point.conn[k][i];
+            nbh = point.conn[i][k];
             //
             x_k = point.x[nbh];
             y_k = point.y[nbh];
@@ -193,8 +193,8 @@ void q_inner_loop()
             //
             for (r = 0; r < 5; r++)
             {
-                qtilde_i[r] = point.q[r][i] - 0.50 * (delx * point.dq[0][r][i] + dely * point.dq[1][r][i] + delz * point.dq[2][r][i]);
-                qtilde_nbh[r] = point.q[r][nbh] - 0.50 * (delx * point.dq[0][r][nbh] + dely * point.dq[1][r][nbh] + delz * point.dq[2][r][nbh]);
+                qtilde_i[r] = point.q[i][r] - 0.50 * (delx * point.dq[i][0][r] + dely * point.dq[i][1][r] + delz * point.dq[i][2][r]);
+                qtilde_nbh[r] = point.q[nbh][r] - 0.50 * (delx * point.dq[nbh][0][r] + dely * point.dq[nbh][1][r] + delz * point.dq[nbh][2][r]);
                 temp[r] = qtilde_nbh[r] - qtilde_i[r];
             }
             //
@@ -220,7 +220,7 @@ void q_inner_loop()
         //
         for (r = 0; r < 5; r++)
         {
-            point.temp[0][r][i] = temp[r] * one_by_det;
+            point.temp[i][0][r] = temp[r] * one_by_det;
             //
         }
         for (r = 0; r < 5; r++)
@@ -230,7 +230,7 @@ void q_inner_loop()
         //
         for (r = 0; r < 5; r++)
         {
-            point.temp[1][r][i] = temp[r] * one_by_det;
+            point.temp[i][1][r] = temp[r] * one_by_det;
         }
         //
         for (r = 0; r < 5; r++)
@@ -240,7 +240,7 @@ void q_inner_loop()
         //
         for (r = 0; r < 5; r++)
         {
-            point.temp[2][r][i] = temp[r] * one_by_det;
+            point.temp[i][2][r] = temp[r] * one_by_det;
         }
         //
     } //
@@ -255,9 +255,9 @@ void update_inner_loop()
         {
             for (r = 0; r < 5; r++)
             {
-                point.dq[0][r][i] = point.temp[0][r][i];
-                point.dq[1][r][i] = point.temp[1][r][i];
-                point.dq[2][r][i] = point.temp[2][r][i];
+                point.dq[i][0][r] = point.temp[i][0][r];
+                point.dq[i][1][r] = point.temp[i][1][r];
+                point.dq[i][2][r] = point.temp[i][2][r];
             }
         }
     }
@@ -312,23 +312,23 @@ __global__ void eval_q_derivatives_cuda(points &point, double power)
     //
     for (k = 0; k < 5; k++)
     {
-        point.qm[0][k][i] = point.q[k][i]; // q_maximum ..
-        point.qm[1][k][i] = point.q[k][i]; // q_minimum ..
+        point.qm[i][0][k] = point.q[i][k]; // q_maximum ..
+        point.qm[i][1][k] = point.q[i][k]; // q_minimum ..
     }
     for (k = 0; k < point.nbhs[i]; k++)
     //
     {
-        nbh = point.conn[k][i];
+        nbh = point.conn[i][k];
         //
         for (r = 0; r < 5; r++)
         {
-            if (point.q[r][nbh] > point.qm[0][r][i])
+            if (point.q[nbh][r] > point.qm[i][0][r])
             {
-                point.qm[0][r][i] = point.q[r][nbh];
+                point.qm[i][0][r] = point.q[nbh][r];
             }
-            if (point.q[r][nbh] < point.qm[1][r][i])
+            if (point.q[nbh][r] < point.qm[i][1][r])
             {
-                point.qm[1][r][i] = point.q[r][nbh];
+                point.qm[i][1][r] = point.q[nbh][r];
             }
         }
         //
@@ -353,7 +353,7 @@ __global__ void eval_q_derivatives_cuda(points &point, double power)
         //
         for (r = 0; r < 5; r++)
         {
-            temp[r] = (point.q[r][nbh] - point.q[r][i]);
+            temp[r] = (point.q[nbh][r] - point.q[i][r]);
 
             sum_delx_delq[r] = sum_delx_delq[r] + weights * delx * temp[r];
             sum_dely_delq[r] = sum_dely_delq[r] + weights * dely * temp[r];
@@ -373,7 +373,7 @@ __global__ void eval_q_derivatives_cuda(points &point, double power)
     //
     for (k = 0; k < 5; k++)
     {
-        point.dq[0][k][i] = temp[k] * one_by_det;
+        point.dq[i][0][k] = temp[k] * one_by_det;
     }
     //
     for (k = 0; k < 5; k++)
@@ -383,7 +383,7 @@ __global__ void eval_q_derivatives_cuda(points &point, double power)
     //
     for (k = 0; k < 5; k++)
     {
-        point.dq[1][k][i] = temp[k] * one_by_det;
+        point.dq[i][1][k] = temp[k] * one_by_det;
     }
     //
     for (k = 0; k < 5; k++)
@@ -392,7 +392,7 @@ __global__ void eval_q_derivatives_cuda(points &point, double power)
     }
     for (k = 0; k < 5; k++)
     {
-        point.dq[2][k][i] = temp[k] * one_by_det;
+        point.dq[i][2][k] = temp[k] * one_by_det;
     }
     //
     //
@@ -409,7 +409,7 @@ __global__ void q_inner_loop_cuda(points &point,int power)
     double det, one_by_det;
     double temp[5], qtilde_i[5], qtilde_nbh[5];
 
-int bx = blockIdx.x;
+    int bx = blockIdx.x;
     int tx = threadIdx.x;
     int i = bx * blockDim.x + tx;
     if (i < 0 || i >= max_points)
@@ -439,7 +439,7 @@ int bx = blockIdx.x;
     for (k = 0; k < point.nbhs[i]; k++)
     //
     {
-        nbh = point.conn[k][i];
+        nbh = point.conn[i][k];
         //
         x_k = point.x[nbh];
         y_k = point.y[nbh];
@@ -462,8 +462,8 @@ int bx = blockIdx.x;
         //
         for (r = 0; r < 5; r++)
         {
-            qtilde_i[r] = point.q[r][i] - 0.50 * (delx * point.dq[0][r][i] + dely * point.dq[1][r][i] + delz * point.dq[2][r][i]);
-            qtilde_nbh[r] = point.q[r][nbh] - 0.50 * (delx * point.dq[0][r][nbh] + dely * point.dq[1][r][nbh] + delz * point.dq[2][r][nbh]);
+            qtilde_i[r] = point.q[i][r] - 0.50 * (delx * point.dq[i][0][r] + dely * point.dq[i][1][r] + delz * point.dq[i][2][r]);
+            qtilde_nbh[r] = point.q[nbh][r] - 0.50 * (delx * point.dq[nbh][0][r] + dely * point.dq[nbh][1][r] + delz * point.dq[nbh][2][r]);
             temp[r] = qtilde_nbh[r] - qtilde_i[r];
         }
         //
@@ -489,7 +489,7 @@ int bx = blockIdx.x;
     //
     for (r = 0; r < 5; r++)
     {
-        point.temp[0][r][i] = temp[r] * one_by_det;
+        point.temp[i][0][r] = temp[r] * one_by_det;
         //
     }
     for (r = 0; r < 5; r++)
@@ -499,7 +499,7 @@ int bx = blockIdx.x;
     //
     for (r = 0; r < 5; r++)
     {
-        point.temp[1][r][i] = temp[r] * one_by_det;
+        point.temp[i][1][r] = temp[r] * one_by_det;
     }
     //
     for (r = 0; r < 5; r++)
@@ -509,7 +509,7 @@ int bx = blockIdx.x;
     //
     for (r = 0; r < 5; r++)
     {
-        point.temp[2][r][i] = temp[r] * one_by_det;
+        point.temp[i][2][r] = temp[r] * one_by_det;
     }
     //
 }
@@ -526,8 +526,8 @@ __global__ void update_inner_loop_cuda(points &point)
     }
     for (r = 0; r < 5; r++)
     {
-        point.dq[0][r][i] = point.temp[0][r][i];
-        point.dq[1][r][i] = point.temp[1][r][i];
-        point.dq[2][r][i] = point.temp[2][r][i];
+        point.dq[i][0][r] = point.temp[i][0][r];
+        point.dq[i][1][r] = point.temp[i][1][r];
+        point.dq[i][2][r] = point.temp[i][2][r];
     }
 }

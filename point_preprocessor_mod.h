@@ -28,15 +28,18 @@ void read_input_point_data()
     for (k = 0; k < max_points; k++)
     {
         fin >> counter  >> point.x[k] >> point.y[k] >> point.z[k]>> point.status[k]>>point.min_dist[k];
-        fin >> point.tan1[0][k] >> point.tan1[1][k] >> point.tan1[2][k];
-        fin >> point.tan2[0][k] >> point.tan2[1][k] >> point.tan2[2][k];
-        fin >> point.nor[0][k] >> point.nor[1][k] >> point.nor[2][k];
+        fin >> point.tan1[k][0] >> point.tan1[k][1] >> point.tan1[k][2];
+        fin >> point.tan2[k][0] >> point.tan2[k][1] >> point.tan2[k][2];
+        fin >> point.nor[k][0] >> point.nor[k][1] >> point.nor[k][2];
         fin >> point.nbhs[k];
         for (r = 0; r < point.nbhs[k]; r++)
         {
-            fin >> point.conn[r][k];
-            point.conn[r][k]-=1;
+            fin >> point.conn[k][r];
+            point.conn[k][r]-=1;
         }
+        // for(int r=0;r<5;r++){
+        //     point.flux_res[k][r]=0.0;
+        // }
         // fin >> point.min_dist[k];
     }
     fin.close();

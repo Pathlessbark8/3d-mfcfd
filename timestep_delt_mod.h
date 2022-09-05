@@ -24,13 +24,13 @@ void timestep_delt()
         for (r = 0; r < point.nbhs[i]; r++)
         //
         {
-            k = point.conn[r][i];
+            k = point.conn[i][r];
             //
-            rho = point.prim[0][k];
-            u1 = point.prim[1][k];
-            u2 = point.prim[2][k];
-            u3 = point.prim[3][k];
-            pr = point.prim[4][k];
+            rho = point.prim[k][0];
+            u1 = point.prim[k][1];
+            u2 = point.prim[k][2];
+            u3 = point.prim[k][3];
+            pr = point.prim[k][4];
             //
             delx = point.x[k] - point.x[i];
             dely = point.y[k] - point.y[i];
@@ -80,13 +80,13 @@ __global__ void timestep_delt_cuda(points &point,double CFL)
     for (r = 0; r < point.nbhs[i]; r++)
     //
     {
-        k = point.conn[r][i];
+        k = point.conn[i][r];
         //
-        rho = point.prim[0][k];
-        u1 = point.prim[1][k];
-        u2 = point.prim[2][k];
-        u3 = point.prim[3][k];
-        pr = point.prim[4][k];
+        rho = point.prim[k][0];
+        u1 = point.prim[k][1];
+        u2 = point.prim[k][2];
+        u3 = point.prim[k][3];
+        pr = point.prim[k][4];
         //
         delx = point.x[k] - point.x[i];
         dely = point.y[k] - point.y[i];

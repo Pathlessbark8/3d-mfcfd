@@ -11,30 +11,30 @@ struct points
     //
     double x[max_points], y[max_points], z[max_points];
     //		double  nor_neigh
-    double tan1[3][max_points], tan2[3][max_points], nor[3][max_points];
+    double tan1[max_points][3], tan2[max_points][3], nor[max_points][3];
     int status[max_points];
     int nbhs[max_points];
-    int conn[27][max_points];
+    int conn[max_points][27];
     double min_dist[max_points];
     //
     int xpos_nbhs[max_points], xneg_nbhs[max_points];
     int ypos_nbhs[max_points], yneg_nbhs[max_points];
     int zpos_nbhs[max_points], zneg_nbhs[max_points];
-    int xpos_conn[22][max_points], xneg_conn[22][max_points];
-    int ypos_conn[22][max_points], yneg_conn[22][max_points];
-    int zpos_conn[22][max_points], zneg_conn[22][max_points];
+    int xpos_conn[max_points][24], xneg_conn[max_points][24];
+    int ypos_conn[max_points][24], yneg_conn[max_points][24];
+    int zpos_conn[max_points][24], zneg_conn[max_points][24];
     //
     //		flow field based attributes ..
     //
-    double U[5][max_points];
-    double delUp[5][max_points];
-    double delUn[5][max_points];
-    double prim[5][max_points];
-    double flux_res[5][max_points];
-    double q[5][max_points];
-    double qm[2][5][max_points];
-    double dq[3][5][max_points];
-    double temp[3][5][max_points];
+    double U[max_points][5];
+    double delUp[max_points][5];
+    double delUn[max_points][5];
+    double prim[max_points][5];
+    double flux_res[max_points][5];
+    double q[max_points][5];
+    double qm[max_points][2][5];
+    double dq[max_points][3][5];
+    double temp[max_points][3][5];
     double delt[max_points];
     //
     //		for the implicit solver ..

@@ -34,7 +34,7 @@ void aliasing()
         p = point.point_with_alias[i];
         for (j = 0; j < point.nbhs[p]; j++)
         {
-            k = point.conn[j][p];
+            k = point.conn[p][j];
             if (point.alias[k] == 0)
             {
                 count = count + 1;
