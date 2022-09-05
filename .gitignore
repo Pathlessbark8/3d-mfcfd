@@ -16,3 +16,4 @@ install/
 *.nsys-rep
 *.sqlite
 temp/
+Different_inner_iterations_CPU_3D/

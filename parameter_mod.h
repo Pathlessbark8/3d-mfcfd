@@ -3,7 +3,7 @@
 
 
 		const int max_points =  580485;
-		int max_iters = 10;//1000
+		int max_iters = 1000;//1000
 //
 //		Flow conditions ..
 //
@@ -18,7 +18,7 @@
 		double power = 0.00;
 		double VL_CONST = 2.00;
 		double CFL = 0.5;
-		int inner_iterations = 0;
+		int inner_iterations = 3;
 //
 //
 //		Freestream values of the primitive variables ..
