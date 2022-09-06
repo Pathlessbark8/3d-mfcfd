@@ -16,3 +16,4 @@ q_var_fortran
 *.sqlite
 install/
 temp/
+Different_inner_iterations_CPU_3D/
