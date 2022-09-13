@@ -30,6 +30,8 @@
 #include <thrust/execution_policy.h>
 #include <nccl.h>
 #include <mpi.h>
+#include <nvToolsExt.h>
+#include <nvToolsExtCuda.h>
 
 #define NCCLCHECK(cmd)                                         \
     do                                                         \
@@ -221,27 +223,26 @@ void fpi_solver_multi_nccl(splitPoints *splitPoint_d, int localRank, transferPoi
     int *wallPointsLocalIndex_d;
     unsigned long long wall_size = wallPointsLocal * sizeof(int);
     cudaMalloc(&wallPointsLocalIndex_d, wall_size);
-    cudaMemcpy(wallPointsLocalIndex_d, wallPointsLocalIndex, wall_size, cudaMemcpyHostToDevice);
 
     int *outerPointsLocalIndex_d;
     unsigned long long outer_size = outerPointsLocal * sizeof(int);
     cudaMalloc(&outerPointsLocalIndex_d, outer_size);
-    cudaMemcpy(outerPointsLocalIndex_d, outerPointsLocalIndex, outer_size, cudaMemcpyHostToDevice);
 
     int *interiorPointsLocalIndex_d;
     unsigned long long interior_size = interiorPointsLocal * sizeof(int);
     cudaMalloc(&interiorPointsLocalIndex_d, interior_size);
-    cudaMemcpy(interiorPointsLocalIndex_d, interiorPointsLocalIndex, interior_size, cudaMemcpyHostToDevice);
+
+    int *symmetryPointsLocalIndex_d;
+    unsigned long long symmetry_size = symmetryPointsLocal * sizeof(int);
+    cudaMalloc(&symmetryPointsLocalIndex_d, symmetry_size);
 
     int *supersonicInletPointsLocalIndex_d;
     unsigned long long supersonic_inlet_size = supersonicInletPointsLocal * sizeof(int);
     cudaMalloc(&supersonicInletPointsLocalIndex_d, supersonic_inlet_size);
-    cudaMemcpy(supersonicInletPointsLocalIndex_d, supersonicInletPointsLocalIndex, supersonic_inlet_size, cudaMemcpyHostToDevice);
 
     int *supersonicOutletPointsLocalIndex_d;
     unsigned long long supersonic_outlet_size = supersonicOutletPointsLocal * sizeof(int);
     cudaMalloc(&supersonicOutletPointsLocalIndex_d, supersonic_outlet_size);
-    cudaMemcpy(supersonicOutletPointsLocalIndex_d, supersonicOutletPointsLocalIndex, supersonic_outlet_size, cudaMemcpyHostToDevice);
 
     double *sum_res_sqr_d = NULL;
     cudaMalloc(&sum_res_sqr_d, sizeof(double) * (local_points));
@@ -250,6 +251,13 @@ void fpi_solver_multi_nccl(splitPoints *splitPoint_d, int localRank, transferPoi
     double *sum_res_sqr_final_d = NULL;
     cudaMalloc(&sum_res_sqr_final_d, sizeof(double));
     cudaMemset(sum_res_sqr_final_d, 0, sizeof(double));
+
+    cudaMemcpyAsync(wallPointsLocalIndex_d, wallPointsLocalIndex, wall_size, cudaMemcpyHostToDevice);
+    cudaMemcpyAsync(outerPointsLocalIndex_d, outerPointsLocalIndex, outer_size, cudaMemcpyHostToDevice);
+    cudaMemcpyAsync(interiorPointsLocalIndex_d, interiorPointsLocalIndex, interior_size, cudaMemcpyHostToDevice);
+    cudaMemcpyAsync(symmetryPointsLocalIndex_d, symmetryPointsLocalIndex, symmetry_size, cudaMemcpyHostToDevice);
+    cudaMemcpyAsync(supersonicInletPointsLocalIndex_d, supersonicInletPointsLocalIndex, supersonic_inlet_size, cudaMemcpyHostToDevice);
+    cudaMemcpyAsync(supersonicOutletPointsLocalIndex_d, supersonicOutletPointsLocalIndex, supersonic_outlet_size, cudaMemcpyHostToDevice);
 
    
     ncclGroupStart();
@@ -265,7 +273,10 @@ void fpi_solver_multi_nccl(splitPoints *splitPoint_d, int localRank, transferPoi
 
     int *globalToLocalIndex_d;
     CUDACHECK(cudaMalloc(&globalToLocalIndex_d, max_points * sizeof(int)));
+    
+    ncclGroupStart();
     NCCLCHECK(ncclAllReduce(globalToLocalIndex_temp, globalToLocalIndex_d, max_points, ncclInt, ncclSum, comm, stream));
+    ncclGroupEnd();
 
     ncclGroupStart();
     for (int i = 0; i < nRanks; ++i)
@@ -278,15 +289,21 @@ void fpi_solver_multi_nccl(splitPoints *splitPoint_d, int localRank, transferPoi
     }
     ncclGroupEnd();
     // printf("cudaProfilerStart\n");
-    // cudaProfilerStart();
+    cudaProfilerStart();
+    nvtxRangePushA("Generate Split Stencil ");
     generate_split_stencils_interior_multi_nccl<<<grid, threads>>>(splitPoint_d, interiorPointsLocalIndex_d, interiorPointsLocal, partVector_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d);
     generate_split_stencils_wall_multi_nccl<<<grid, threads>>>(myRank, splitPoint_d, wallPointsLocalIndex_d, wallPointsLocal, partVector_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d);
     generate_split_stencils_outer_multi_nccl<<<grid, threads>>>(splitPoint_d, outerPointsLocalIndex_d, outerPointsLocal, partVector_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d);
-    // cudaProfilerStop();
+    nvtxRangePop();
+    cudaProfilerStop();
     // printf("cudaProfilerStop\n");
     for (int t = 1; t <= max_iters; ++t)
     {
+        cudaProfilerStart();
+        nvtxRangePushA("q-variables");
         eval_q_variables_multi_nccl<<<grid, threads>>>(myRank, splitPoint_d, numberOfPointsPerDevice, sendBuffer_d);
+        nvtxRangePop();
+        cudaProfilerStop();
         ncclGroupStart();
         for (int i = 0; i < nRanks; ++i)
         {
@@ -297,7 +314,11 @@ void fpi_solver_multi_nccl(splitPoints *splitPoint_d, int localRank, transferPoi
             }
         }
         ncclGroupEnd();
+        cudaProfilerStart();
+        nvtxRangePushA("q-derivatives");
         eval_q_derivatives_multi_nccl<<<grid, threads>>>(myRank, splitPoint_d, power, numberOfPointsPerDevice, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d, sendBuffer_d);
+        nvtxRangePop();
+        cudaProfilerStop();
         ncclGroupStart();
         for (int i = 0; i < nRanks; ++i)
         {
@@ -308,23 +329,29 @@ void fpi_solver_multi_nccl(splitPoints *splitPoint_d, int localRank, transferPoi
             }
         }
         ncclGroupEnd();
-        for (int r = 0; r < inner_iterations; r++)
-        {
-            q_inner_loop_multi_nccl<<<grid, threads>>>(myRank, splitPoint_d, power, numberOfPointsPerDevice, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d, sendBuffer_d);
-            update_inner_loop_multi_nccl<<<grid, threads>>>(myRank,splitPoint_d,numberOfPointsPerDevice,sendBuffer_d);
-            ncclGroupStart();
-            for (int i = 0; i < nRanks; ++i)
-            {
-                if (i != myRank)
-                {
-                    NCCLCHECK(ncclSend(sendPointer[i], sendPoints[i] * sizeof(transferPoints), ncclChar, i, comm, stream));
-                    NCCLCHECK(ncclRecv(receivePointer[i], receivePoints[i] * sizeof(transferPoints), ncclChar, i, comm, stream));
-                }
-            }
-            ncclGroupEnd();
-        }
+        nvtxRangePushA("second-order-derivatives");
+        // for (int r = 0; r < inner_iterations; r++)
+        // {
+        //     cudaProfilerStart();
+        //     q_inner_loop_multi_nccl<<<grid, threads>>>(myRank, splitPoint_d, power, numberOfPointsPerDevice, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d, sendBuffer_d);
+        //     update_inner_loop_multi_nccl<<<grid, threads>>>(myRank,splitPoint_d,numberOfPointsPerDevice,sendBuffer_d);
+        //     cudaProfilerStop();
+        //     ncclGroupStart();
+        //     for (int i = 0; i < nRanks; ++i)
+        //     {
+        //         if (i != myRank)
+        //         {
+        //             NCCLCHECK(ncclSend(sendPointer[i], sendPoints[i] * sizeof(transferPoints), ncclChar, i, comm, stream));
+        //             NCCLCHECK(ncclRecv(receivePointer[i], receivePoints[i] * sizeof(transferPoints), ncclChar, i, comm, stream));
+        //         }
+        //     }
+        //     ncclGroupEnd();
+        // }
+        nvtxRangePop();
+        cudaProfilerStart();
         timestep_delt_multi_nccl<<<grid, threads>>>(myRank, splitPoint_d, CFL, numberOfPointsPerDevice, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d, sendBuffer_d);
 
+        nvtxRangePushA("flux-residual");
         wall_dGx_pos_multi_nccl<<<grid, threads>>>(myRank, splitPoint_d, power, VL_CONST, pi, wallPointsLocal, wallPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
         wall_dGx_neg_multi_nccl<<<grid, threads>>>(myRank, splitPoint_d, power, VL_CONST, pi, wallPointsLocal, wallPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
         wall_dGy_pos_multi_nccl<<<grid, threads>>>(splitPoint_d, power, VL_CONST, pi, wallPointsLocal, wallPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
@@ -332,25 +359,27 @@ void fpi_solver_multi_nccl(splitPoints *splitPoint_d, int localRank, transferPoi
         wall_dGz_neg_multi_nccl<<<grid, threads>>>(splitPoint_d, power, VL_CONST, pi, wallPointsLocal, wallPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
 
         interior_dGx_pos_multi_nccl<<<grid, threads>>>(myRank, splitPoint_d, power, VL_CONST, pi, interiorPointsLocal, interiorPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
-        interior_dGx_neg_multi_nccl<<<grid, threads>>>(splitPoint_d, power, VL_CONST, pi, interiorPointsLocal, interiorPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
-        interior_dGy_pos_multi_nccl<<<grid, threads>>>(splitPoint_d, power, VL_CONST, pi, interiorPointsLocal, interiorPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
-        interior_dGy_neg_multi_nccl<<<grid, threads>>>(splitPoint_d, power, VL_CONST, pi, interiorPointsLocal, interiorPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
-        interior_dGz_pos_multi_nccl<<<grid, threads>>>(splitPoint_d, power, VL_CONST, pi, interiorPointsLocal, interiorPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
-        interior_dGz_neg_multi_nccl<<<grid, threads>>>(splitPoint_d, power, VL_CONST, pi, interiorPointsLocal, interiorPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
+        // interior_dGx_neg_multi_nccl<<<grid, threads>>>(splitPoint_d, power, VL_CONST, pi, interiorPointsLocal, interiorPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
+        // interior_dGy_pos_multi_nccl<<<grid, threads>>>(splitPoint_d, power, VL_CONST, pi, interiorPointsLocal, interiorPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
+        // interior_dGy_neg_multi_nccl<<<grid, threads>>>(splitPoint_d, power, VL_CONST, pi, interiorPointsLocal, interiorPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
+        // interior_dGz_pos_multi_nccl<<<grid, threads>>>(splitPoint_d, power, VL_CONST, pi, interiorPointsLocal, interiorPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
+        // interior_dGz_neg_multi_nccl<<<grid, threads>>>(splitPoint_d, power, VL_CONST, pi, interiorPointsLocal, interiorPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
 
         outer_dGx_pos_multi_nccl<<<grid, threads>>>(myRank, splitPoint_d, power, VL_CONST, pi, outerPointsLocal, outerPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
         outer_dGx_neg_multi_nccl<<<grid, threads>>>(splitPoint_d, power, VL_CONST, pi, outerPointsLocal, outerPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
         outer_dGy_pos_multi_nccl<<<grid, threads>>>(splitPoint_d, power, VL_CONST, pi, outerPointsLocal, outerPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
-        outer_dGy_neg_multi_nccl<<<grid, threads>>>(splitPoint_d, power, VL_CONST, pi, outerPointsLocal, outerPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
+        outer_dGy_neg_multi_nccl<<<grid, threads>>>(myRank,splitPoint_d, power, VL_CONST, pi, outerPointsLocal, outerPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
         outer_dGz_pos_multi_nccl<<<grid, threads>>>(splitPoint_d, power, VL_CONST, pi, outerPointsLocal, outerPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
-
+        nvtxRangePop();
+        nvtxRangePushA("state-update");
         state_update_wall_multi_nccl<<<grid, threads>>>(myRank, splitPoint_d, wallPointsLocal, wallPointsLocalIndex_d, sum_res_sqr_d);
-        state_update_outer_multi_nccl<<<grid, threads>>>(splitPoint_d, outerPointsLocal, outerPointsLocalIndex_d, u1_inf, u2_inf, u3_inf, rho_inf, pi, pr_inf);
+        state_update_outer_multi_nccl<<<grid, threads>>>(myRank,splitPoint_d, outerPointsLocal, outerPointsLocalIndex_d, u1_inf, u2_inf, u3_inf, rho_inf, pi, pr_inf);
         state_update_interior_multi_nccl<<<grid, threads>>>(splitPoint_d, interiorPointsLocal, interiorPointsLocalIndex_d, sum_res_sqr_d);
-
+        state_update_symmetric_multi_nccl<<<grid,threads>>>(splitPoint_d, power, VL_CONST, pi, symmetryPointsLocal, symmetryPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
+        nvtxRangePop();
         cudaDeviceSynchronize();
         sum_res_sqr = thrust::reduce(thrust::cuda::par.on(stream), sum_res_sqr_d, sum_res_sqr_d + local_points, (double)0.0, thrust::plus<double>());
-
+        cudaProfilerStop();
         MPI_Barrier(MPI_COMM_WORLD);
         if (myRank == 0)
         {
@@ -360,6 +389,7 @@ void fpi_solver_multi_nccl(splitPoints *splitPoint_d, int localRank, transferPoi
         {
             MPICHECK(MPI_Reduce(&sum_res_sqr, &sum_res_sqr, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD));
         }
+        CUDACHECK(cudaMemcpy(splitPoint, splitPoint_d, numberOfPointsPerDevice * sizeof(splitPoints), cudaMemcpyDeviceToHost));
         if (myRank == 0)
         {
             res_new = sqrt(sum_res_sqr) / max_points;
@@ -373,17 +403,24 @@ void fpi_solver_multi_nccl(splitPoints *splitPoint_d, int localRank, transferPoi
                 residue = log10(res_new / res_old);
             }
             cout << t << " " << res_new << " " << residue << " " << sum_res_sqr << endl;
+            fstream fout;
+            fout.open("error.dat",ios::out);
+            for(int r=0;r<max_points;r++){
+                fout<<splitPoint[r].prim[0]<<" "<<splitPoint[r].prim[1]<<" "<<splitPoint[r].prim[2]<<" "<<splitPoint[r].prim[3]<<" "<<splitPoint[r].prim[4]<<endl;
+            }
+            fout.close();
         }
     }
-    cudaMemcpy(&wallPointsLocalIndex, wallPointsLocalIndex_d, wall_size, cudaMemcpyDeviceToHost);
-    cudaMemcpy(&outerPointsLocalIndex, outerPointsLocalIndex_d, outer_size, cudaMemcpyDeviceToHost);
-    cudaMemcpy(&interiorPointsLocalIndex, interiorPointsLocalIndex_d, interior_size, cudaMemcpyDeviceToHost);
-    cudaMemcpy(&supersonicInletPointsLocalIndex, supersonicInletPointsLocalIndex_d, supersonic_inlet_size, cudaMemcpyDeviceToHost);
-    cudaMemcpy(&supersonicOutletPointsLocalIndex, supersonicOutletPointsLocalIndex_d, supersonic_outlet_size, cudaMemcpyDeviceToHost);
+    // cudaMemcpy(&wallPointsLocalIndex, wallPointsLocalIndex_d, wall_size, cudaMemcpyDeviceToHost);
+    // cudaMemcpy(&outerPointsLocalIndex, outerPointsLocalIndex_d, outer_size, cudaMemcpyDeviceToHost);
+    // cudaMemcpy(&interiorPointsLocalIndex, interiorPointsLocalIndex_d, interior_size, cudaMemcpyDeviceToHost);
+    // cudaMemcpy(&supersonicInletPointsLocalIndex, supersonicInletPointsLocalIndex_d, supersonic_inlet_size, cudaMemcpyDeviceToHost);
+    // cudaMemcpy(&supersonicOutletPointsLocalIndex, supersonicOutletPointsLocalIndex_d, supersonic_outlet_size, cudaMemcpyDeviceToHost);
 
     cudaFree(wallPointsLocalIndex_d);
     cudaFree(outerPointsLocalIndex_d);
     cudaFree(interiorPointsLocalIndex_d);
+    cudaFree(symmetryPointsLocalIndex_d);
     cudaFree(supersonicInletPointsLocalIndex_d);
     cudaFree(supersonicOutletPointsLocalIndex_d);
     cudaFree(sum_res_sqr_d);

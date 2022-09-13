@@ -121,6 +121,14 @@ __global__ void eval_q_variables_multi_nccl(int myRank,splitPoints *splitPoint,i
 		splitPoint[k].q[3] = two_times_beta * u3;
 		splitPoint[k].q[4] = -two_times_beta;
 		
+		if(splitPoint[k].globalIndex==799500){
+			// for(int r=0;r<splitPoint[k].numberOfLocalNbhs;r++)
+        	// 	printf("nbh is %d\n",splitPoint[k].localNbhs[r]);
+			// for(int r=0;r<splitPoint[k].numberOfGhostNbhs;r++)
+        	// 	printf("nbh is %d\n",splitPoint[k].ghostNbhs[r]);
+			for(int r=0;r<5;r++)
+				printf("prim var %.15f\n",splitPoint[k].prim[r]);
+    	}
 		if(splitPoint[k].isGhost){
 			for(int t=0;t<splitPoint[k].numberOfPartitionsToSendTo;++t){
 				sendBuffer[splitPoint[k].partitions[t]][splitPoint[k].ghostIndex[t]].min_dist=splitPoint[k].min_dist;

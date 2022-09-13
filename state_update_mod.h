@@ -429,7 +429,21 @@ __global__ void state_update_wall_multi_nccl(int myRank,splitPoints *splitPoint,
 	temp = U[0];
 	for (int r = 0; r < 5; r++)
 	{
+		// if(U[r]!=U[r]){
+		// 	printf("k is %d\n",k);
+		// 	printf("r is %d\n",r);
+		// }
 		U[r] = U[r] - splitPoint[k].flux_res[r];
+		// if(splitPoint[k].prim[0]<0){
+		// 	printf("Wall splitPoint[%d].prim[%d] %.15f",splitPoint[k].globalIndex,r,splitPoint[k].prim[0]);
+		// }
+		// if(k==50001 && ((splitPoint[k].flux_res[0]<0 && 0-splitPoint[k].flux_res[0]>10e-15) ||(splitPoint[k].flux_res[4]<0 && 0-splitPoint[k].flux_res[4]>10e-15)) ){
+		// 	printf("Wall Here %d\n",k);
+		// }
+		// if(splitPoint[k].flux_res[r]!=splitPoint[k].flux_res[r]){
+		// 	printf("k is %d\n",k);
+		// 	printf("r is %d\n",r);
+		// }
 	}
 	U[3] = 0.00;
 	//
@@ -457,6 +471,15 @@ __global__ void state_update_interior_multi_nccl(splitPoints *splitPoint, int in
 	for (int r = 0; r < 5; r++)
 	{
 		U[r] = U[r] - splitPoint[k].flux_res[r];
+		// if(splitPoint[k].prim[0]<0){
+		// 	printf("Interior splitPoint[%d].prim[%d] %.15f",splitPoint[k].globalIndex,r,splitPoint[k].prim[0]);
+		// }
+		// if(k==50001 && ((splitPoint[k].flux_res[0]<0 && 0-splitPoint[k].flux_res[0]>10e-15) ||(splitPoint[k].flux_res[4]<0 && 0-splitPoint[k].flux_res[4]>10e-15)) ){
+		// 	printf("Interior Here %d\n",k);
+		// }
+		// if(splitPoint[k].flux_res[r]!=splitPoint[k].flux_res[r]){
+		// 	printf("Interior Here %d\n",splitPoint[k].globalIndex);
+		// }
 	}
 	//
 	res_sqr = (U[0] - temp) * (U[0] - temp);
@@ -465,7 +488,7 @@ __global__ void state_update_interior_multi_nccl(splitPoints *splitPoint, int in
 	conserved_to_primitive_multi_nccl(splitPoint, k, U);
 }
 
-__global__ void state_update_outer_multi_nccl(splitPoints *splitPoint, int outerPointsLocal, int *outerPointsLocalIndex, double u1_inf, double u2_inf, double u3_inf, double rho_inf, double pi, double pr_inf)
+__global__ void state_update_outer_multi_nccl(int myRank,splitPoints *splitPoint, int outerPointsLocal, int *outerPointsLocalIndex, double u1_inf, double u2_inf, double u3_inf, double rho_inf, double pi, double pr_inf)
 {
 	int k;
 	double U[5];
@@ -481,8 +504,53 @@ __global__ void state_update_outer_multi_nccl(splitPoints *splitPoint, int outer
 	for (int r = 0; r < 5; r++)
 	{
 		U[r] = U[r] - splitPoint[k].flux_res[r];
+		// if(splitPoint[k].prim[0]<0){
+		// 	printf("Outer splitPoint[%d].prim[%d] %.15f",splitPoint[k].globalIndex,r,splitPoint[k].prim[0]);
+		// }
+		// if(k==249755 && myRank==1){
+		// 	printf("splitPoint[k].flux_res[r] %.15f\n",splitPoint[k].flux_res[r]);
+		// }
+		// if(splitPoint[k].flux_res[r]!=splitPoint[k].flux_res[r]){
+		// 	printf("Outer Here %d\n",k);
+		// }
 	}
 	//
 
 	conserved_to_primitive_multi_nccl(splitPoint, k, U);
+}
+
+__global__ void state_update_symmetric_multi_nccl(splitPoints *splitPoint, double power, double VL_CONST, double pi, int symmetryPointsLocal, int *symmetryPointsLocalIndex,int* globalToLocalIndex,int **globalToGhostIndex,transferPoints **receiveBuffer,int *partVector){
+	int k;
+	int i = blockIdx.x * blockDim.x + threadIdx.x;
+	double delx, dely;
+	if (i < 0 || i >= symmetryPointsLocal)
+	{
+		return;
+	}
+	k=symmetryPointsLocalIndex[i];
+
+	for (int j=0;j<splitPoint[k].numberOfLocalNbhs;j++){
+		int nbh = splitPoint[k].localNbhs[j];
+		nbh = globalToLocalIndex[nbh];
+		delx = splitPoint[nbh].x-splitPoint[k].x;
+		dely = splitPoint[nbh].y-splitPoint[k].y;
+		if(delx <10e-9 && dely <10e-9){
+			for(int r=0;r<5;r++){
+				splitPoint[k].prim[r]=splitPoint[nbh].prim[r];
+			}
+		}
+	}
+	for (int j = 0; j < splitPoint[k].numberOfGhostNbhs; j++)
+    {
+        int nbh = splitPoint[k].ghostNbhs[j];
+        int device=partVector[nbh];
+        int ghostIndex=globalToGhostIndex[device][nbh];
+		delx = receiveBuffer[device][ghostIndex].x-splitPoint[k].x;
+		dely = receiveBuffer[device][ghostIndex].y-splitPoint[k].y;
+		if(delx <10e-9 && dely <10e-9){
+			for(int r=0;r<5;r++){
+				splitPoint[k].prim[r]=receiveBuffer[device][ghostIndex].prim[r];
+			}
+		}
+	}
 }

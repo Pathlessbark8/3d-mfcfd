@@ -138,7 +138,7 @@ int *localToGlobalIndex;
 int **ghostToGlobalIndex;
 //
 //
-int interior_points, wall_points, outer_points;
+int interior_points, wall_points, outer_points,symmetry_points;
 int supersonic_inlet_points, supersonic_outlet_points;
 //
 int interior_points_index[max_points];
@@ -146,16 +146,18 @@ int wall_points_index[max_points];
 int outer_points_index[max_points];
 int supersonic_outlet_points_index[max_points];
 int supersonic_inlet_points_index[max_points];
+int symmetry_points_index[max_points];
 //
 
 // For the parallel version
-int interiorPointsLocal=0, wallPointsLocal=0, outerPointsLocal=0;
+int interiorPointsLocal=0, wallPointsLocal=0, outerPointsLocal=0, symmetryPointsLocal=0;
 int supersonicInletPointsLocal=0, supersonicOutletPointsLocal=0;
 int *interiorPointsLocalIndex;
 int *wallPointsLocalIndex;
 int *outerPointsLocalIndex;
 int *supersonicOutletPointsLocalIndex;
 int *supersonicInletPointsLocalIndex;
+int *symmetryPointsLocalIndex;
 //
 //
 double res_old, res_new, max_res, residue;
@@ -173,6 +175,8 @@ void findNatureOfLocalPoints(splitPoints &splitPoint){
             wallPointsLocal = wallPointsLocal + 1;
         else if (splitPoint.status == 2)
             outerPointsLocal = outerPointsLocal + 1;
+        else if (splitPoint.status == 3)
+            symmetryPointsLocal = symmetryPointsLocal + 1;
         else if (splitPoint.status== 6)
         {
             supersonicOutletPointsLocal = supersonicOutletPointsLocal + 1;
@@ -189,11 +193,13 @@ void allocateSizeForNatureOfLocalPoints(){
     outerPointsLocalIndex=new int[outerPointsLocal];
     supersonicOutletPointsLocalIndex=new int[supersonicOutletPointsLocal];
     supersonicInletPointsLocalIndex=new int[supersonicInletPointsLocal];
+    symmetryPointsLocalIndex=new int[symmetryPointsLocal];
     interiorPointsLocal=0;
     wallPointsLocal=0;
     outerPointsLocal=0;
     supersonicOutletPointsLocal=0;
     supersonicInletPointsLocal=0;
+    symmetryPointsLocal=0;
 }
 
 void assignNatureOfLocalPoints(splitPoints &splitPoint,int k){
@@ -212,6 +218,11 @@ void assignNatureOfLocalPoints(splitPoints &splitPoint,int k){
         {
             outerPointsLocalIndex[outerPointsLocal] = k;
             outerPointsLocal = outerPointsLocal + 1;
+        }
+        else if (splitPoint.status == 3)
+        {
+            symmetryPointsLocalIndex[symmetryPointsLocal] = k;
+            symmetryPointsLocal = symmetryPointsLocal + 1;
         }
         else if (splitPoint.status == 6)
         {

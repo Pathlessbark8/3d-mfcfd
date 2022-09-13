@@ -343,11 +343,17 @@ __global__ void interior_dGx_pos_multi_nccl(int myRank,splitPoints *splitPoint, 
         nor[r] = splitPoint[i].nor[r];
     }
     //
+    // if(splitPoint[i].globalIndex==699499)
+    //     printf("Total nbhs = %d\n",splitPoint[i].numberOfLocalxposNbhs+splitPoint[i].numberOfGhostxposNbhs);
+    //
     for (j = 0; j < splitPoint[i].numberOfLocalxposNbhs; j++)
     //
     {
         k = splitPoint[i].localxpos_conn[j];
         k=globalToLocalIndex[k];
+        //
+        // if(splitPoint[i].globalIndex==699499)
+        //     printf("Status of nbhs %d %d\n",splitPoint[k].globalIndex,splitPoint[k].status);
         //
         x_k = splitPoint[k].x;
         y_k = splitPoint[k].y;
@@ -380,24 +386,57 @@ __global__ void interior_dGx_pos_multi_nccl(int myRank,splitPoints *splitPoint, 
         {
             temp[r] = delx * splitPoint[i].dq[0][r] + dely * splitPoint[i].dq[1][r] + delz * splitPoint[i].dq[2][r];
             qtilde[r] = splitPoint[i].q[r] - 0.50 * temp[r];
+            // if(splitPoint[i].globalIndex==699499){
+            //     printf("temp[r] %.15f\n",temp[r]);
+            // }
         }
 		venkat_limiter_multi_nccl(splitPoint,qtilde, phi, i,VL_CONST);
         for (int r = 0; r < 5; r++)
         {
             qtilde[r] = splitPoint[i].q[r] - 0.50 * phi[r] * temp[r];
+        //     if(splitPoint[i].globalIndex==699499){
+        //     for(int r=0;r<3;r++){
+        //         printf("splitPoint[i].q[r] %.15f\n",splitPoint[i].q[r]);
+        //         printf("phi[r] %.15f\n",phi[r]);
+        //         printf("temp[r] %.15f\n",temp[r]);
+        //     }
+        // }
         }
+        // if(splitPoint[i].globalIndex==699499){
+        //     for(int r=0;r<3;r++){
+        //         printf("tan1 %.15f\n",tan1[r]);
+        //         printf("tan2 %.15f\n",tan2[r]);
+        //         printf("nor %.15f\n",nor[r]);
+        //     }
+        // }
         qtilde_to_primitive_cuda(qtilde, prim);
+        // if(splitPoint[i].globalIndex==699499){
+        // for(int r=0;r<5;r++){
+        //         printf("prim %.15f\n",prim[r]);
+        //     }
+        // }
         flux_Gxp_cuda(G_i, tan1, tan2, nor, prim, pi);
         //
         for (int r = 0; r < 5; r++)
         {
             temp[r] = delx * splitPoint[k].dq[0][r] + dely * splitPoint[k].dq[1][r]+ delz * splitPoint[k].dq[2][r];
             qtilde[r] = splitPoint[k].q[r] - 0.50 * temp[r];
+            // if(splitPoint[i].globalIndex== 898505){
+            //     printf("1 Local splitPoint[k].dq[0][r] %.25f\n",splitPoint[k].dq[0][r]);
+            //     printf("1 splitPoint[k].dq[1][r] %.15f\n",splitPoint[k].dq[1][r]);
+            //     printf("1 splitPoint[k].dq[2][r] %.15f\n",splitPoint[k].dq[2][r]);
+            // }
         }
 		venkat_limiter_multi_nccl(splitPoint,qtilde, phi, k,VL_CONST);
         for (int r = 0; r < 5; r++)
         {
             qtilde[r] = splitPoint[k].q[r] - 0.50 * phi[r] * temp[r];
+            // if(splitPoint[i].globalIndex== 898505){
+            //     printf("1 Local qtilde[r] %.25f\n",qtilde[r]);
+            //     printf("1 splitPoint[k].q[r] %.15f\n",splitPoint[k].q[r]);
+            //     printf("1 phi[r] %.15f\n",phi[r]);
+            //     printf("1 temp[r] %.15f\n",temp[r]);
+            // }
         }
         qtilde_to_primitive_cuda(qtilde, prim);
         flux_Gxp_cuda(G_k, tan1, tan2, nor, prim, pi);
@@ -405,6 +444,11 @@ __global__ void interior_dGx_pos_multi_nccl(int myRank,splitPoints *splitPoint, 
         for (int r = 0; r < 5; r++)
         {
             temp[r] = G_k[r] - G_i[r];
+            // if(splitPoint[i].globalIndex== 699499){
+            //     printf("1 Local temp[r] %.25f\n",temp[r]);
+            //     printf("1 G_k[r] %.15f\n",G_k[r]);
+            //     printf("1 G_i[r] %.15f\n",G_i[r]);
+            // }
         }
         //
         for (int r = 0; r < 5; r++)
@@ -412,6 +456,14 @@ __global__ void interior_dGx_pos_multi_nccl(int myRank,splitPoints *splitPoint, 
             sum_delx_delf[r] = sum_delx_delf[r] + temp[r] * dels_weights;
             sum_dely_delf[r] = sum_dely_delf[r] + temp[r] * delt_weights;
             sum_delz_delf[r] = sum_delz_delf[r] + temp[r] * deln_weights;
+            // if(splitPoint[i].globalIndex==699499){
+            //     printf("1 dels_weights %.25f\n",dels_weights);
+            //     printf("1 dels_weights %.15f\n",delt_weights);
+            //     printf("1 dels_weights %.15f\n",deln_weights);
+            //     printf("1 sum_delx_delf %.25f\n",sum_delx_delf[r]);
+            //     printf("1 sum_dely_delf %.15f\n",sum_dely_delf[r]);
+            //     printf("1 sum_delz_delf %.15f\n",sum_delz_delf[r]);
+            // }
         }
         //
     }
@@ -479,6 +531,11 @@ __global__ void interior_dGx_pos_multi_nccl(int myRank,splitPoints *splitPoint, 
         for (int r = 0; r < 5; r++)
         {
             temp[r] = G_k[r] - G_i[r];
+            // if(splitPoint[i].globalIndex== 699499){
+            //     printf("1 Local temp[r] %.25f\n",temp[r]);
+            //     printf("1 G_k[r] %.15f\n",G_k[r]);
+            //     printf("1 G_i[r] %.15f\n",G_i[r]);
+            // }
         }
         //
         for (int r = 0; r < 5; r++)
@@ -486,6 +543,14 @@ __global__ void interior_dGx_pos_multi_nccl(int myRank,splitPoints *splitPoint, 
             sum_delx_delf[r] = sum_delx_delf[r] + temp[r] * dels_weights;
             sum_dely_delf[r] = sum_dely_delf[r] + temp[r] * delt_weights;
             sum_delz_delf[r] = sum_delz_delf[r] + temp[r] * deln_weights;
+            // if(splitPoint[i].globalIndex==699499){
+            //     printf("1 dels_weights %.25f\n",dels_weights);
+            //     printf("1 dels_weights %.15f\n",delt_weights);
+            //     printf("1 dels_weights %.15f\n",deln_weights);
+            //     printf("1 sum_delx_delf %.25f\n",sum_delx_delf[r]);
+            //     printf("1 sum_dely_delf %.15f\n",sum_dely_delf[r]);
+            //     printf("1 sum_delz_delf %.15f\n",sum_delz_delf[r]);
+            // }
         }
         //
     }
@@ -500,6 +565,18 @@ __global__ void interior_dGx_pos_multi_nccl(int myRank,splitPoints *splitPoint, 
     for (int r = 0; r < 5; r++)
     {
        splitPoint[i].flux_res[r] = temp[r]*splitPoint[i].delt / det;
+    //    if(i==50001 && myRank==0 && r==0 && splitPoint[i].flux_res[r]<0){
+    //     printf("0 temp %.15f\n",temp[r]);
+    //     printf("0 splitPoint[i].delt %.15f\n",splitPoint[i].delt);
+    //     printf("0 det %.15f\n",det);
+    //    }
+    //    if( splitPoint[i].globalIndex==699499){
+    //     printf("1 POINT %d\n",splitPoint[i].globalIndex);
+    //     printf("1 splitPoint[i].flux_res[r] %.25f\n",splitPoint[i].flux_res[r]);
+    //     printf("1 temp %.25f\n",temp[r]);
+    //     printf("1 splitPoint[i].delt %.15f\n",splitPoint[i].delt);
+    //     printf("1 det %.15f\n",det);
+    //    }
     }
     //
 }

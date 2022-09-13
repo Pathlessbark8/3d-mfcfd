@@ -23,6 +23,7 @@
 //
 #include "data_structure_mod.h"
 #include "fstream"
+#include <string.h>
 //
 //
 //
@@ -32,14 +33,15 @@ void read_input_point_data()
 {
     //
     int k, r, counter;
-    int interior_count, wall_count, outer_count;
+    int interior_count, wall_count, outer_count, symmetry_count;
     int supersonic_inlet_count, supersonic_outlet_count;
     //
     //
     //
     //		
     std::fstream fin;
-    fin.open("/home/anil/new_3d_code/3d-mfcfd/inputFiles/3d-grid-580485.dat", std::ios::in);
+    fin.open("/home/nsm/3d-mfcfd/inputFiles/"+to_string(max_points)+"/partGrid-"+to_string(max_points)+".dat", std::ios::in);
+    cout<<"/home/nsm/3d-mfcfd/inputFiles/"+to_string(max_points)+"/partGrid-"+to_string(max_points)+".dat"<<endl;
     //
     for (k = 0; k < max_points; k++)
     {
@@ -47,12 +49,25 @@ void read_input_point_data()
         fin >> point.tan1[0][k] >> point.tan1[1][k] >> point.tan1[2][k];
         fin >> point.tan2[0][k] >> point.tan2[1][k] >> point.tan2[2][k];
         fin >> point.nor[0][k] >> point.nor[1][k] >> point.nor[2][k];
+        if(point.status[k]==0){
+            point.nor[2][k]=1;
+        }
         fin >> point.nbhs[k];
         for (r = 0; r < point.nbhs[k]; r++)
         {
             fin >> point.conn[r][k];
             point.conn[r][k]-=1;
+            // if(k==9){
+            //     cout<<point.conn[r][k]<<endl;
+            // }
         }
+        // if(k==1){
+        //     cout<<counter  <<" "<< point.x[k] <<" "<< point.y[k] <<" "<< point.z[k]<<" "<< point.status[k]<<" "<<point.min_dist[k];
+        //     cout<<" "<< point.tan1[0][k] <<" "<< point.tan1[1][k] <<" "<< point.tan1[2][k];
+        // cout<<" "<< point.tan2[0][k] <<" "<< point.tan2[1][k] <<" "<< point.tan2[2][k];
+        // cout<<" "<< point.nor[0][k]<<" "<< point.nor[1][k] <<" "<< point.nor[2][k];
+        // cout<<" "<< point.nbhs[k];
+        // }
         // fin >> point.min_dist[k];
     }
     fin.close();
@@ -65,6 +80,8 @@ void read_input_point_data()
     outer_points = 0;
     supersonic_outlet_points = 0;
     supersonic_inlet_points = 0;
+    symmetry_points = 0;
+
     //
     for (k = 0; k < max_points; k++)
     {
@@ -74,6 +91,8 @@ void read_input_point_data()
             wall_points = wall_points + 1;
         else if (point.status[k] == 2)
             outer_points = outer_points + 1;
+        else if(point.status[k] == 3)
+            symmetry_points=symmetry_points+1;
         else if (point.status[k] == 6)
         {
             supersonic_outlet_points = supersonic_outlet_points + 1;
@@ -103,6 +122,7 @@ void read_input_point_data()
     outer_count = -1;
     supersonic_inlet_count = -1;
     supersonic_outlet_count = -1;
+    symmetry_count=-1;
     //
     for (k = 0; k < max_points; k++)
     {
@@ -120,6 +140,10 @@ void read_input_point_data()
         {
             outer_count = outer_count + 1;
             outer_points_index[outer_count] = k;
+        }
+        else if (point.status[k] == 3){
+            symmetry_count=symmetry_count+1;
+            symmetry_points_index[symmetry_count] = k;
         }
         else if (point.status[k] == 6)
         {

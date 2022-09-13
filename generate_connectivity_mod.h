@@ -21,6 +21,8 @@
 #pragma once
 
 #include "data_structure_mod.h"
+#include <nvToolsExt.h>
+#include <nvToolsExtCuda.h>
 //
 //
 
@@ -295,6 +297,7 @@ __global__ void generate_split_stencils_interior_multi_nccl(splitPoints *splitPo
 //
 {
     //
+    // nvtxMark{A,W} 
     int i, k;
     int bx = blockIdx.x;
     int tx = threadIdx.x;

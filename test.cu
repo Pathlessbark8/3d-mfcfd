@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-
+// Check read/write permissions
 #include <iostream>
 #include <fstream>
 #include <random>
@@ -91,6 +91,7 @@ int main(int argc, char* argv[])
     MPICHECK(MPI_Comm_size(MPI_COMM_WORLD, &nRanks));
     //
 
+
     //CHECK IF MPI LIBRARY HAD CUDA SUPPORT
     if(myRank==0){
       printf("Compile time check:\n");
@@ -132,7 +133,7 @@ int main(int argc, char* argv[])
     }
     //READ POINTS FOR EACH DEVICE FROM FILE
     fstream fin;
-    fin.open("/home/anil/new_3d_code/3d-mfcfd/inputFiles/filesFor"+to_string(nRanks)+"Devices/Device"+to_string(myRank)+".dat",ios::in);
+    fin.open("/home/nsm/3d-mfcfd/inputFiles/"+to_string(max_points)+"/filesFor"+to_string(nRanks)+"Devices/Device"+to_string(myRank)+".dat",ios::in);
     fin>>numDevices;
     fin>>local_points;
     int counter;
@@ -163,13 +164,15 @@ int main(int argc, char* argv[])
     for(int i=0;i<local_points;i++){
       assign(splitPoint[i],localToGlobalIndex[i],myRank);
       findNatureOfLocalPoints(splitPoint[i]);
+      // printf("%d\n",i);
     }
+    cout<<"Reading Here"<<endl;
     allocateSizeForNatureOfLocalPoints();
     for(int i=0;i<local_points;i++){
       assignNatureOfLocalPoints(splitPoint[i],i);
     }
-
     //Initialising the Send Buffer
+    cout<<"Reading send Buffer Here"<<endl;
     sendBuffer=new transferPoints*[nRanks];
     int points_on_gpu_to_send_to;
     int total_points_to_send=0;
@@ -178,7 +181,7 @@ int main(int argc, char* argv[])
         total_points_to_send+=points_on_gpu_to_send_to;
         sendBuffer[i]=new transferPoints[points_on_gpu_to_send_to];
     }
-    
+    cout<<"Reading send Buffer 2 Here"<<endl;
     int currDevice=0;
     int *sendPoints=new int[nRanks];
     for(int i=0;i<nRanks;i++){
@@ -198,9 +201,7 @@ int main(int argc, char* argv[])
         sendPoints[currDevice]++;   
     }
     fin.close();
-    
     cout<<"Number of Points in Process "<<myRank<<" are: "<<numberOfPointsPerDevice<<endl;
-
     //Sharing Size across All Processes
     int *receivePoints=new int[nRanks];
     for(int i=0;i<nRanks;i++){
@@ -260,6 +261,8 @@ int main(int argc, char* argv[])
     transferPoints** sendBuffer_d,** receiveBuffer_d;
     transferPoints** sendPointer=(transferPoints**)malloc(sizeof(transferPoints*)*nRanks);
     transferPoints** receivePointer=(transferPoints**)malloc(sizeof(transferPoints*)*nRanks);
+    // CUcontext * temp;
+    // cuCtxCreate(temp,CU_CTX_SCHED_AUTO,localRank);
     CUDACHECK(cudaSetDevice(localRank));
 
     //POINTER TO POINTER
@@ -340,7 +343,7 @@ int main(int argc, char* argv[])
     if(myRank==0){
       cout<<"Copying memory back to Host\n";
     }
-    CUDACHECK(cudaMemcpy(splitPoint, splitPoint_d, numberOfPointsPerDevice * sizeof(splitPoints), cudaMemcpyDeviceToHost));
+    // CUDACHECK(cudaMemcpy(splitPoint, splitPoint_d, numberOfPointsPerDevice * sizeof(splitPoints), cudaMemcpyDeviceToHost));
 
     
     // TO COPY BACK THE SEND BUFFER TO HOST (POINTER TO POINTER METHOD)

@@ -209,5 +209,13 @@ __global__ void timestep_delt_multi_nccl(int myRank,splitPoints *splitPoint,doub
     }
     splitPoint[i].delt = min_delt;
     //
+    // if(splitPoint[i].globalIndex== 599001){
+    //     for(int r=0;r<5;r++){
+    //         printf("q[%d] is :%.15f \n",i,splitPoint[i].q[r]);
+    //         printf("dq[0][%d] is :%.15f \n",i,splitPoint[i].dq[0][r]);
+    //         printf("dq[1][%d] is :%.15f \n",i,splitPoint[i].dq[1][r]);
+    //         printf("dq[2][%d] is :%.15f \n",i,splitPoint[i].dq[2][r]);
+    //     }
+    // }
     
 }

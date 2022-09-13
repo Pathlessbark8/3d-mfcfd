@@ -308,7 +308,6 @@ __global__ void wall_dGx_pos_multi_nccl(int myRank,splitPoints *splitPoint, doub
     {
         return;
     }
-    
     int i = wallPointsLocalIndex[ind];
     int j, k;
     double prim[5];
@@ -375,6 +374,22 @@ __global__ void wall_dGx_pos_multi_nccl(int myRank,splitPoints *splitPoint, doub
         sum_delx_sqr = sum_delx_sqr + dels * dels_weights;
         sum_dely_sqr = sum_dely_sqr + delt * delt_weights;
         sum_delz_sqr = sum_delz_sqr + deln * deln_weights;
+        //
+        // if(ind==0 && myRank==0){
+        //         printf("INDEX %d\n",splitPoint[i].globalIndex);
+        //         printf("sum_delx_sqr %.15f\n",sum_delx_sqr);
+        //         printf("sum_dely_sqr %.15f\n",sum_dely_sqr);
+        //         printf("sum_delz_sqr %.15f\n",sum_delz_sqr);
+        //         printf("dels %.15f\n",dels);
+        //         printf("delt %.15f\n",delt);
+        //         printf("deln %.15f\n",deln);
+        //         printf("dels_weights %.15f\n",dels_weights);
+        //         printf("delt_weights %.15f\n",delt_weights);
+        //         printf("deln_weights %.15f\n",deln_weights);
+        //         printf("delx %.15f\n",delx);
+        //         printf("dely %.15f\n",dely);
+        //         printf("delz %.15f\n",delz);
+        // }
         //
         sum_delx_dely = sum_delx_dely + dels * delt_weights;
         sum_dely_delz = sum_dely_delz + delt * deln_weights;
@@ -452,6 +467,22 @@ __global__ void wall_dGx_pos_multi_nccl(int myRank,splitPoints *splitPoint, doub
         sum_dely_sqr = sum_dely_sqr + delt * delt_weights;
         sum_delz_sqr = sum_delz_sqr + deln * deln_weights;
         //
+        // if(ind==0 && myRank==0){
+        //         printf("INDEX %d\n",splitPoint[i].globalIndex);
+        //         printf("sum_delx_sqr %.15f\n",sum_delx_sqr);
+        //         printf("sum_dely_sqr %.15f\n",sum_dely_sqr);
+        //         printf("sum_delz_sqr %.15f\n",sum_delz_sqr);
+        //         printf("dels %.15f\n",dels);
+        //         printf("delt %.15f\n",delt);
+        //         printf("deln %.15f\n",deln);
+        //         printf("dels_weights %.15f\n",dels_weights);
+        //         printf("delt_weights %.15f\n",delt_weights);
+        //         printf("deln_weights %.15f\n",deln_weights);
+        //         printf("delx %.15f\n",delx);
+        //         printf("dely %.15f\n",dely);
+        //         printf("delz %.15f\n",delz);
+        // }
+        //
         sum_delx_dely = sum_delx_dely + dels * delt_weights;
         sum_dely_delz = sum_dely_delz + delt * deln_weights;
         sum_delz_delx = sum_delz_delx + deln * dels_weights;
@@ -498,6 +529,10 @@ __global__ void wall_dGx_pos_multi_nccl(int myRank,splitPoints *splitPoint, doub
     }
     
     det = sum_delx_sqr * (sum_dely_sqr * sum_delz_sqr - sum_dely_delz * sum_dely_delz) - sum_delx_dely * (sum_delx_dely * sum_delz_sqr - sum_dely_delz * sum_delz_delx) + sum_delz_delx * (sum_delx_dely * sum_dely_delz - sum_dely_sqr * sum_delz_delx);
+    // if(ind==0 && myRank==0){
+    //     printf("value %.15f",(sum_dely_sqr * sum_delz_sqr - sum_dely_delz * sum_dely_delz));
+    // }
+
     //
     for (int r = 0; r < 5; r++)
     {
@@ -507,6 +542,12 @@ __global__ void wall_dGx_pos_multi_nccl(int myRank,splitPoints *splitPoint, doub
     for (int r = 0; r < 5; r++)
     {
         splitPoint[i].flux_res[r] = 2.00 *splitPoint[i].delt* temp[r] / det;
+    //     if(ind==0 ){
+    //     printf(" splitPoint[i].flux_res[r] %.25f\n",splitPoint[i].flux_res[r]);
+    //     printf(" temp %.25f\n",temp[r]);
+    //     printf(" splitPoint[i].delt %.15f\n",splitPoint[i].delt);
+    //     printf(" det %.15f\n",det);
+    //    }
     }
     
 }
