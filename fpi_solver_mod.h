@@ -330,23 +330,23 @@ void fpi_solver_multi_nccl(splitPoints *splitPoint_d, int localRank, transferPoi
         }
         ncclGroupEnd();
         nvtxRangePushA("second-order-derivatives");
-        // for (int r = 0; r < inner_iterations; r++)
-        // {
-        //     cudaProfilerStart();
-        //     q_inner_loop_multi_nccl<<<grid, threads>>>(myRank, splitPoint_d, power, numberOfPointsPerDevice, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d, sendBuffer_d);
-        //     update_inner_loop_multi_nccl<<<grid, threads>>>(myRank,splitPoint_d,numberOfPointsPerDevice,sendBuffer_d);
-        //     cudaProfilerStop();
-        //     ncclGroupStart();
-        //     for (int i = 0; i < nRanks; ++i)
-        //     {
-        //         if (i != myRank)
-        //         {
-        //             NCCLCHECK(ncclSend(sendPointer[i], sendPoints[i] * sizeof(transferPoints), ncclChar, i, comm, stream));
-        //             NCCLCHECK(ncclRecv(receivePointer[i], receivePoints[i] * sizeof(transferPoints), ncclChar, i, comm, stream));
-        //         }
-        //     }
-        //     ncclGroupEnd();
-        // }
+        for (int r = 0; r < inner_iterations; r++)
+        {
+            cudaProfilerStart();
+            q_inner_loop_multi_nccl<<<grid, threads>>>(myRank, splitPoint_d, power, numberOfPointsPerDevice, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d, sendBuffer_d);
+            update_inner_loop_multi_nccl<<<grid, threads>>>(myRank,splitPoint_d,numberOfPointsPerDevice,sendBuffer_d);
+            cudaProfilerStop();
+            ncclGroupStart();
+            for (int i = 0; i < nRanks; ++i)
+            {
+                if (i != myRank)
+                {
+                    NCCLCHECK(ncclSend(sendPointer[i], sendPoints[i] * sizeof(transferPoints), ncclChar, i, comm, stream));
+                    NCCLCHECK(ncclRecv(receivePointer[i], receivePoints[i] * sizeof(transferPoints), ncclChar, i, comm, stream));
+                }
+            }
+            ncclGroupEnd();
+        }
         nvtxRangePop();
         cudaProfilerStart();
         timestep_delt_multi_nccl<<<grid, threads>>>(myRank, splitPoint_d, CFL, numberOfPointsPerDevice, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d, sendBuffer_d);
@@ -359,11 +359,11 @@ void fpi_solver_multi_nccl(splitPoints *splitPoint_d, int localRank, transferPoi
         wall_dGz_neg_multi_nccl<<<grid, threads>>>(splitPoint_d, power, VL_CONST, pi, wallPointsLocal, wallPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
 
         interior_dGx_pos_multi_nccl<<<grid, threads>>>(myRank, splitPoint_d, power, VL_CONST, pi, interiorPointsLocal, interiorPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
-        // interior_dGx_neg_multi_nccl<<<grid, threads>>>(splitPoint_d, power, VL_CONST, pi, interiorPointsLocal, interiorPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
-        // interior_dGy_pos_multi_nccl<<<grid, threads>>>(splitPoint_d, power, VL_CONST, pi, interiorPointsLocal, interiorPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
-        // interior_dGy_neg_multi_nccl<<<grid, threads>>>(splitPoint_d, power, VL_CONST, pi, interiorPointsLocal, interiorPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
-        // interior_dGz_pos_multi_nccl<<<grid, threads>>>(splitPoint_d, power, VL_CONST, pi, interiorPointsLocal, interiorPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
-        // interior_dGz_neg_multi_nccl<<<grid, threads>>>(splitPoint_d, power, VL_CONST, pi, interiorPointsLocal, interiorPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
+        interior_dGx_neg_multi_nccl<<<grid, threads>>>(splitPoint_d, power, VL_CONST, pi, interiorPointsLocal, interiorPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
+        interior_dGy_pos_multi_nccl<<<grid, threads>>>(splitPoint_d, power, VL_CONST, pi, interiorPointsLocal, interiorPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
+        interior_dGy_neg_multi_nccl<<<grid, threads>>>(splitPoint_d, power, VL_CONST, pi, interiorPointsLocal, interiorPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
+        interior_dGz_pos_multi_nccl<<<grid, threads>>>(splitPoint_d, power, VL_CONST, pi, interiorPointsLocal, interiorPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
+        interior_dGz_neg_multi_nccl<<<grid, threads>>>(splitPoint_d, power, VL_CONST, pi, interiorPointsLocal, interiorPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
 
         outer_dGx_pos_multi_nccl<<<grid, threads>>>(myRank, splitPoint_d, power, VL_CONST, pi, outerPointsLocal, outerPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
         outer_dGx_neg_multi_nccl<<<grid, threads>>>(splitPoint_d, power, VL_CONST, pi, outerPointsLocal, outerPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
@@ -389,7 +389,7 @@ void fpi_solver_multi_nccl(splitPoints *splitPoint_d, int localRank, transferPoi
         {
             MPICHECK(MPI_Reduce(&sum_res_sqr, &sum_res_sqr, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD));
         }
-        CUDACHECK(cudaMemcpy(splitPoint, splitPoint_d, numberOfPointsPerDevice * sizeof(splitPoints), cudaMemcpyDeviceToHost));
+        // CUDACHECK(cudaMemcpy(splitPoint, splitPoint_d, numberOfPointsPerDevice * sizeof(splitPoints), cudaMemcpyDeviceToHost));
         if (myRank == 0)
         {
             res_new = sqrt(sum_res_sqr) / max_points;
@@ -403,12 +403,12 @@ void fpi_solver_multi_nccl(splitPoints *splitPoint_d, int localRank, transferPoi
                 residue = log10(res_new / res_old);
             }
             cout << t << " " << res_new << " " << residue << " " << sum_res_sqr << endl;
-            fstream fout;
-            fout.open("error.dat",ios::out);
-            for(int r=0;r<max_points;r++){
-                fout<<splitPoint[r].prim[0]<<" "<<splitPoint[r].prim[1]<<" "<<splitPoint[r].prim[2]<<" "<<splitPoint[r].prim[3]<<" "<<splitPoint[r].prim[4]<<endl;
-            }
-            fout.close();
+            // fstream fout;
+            // fout.open("error.dat",ios::out);
+            // for(int r=0;r<max_points;r++){
+            //     fout<<splitPoint[r].prim[0]<<" "<<splitPoint[r].prim[1]<<" "<<splitPoint[r].prim[2]<<" "<<splitPoint[r].prim[3]<<" "<<splitPoint[r].prim[4]<<endl;
+            // }
+            // fout.close();
         }
     }
     // cudaMemcpy(&wallPointsLocalIndex, wallPointsLocalIndex_d, wall_size, cudaMemcpyDeviceToHost);

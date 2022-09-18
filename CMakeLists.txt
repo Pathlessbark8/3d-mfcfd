@@ -22,7 +22,7 @@ set(LIBS ${LIBS} ${MPI_LIBRARIES})
 set(LIBS ${LIBS} ${NVTX_LIBRARIES})
 
 if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
-  set(CMAKE_CUDA_ARCHITECTURES 70)
+  set(CMAKE_CUDA_ARCHITECTURES 80)
 endif()
 
 add_compile_options(-O3 --default-stream per-thread -mcmodel=medium --generate-line-info -lineinfo)

@@ -166,13 +166,11 @@ int main(int argc, char* argv[])
       findNatureOfLocalPoints(splitPoint[i]);
       // printf("%d\n",i);
     }
-    cout<<"Reading Here"<<endl;
     allocateSizeForNatureOfLocalPoints();
     for(int i=0;i<local_points;i++){
       assignNatureOfLocalPoints(splitPoint[i],i);
     }
     //Initialising the Send Buffer
-    cout<<"Reading send Buffer Here"<<endl;
     sendBuffer=new transferPoints*[nRanks];
     int points_on_gpu_to_send_to;
     int total_points_to_send=0;
@@ -181,7 +179,6 @@ int main(int argc, char* argv[])
         total_points_to_send+=points_on_gpu_to_send_to;
         sendBuffer[i]=new transferPoints[points_on_gpu_to_send_to];
     }
-    cout<<"Reading send Buffer 2 Here"<<endl;
     int currDevice=0;
     int *sendPoints=new int[nRanks];
     for(int i=0;i<nRanks;i++){

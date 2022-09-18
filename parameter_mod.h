@@ -19,9 +19,9 @@
 #include <nccl.h>
 
 
-		const int max_points = 1000000;
+		const int max_points = 16000000;
 		const int max_partitions=8;
-		int max_iters = 1;//1000
+		int max_iters = 1000;//1000
 //
 //		Flow conditions ..
 //
@@ -33,9 +33,9 @@
 		double gamma_new = 1.40;
 		double pi=4.00*atan(1.00);
 		double theta = aoa*pi/180.00;
-		double power = 2.00;
+		double power = 0.00;
 		double VL_CONST = 50.00;
-		double CFL = 0.0;
+		double CFL = 0.1;
 		int inner_iterations = 3;
 //
 //
