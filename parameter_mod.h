@@ -3,7 +3,7 @@
 
 
 		const int max_points =  32000000;
-		int max_iters = 1000;//1000
+		int max_iters = 200;//1000
 //
 //		Flow conditions ..
 //
