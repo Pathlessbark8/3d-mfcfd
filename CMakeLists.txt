@@ -25,7 +25,7 @@ if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
   set(CMAKE_CUDA_ARCHITECTURES 80)
 endif()
 
-add_compile_options(-O3 --default-stream per-thread -mcmodel=medium --generate-line-info -lineinfo)
+add_compile_options(-O3 --default-stream per-thread -mcmodel=medium )
 list(APPEND MFCFD_CUDA_SOURCES ${CMAKE_SOURCE_DIR}/test.cu)
 set(CMAKE_C_FLAGS "${CMAKE_CUDA_FLAGS} -Mcuda=nordc,lineinfo  -Minfo")
 set(CUDA_SEPARABLE_COMPILATION ON)
