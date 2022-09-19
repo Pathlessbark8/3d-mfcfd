@@ -29,9 +29,12 @@ int main()
 {
 
     cout<<setprecision(13)<<scientific;
-
+    
+    cout<<"Reading Points\n";
     read_input_point_data();
+    cout<<"Setting Initial Conditions\n";
     initial_conditions();
+    cout<<"Generating Stencil\n";
     generate_split_stencils();
 
     // cout<<"Testing"<<endl;

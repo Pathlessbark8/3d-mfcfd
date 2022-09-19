@@ -17,3 +17,5 @@ install/
 *.sqlite
 temp/
 Different_inner_iterations_CPU_3D/
+single_gpu_jobs/
+build/
