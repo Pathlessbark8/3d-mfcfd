@@ -150,7 +150,7 @@ int main(int argc, char* argv[])
         globalToLocalIndex[localToGlobalIndex[i]]=i;
         numberOfPointsPerDevice++;
     }
-
+    cout<<"SIZE is "<<numberOfPointsPerDevice * sizeof(splitPoints)<<endl;
     //Share Partition Value across Proccesses
     MPICHECK(MPI_Allreduce(MPI_IN_PLACE, &partVector, max_points, MPI_INT, MPI_SUM, MPI_COMM_WORLD));    
 
@@ -260,6 +260,9 @@ int main(int argc, char* argv[])
     transferPoints** receivePointer=(transferPoints**)malloc(sizeof(transferPoints*)*nRanks);
     // CUcontext * temp;
     // cuCtxCreate(temp,CU_CTX_SCHED_AUTO,localRank);
+    if(myRank==0){
+        cout<<"Setting Device"<<endl;
+    }
     CUDACHECK(cudaSetDevice(localRank));
 
     //POINTER TO POINTER
@@ -301,6 +304,9 @@ int main(int argc, char* argv[])
         memcpy(&globalToGhostIndexReceivePointer[i],&darray,sizeof(int*));
     }
 
+    if(myRank==0){
+        cout<<"Copying linear arrays"<<endl;
+    }
     CUDACHECK(cudaMalloc(&splitPoint_d, numberOfPointsPerDevice * sizeof(splitPoints)));
     CUDACHECK(cudaMemcpy(splitPoint_d, splitPoint, numberOfPointsPerDevice * sizeof(splitPoints), cudaMemcpyHostToDevice));
     CUDACHECK(cudaMalloc(&globalToLocalIndex_temp, max_points * sizeof(int)));

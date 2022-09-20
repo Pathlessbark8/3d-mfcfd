@@ -380,7 +380,7 @@ void fpi_solver_multi_nccl(splitPoints *splitPoint_d, int localRank, transferPoi
         cudaDeviceSynchronize();
         sum_res_sqr = thrust::reduce(thrust::cuda::par.on(stream), sum_res_sqr_d, sum_res_sqr_d + local_points, (double)0.0, thrust::plus<double>());
         cudaProfilerStop();
-        MPI_Barrier(MPI_COMM_WORLD);
+        // MPI_Barrier(MPI_COMM_WORLD);
         if (myRank == 0)
         {
             MPICHECK(MPI_Reduce(MPI_IN_PLACE, &sum_res_sqr, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD));
