@@ -2,8 +2,8 @@
 #include "math.h"
 
 
-		const int max_points =  32000000;
-		int max_iters = 200;//1000
+		const int max_points =  16000000;
+		int max_iters = 1;//1000
 //
 //		Flow conditions ..
 //
