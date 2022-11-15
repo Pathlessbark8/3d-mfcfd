@@ -2,13 +2,13 @@
 #include "math.h"
 
 
-		const int max_points =  580485;
-		int max_iters = 1000;//1000
+		const int max_points =  16000000;
+		int max_iters = 50;//1000
 //
 //		Flow conditions ..
 //
-		double Mach = 0.7;
-		double aoa = 0.00;
+		double Mach = 0.63;
+		double aoa = 3.00;
 //
 //		Other parameters ..
 //
@@ -16,8 +16,8 @@
 		double pi=4.00*atan(1.00);
 		double theta = aoa*pi/180.00;
 		double power = 0.00;
-		double VL_CONST = 2.00;
-		double CFL = 0.5;
+		double VL_CONST = 50.00;
+		double CFL = 0.2;
 		int inner_iterations = 3;
 //
 //

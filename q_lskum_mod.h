@@ -20,8 +20,8 @@ void q_lskum()
 	//
 	int t;
 	//
-	fstream fout;
-	fout.open("/home/anil/new_3d_code/3d-mfcfd/temp/inner_3.dat", ios::out);
+	// fstream fout;
+	// fout.open("/home/anil/new_3d_code/3d-mfcfd/temp/inner_3.dat", ios::out);
 	//
 	//
 	generate_split_stencils();
@@ -31,13 +31,13 @@ void q_lskum()
 	{
 		fpi_solver(t);
 		cout <<scientific<< setprecision(13) << t << " " << res_new << " " << residue << endl;
-		fout << scientific<<setprecision(13) << t << " " << res_new << " " << residue << endl;
+		// fout << scientific<<setprecision(13) << t << " " << res_new << " " << residue << endl;
 	}
 	auto stop = high_resolution_clock::now();
     auto duration = duration_cast<microseconds>(stop - start);
     cout << "Time Taken :" << duration.count() / 1000000.0 << endl;
-	fout << "Time Taken :" << duration.count() / 1000000.0 << endl;
-	fout.close();
+	// fout << "Time Taken :" << duration.count() / 1000000.0 << endl;
+	// fout.close();
 	//
 	//
 }

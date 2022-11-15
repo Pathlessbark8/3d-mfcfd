@@ -16,7 +16,7 @@ void read_input_point_data()
 {
     //
     int k, r, counter;
-    int interior_count, wall_count, outer_count;
+    int interior_count, wall_count, outer_count, symmetry_count;
     int supersonic_inlet_count, supersonic_outlet_count;
     //
     //
@@ -24,7 +24,7 @@ void read_input_point_data()
     //		OPEN(UNIT=101,FILE="hemisphere-testcase/3d_input_data",FORM="FORMATTED",STATUS="OLD",ACTION="READ")
     //OPEN(UNIT=101,FILE="3d_input_data",FORM="FORMATTED",STATUS="OLD",ACTION="READ")
     std::fstream fin;
-    fin.open("/home/anil/new_3d_code/3d-mfcfd/inputFiles/3d-grid-580485.dat", std::ios::in);
+    fin.open("/home/nsm/3d-mfcfd/inputFiles/"+to_string(max_points)+"/partGrid-"+to_string(max_points)+".dat", std::ios::in);
     //
     for (k = 0; k < max_points; k++)
     {
@@ -49,6 +49,7 @@ void read_input_point_data()
     outer_points = 0;
     supersonic_outlet_points = 0;
     supersonic_inlet_points = 0;
+    symmetry_points = 0;
     //
     for (k = 0; k < max_points; k++)
     {
@@ -58,6 +59,8 @@ void read_input_point_data()
             wall_points = wall_points + 1;
         else if (point.status[k] == 2)
             outer_points = outer_points + 1;
+        else if(point.status[k] == 3)
+            symmetry_points=symmetry_points+1;
         else if (point.status[k] == 6)
             supersonic_outlet_points = supersonic_outlet_points + 1;
         else if (point.status[k] == 5)
@@ -80,6 +83,7 @@ void read_input_point_data()
     outer_count = -1;
     supersonic_inlet_count = -1;
     supersonic_outlet_count = -1;
+    symmetry_count=-1;
     //
     for (k = 0; k < max_points; k++)
     {
@@ -97,6 +101,10 @@ void read_input_point_data()
         {
             outer_count = outer_count + 1;
             outer_points_index[outer_count] = k;
+        }
+        else if (point.status[k] == 3){
+            symmetry_count=symmetry_count+1;
+            symmetry_points_index[symmetry_count] = k;
         }
         else if (point.status[k] == 6)
         {

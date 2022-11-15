@@ -20,9 +20,9 @@ struct points
     int xpos_nbhs[max_points], xneg_nbhs[max_points];
     int ypos_nbhs[max_points], yneg_nbhs[max_points];
     int zpos_nbhs[max_points], zneg_nbhs[max_points];
-    int xpos_conn[22][max_points], xneg_conn[22][max_points];
-    int ypos_conn[22][max_points], yneg_conn[22][max_points];
-    int zpos_conn[22][max_points], zneg_conn[22][max_points];
+    int xpos_conn[27][max_points], xneg_conn[27][max_points];
+    int ypos_conn[27][max_points], yneg_conn[27][max_points];
+    int zpos_conn[27][max_points], zneg_conn[27][max_points];
     //
     //		flow field based attributes ..
     //
@@ -47,7 +47,7 @@ struct points
 points point;
 //
 //
-int interior_points, wall_points, outer_points;
+int interior_points, wall_points, outer_points,symmetry_points;
 int supersonic_inlet_points, supersonic_outlet_points;
 //
 int interior_points_index[max_points];
@@ -55,6 +55,7 @@ int wall_points_index[max_points];
 int outer_points_index[max_points];
 int supersonic_outlet_points_index[max_points];
 int supersonic_inlet_points_index[max_points];
+int symmetry_points_index[max_points];
 //
 double res_old, res_new, max_res, residue;
 int max_res_point;

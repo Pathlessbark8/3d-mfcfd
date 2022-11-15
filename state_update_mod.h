@@ -132,6 +132,20 @@ void state_update()
 			point.prim[r][k] = point.prim[r][p];
 		}
 	}
+	for(int i=0;i<symmetry_points;i++){
+		k=symmetry_points_index[i];
+		double dely,delx;
+		for (int j=0;j<point.nbhs[k];j++){
+			int nbh = point.conn[j][k];
+			delx = point.x[nbh]-point.x[k];
+			dely = point.y[nbh]-point.y[k];
+			if(delx <10e-9 && dely <10e-9){
+				for(int r=0;r<5;r++){
+					point.prim[r][k]=point.prim[r][k];
+				}
+			}
+		}
+	}
 	res_new = sqrt(sum_res_sqr) / max_points;
 	//
 	//
