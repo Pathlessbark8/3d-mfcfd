@@ -132,20 +132,45 @@ void state_update()
 			point.prim[r][k] = point.prim[r][p];
 		}
 	}
-	for(int i=0;i<symmetry_points;i++){
-		k=symmetry_points_index[i];
-		double dely,delx;
-		for (int j=0;j<point.nbhs[k];j++){
-			int nbh = point.conn[j][k];
-			delx = point.x[nbh]-point.x[k];
-			dely = point.y[nbh]-point.y[k];
-			if(delx <10e-9 && dely <10e-9){
-				for(int r=0;r<5;r++){
-					point.prim[r][k]=point.prim[r][k];
-				}
-			}
-		}
-	}
+	// for(int i=0;i<symmetry_points;i++){
+	// 	k=symmetry_points_index[i];
+	// 	double delz,delx;
+	// 	int count=0;
+	// 	for (int j=0;j<point.nbhs[k];j++){
+	// 		int nbh = point.conn[j][k];
+	// 		delx = point.x[nbh]-point.x[k];
+	// 		delz = point.z[nbh]-point.z[k];
+	// 		if(abs(delx) <10e-9 && abs(delz) <10e-9){
+	// 			for(int r=0;r<5;r++){
+	// 				point.prim[r][k]=point.prim[r][nbh];
+	// 			}
+	// 			count++;
+	// 		}
+	// 		if(count>1){
+	// 			cout<<"Error in symmetry points"<<endl;
+	// 			break;
+	// 		}
+	// 	}
+	// 	// exit(0);
+	// 	if(count>1){
+	// 		cout<<"Point is "<<k<<endl;
+	// 		cout<<"X and Z are "<<point.x[k]<<" "<<point.z[k]<<endl;
+	// 		for (int j=0;j<point.nbhs[k];j++){
+	// 			int nbh = point.conn[j][k];
+	// 			delx = point.x[nbh]-point.x[k];
+	// 			delz = point.z[nbh]-point.z[k];
+	// 			if(abs(delx) <10e-9 && abs(delz) <10e-9){
+	// 				cout<<"Neighbour is "<<nbh<<endl;
+	// 				cout<<"X and Z are "<<point.x[nbh]<<" "<<point.z[nbh]<<endl;
+	// 				for(int r=0;r<5;r++){
+	// 					point.prim[r][k]=point.prim[r][nbh];
+	// 				}
+	// 				count++;
+	// 			}
+	// 		}
+	// 		exit(0);
+	// 	}
+	// }
 	res_new = sqrt(sum_res_sqr) / max_points;
 	//
 	//
