@@ -17,3 +17,5 @@ q_var_fortran
 install/
 temp/
 Different_inner_iterations_CPU_3D/
+cpuScripts/
+single_gpu_jobs/
