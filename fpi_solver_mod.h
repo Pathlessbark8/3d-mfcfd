@@ -118,7 +118,7 @@ void fpi_solver_cuda( points *point_d,cudaStream_t stream)
         state_update_wall<<<grid, threads>>>(*point_d, wall_points, wall_points_index_d, sum_res_sqr_d);
         state_update_outer<<<grid, threads>>>(*point_d, outer_points, outer_points_index_d, u1_inf, u2_inf, u3_inf, rho_inf, pi, pr_inf);
         state_update_interior<<<grid, threads>>>(*point_d, interior_points, interior_points_index_d, sum_res_sqr_d);
-        state_update_symmetric_multi_nccl<<<grid,threads>>>(*point_d, power, VL_CONST, pi, symmetry_points, symmetry_points_index_d);
+        state_update_symmetric<<<grid,threads>>>(*point_d, power, VL_CONST, pi, symmetry_points, symmetry_points_index_d);
 
         // state_update_supersonic_outlet();
         // state_update_supersonic_inlet();

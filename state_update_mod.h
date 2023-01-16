@@ -271,9 +271,16 @@ __global__ void state_update_wall(points &point, int wall_points, int *wall_poin
 	k = wall_points_index[i];
 	primitive_to_conserved_cuda(point, k, U);
 	temp = U[0];
+	// if(k==100001){
+	// 	for (int r = 0; r < 5; r++)
+	// 	{
+	// 		printf("point.flux_res[k][r] = %.15f\n", point.flux_res[k][r]);
+	// 	}
+	// 	printf("\n");
+	// }
 	for (int r = 0; r < 5; r++)
 	{
-		U[r] = U[r];// - point.flux_res[k][r];
+		U[r] = U[r] - point.flux_res[k][r];
 	}
 	U[3] = 0.00;
 	//
@@ -332,10 +339,10 @@ __global__ void state_update_interior(points &point, int interior_points, int *i
 	conserved_to_primitive_cuda(point, k, U);
 }
 //
-__global__ void state_update_symmetric_multi_nccl(points &point, double power, double VL_CONST, double pi, int symmetryPointsLocal, int *symmetryPointsLocalIndex){
+__global__ void state_update_symmetric(points &point, double power, double VL_CONST, double pi, int symmetryPointsLocal, int *symmetryPointsLocalIndex){
 	int k;
 	int i = blockIdx.x * blockDim.x + threadIdx.x;
-	double delx, dely;
+	double delx, delz;
 	if (i < 0 || i >= symmetryPointsLocal)
 	{
 		return;
@@ -345,8 +352,8 @@ __global__ void state_update_symmetric_multi_nccl(points &point, double power, d
 	for (int j=0;j<point.nbhs[k];j++){
 		int nbh = point.conn[k][j];
 		delx = point.x[nbh]-point.x[k];
-		dely = point.y[nbh]-point.y[k];
-		if(delx <10e-9 && dely <10e-9){
+		delz = point.z[nbh]-point.z[k];
+		if(abs(delx) <10e-9 && abs(delz) <10e-9){
 			for(int r=0;r<5;r++){
 				point.prim[k][r]=point.prim[nbh][r];
 			}

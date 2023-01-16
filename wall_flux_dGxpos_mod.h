@@ -238,6 +238,19 @@ __global__ void wall_dGx_pos_cuda(points &point, double power, double VL_CONST, 
         {
             temp[r] = delx * point.dq[i][0][r] + dely * point.dq[i][1][r] + delz * point.dq[i][2][r];
             qtilde[r] = point.q[i][r] - 0.50 * temp[r];
+            // if(ind==0){
+			// 	printf("i = %d\n",i);
+			// 	printf("k = %d\n",k);
+			// 	printf("delx=%.15f\n",delx);
+			// 	printf("dely=%.15f\n",dely);
+			// 	printf("delz=%.15f\n",delz);
+			// 	printf("point.dq[%d][0][%d]=%.15f\n",i,r,point.dq[i][0][r]);
+			// 	printf("point.dq[%d][1][%d]=%.15f\n",i,r,point.dq[i][1][r]);
+			// 	printf("point.dq[%d][2][%d]=%.15f\n",i,r,point.dq[i][2][r]);
+			// 	printf("qtilde[%d]=%.15f\n",r,qtilde[r]);
+			// 	printf("temp[%d]=%.15f\n",r,temp[r]);
+			// 	printf("point.q[%d][%d]=%.15f\n",i,r,point.q[i][r]);
+			// }
         }
 
         venkat_limiter_cuda(point, qtilde, phi, i, VL_CONST);

@@ -3,7 +3,7 @@
 
 
 		const int max_points =  1000000;
-		int max_iters = 2;//1000
+		int max_iters = 1000;//1000
 //
 //		Flow conditions ..
 //
@@ -28,5 +28,7 @@
 		double u2_inf = Mach*sin(theta);
 		double u3_inf = 0.00;
 		double pr_inf = 1.00/1.40;
+
+		bool restart=true;
 //
 //

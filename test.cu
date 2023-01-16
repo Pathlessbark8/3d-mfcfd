@@ -72,12 +72,38 @@ int main()
     
     cudaMemcpy(&point, point_d, point_size, cudaMemcpyDeviceToHost);
    
-    // fstream fout;
-    // fout.open("output_prim.dat", ios::out);
-    // for(int i=0;i<max_points;++i){
-    //     fout<<point.prim[i][0]<<" "<<point.prim[i][1]<<" "<<point.prim[i][2]<<" "<<point.prim[i][3]<<" "<<point.prim[i][4]<<endl;
-    // }
-    // fout.close();
+    if(restart){
+        cout<<"Writing Restart File\n";
+        fstream fout,fout2,fout3,fout4;
+        fout.open("output_prim.dat", ios::out);
+        fout2.open("output_q.dat", ios::out);
+        fout3.open("output_qder.dat", ios::out);
+        fout4.open("output_fluxres.dat", ios::out);
+		fout<<setprecision(15);
+		fout2<<setprecision(15);
+        fout3<<setprecision(15);
+        fout4<<setprecision(15);
+        for(int i=0;i<max_points;++i){
+            for(int r=0;r<5;++r){
+                if(point.prim[i][r]<2e-13){
+                    point.prim[i][r]=0;
+                }
+            }
+        }
+        for(int i=0;i<max_points;++i){
+            fout<<point.prim[i][0]<<" "<<point.prim[i][1]<<" "<<point.prim[i][2]<<" "<<point.prim[i][3]<<" "<<point.prim[i][4]<<endl;
+            fout2<<point.q[i][0]<<" "<<point.q[i][1]<<" "<<point.q[i][2]<<" "<<point.q[i][3]<<" "<<point.q[i][4]<<endl;
+            fout3<<point.dq[i][0][0]<<" "<<point.dq[i][0][1]<<" "<<point.dq[i][0][2]<<" "<<point.dq[i][0][3]<<" "<<point.dq[i][0][4]<<endl;
+            fout3<<point.dq[i][1][0]<<" "<<point.dq[i][1][1]<<" "<<point.dq[i][1][2]<<" "<<point.dq[i][1][3]<<" "<<point.dq[i][1][4]<<endl;
+            fout3<<point.dq[i][2][0]<<" "<<point.dq[i][2][1]<<" "<<point.dq[i][2][2]<<" "<<point.dq[i][2][3]<<" "<<point.dq[i][2][4]<<endl;
+            fout4<<point.flux_res[i][0]<<" "<<point.flux_res[i][1]<<" "<<point.flux_res[i][2]<<" "<<point.flux_res[i][3]<<" "<<point.flux_res[i][4]<<endl;
+        }
+        fout2.close();
+        fout.close();
+        fout3.close();
+        fout4.close();
+    }
+    
     cudaFree(point_d);
     //
     cout << "Done\n";
