@@ -19,9 +19,9 @@
 #include <nccl.h>
 
 
-		const int max_points = 32000000;
-		const int max_partitions=1;
-		int max_iters = 200;//1000
+		const int max_points = 1000000;
+		const int max_partitions=8;
+		int max_iters = 1000;//1000
 //
 //		Flow conditions ..
 //

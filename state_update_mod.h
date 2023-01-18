@@ -522,7 +522,7 @@ __global__ void state_update_outer_multi_nccl(int myRank,splitPoints *splitPoint
 __global__ void state_update_symmetric_multi_nccl(splitPoints *splitPoint, double power, double VL_CONST, double pi, int symmetryPointsLocal, int *symmetryPointsLocalIndex,int* globalToLocalIndex,int **globalToGhostIndex,transferPoints **receiveBuffer,int *partVector){
 	int k;
 	int i = blockIdx.x * blockDim.x + threadIdx.x;
-	double delx, dely;
+	double delx, delz;
 	if (i < 0 || i >= symmetryPointsLocal)
 	{
 		return;
@@ -533,8 +533,8 @@ __global__ void state_update_symmetric_multi_nccl(splitPoints *splitPoint, doubl
 		int nbh = splitPoint[k].localNbhs[j];
 		nbh = globalToLocalIndex[nbh];
 		delx = splitPoint[nbh].x-splitPoint[k].x;
-		dely = splitPoint[nbh].y-splitPoint[k].y;
-		if(delx <10e-9 && dely <10e-9){
+		delz = splitPoint[nbh].z-splitPoint[k].z;
+		if(abs(delx) <10e-9 && abs(delz) <10e-9){
 			for(int r=0;r<5;r++){
 				splitPoint[k].prim[r]=splitPoint[nbh].prim[r];
 			}
@@ -546,8 +546,8 @@ __global__ void state_update_symmetric_multi_nccl(splitPoints *splitPoint, doubl
         int device=partVector[nbh];
         int ghostIndex=globalToGhostIndex[device][nbh];
 		delx = receiveBuffer[device][ghostIndex].x-splitPoint[k].x;
-		dely = receiveBuffer[device][ghostIndex].y-splitPoint[k].y;
-		if(delx <10e-9 && dely <10e-9){
+		delz = receiveBuffer[device][ghostIndex].z-splitPoint[k].z;
+		if(abs(delx) <10e-9 && abs(delz) <10e-9){
 			for(int r=0;r<5;r++){
 				splitPoint[k].prim[r]=receiveBuffer[device][ghostIndex].prim[r];
 			}
