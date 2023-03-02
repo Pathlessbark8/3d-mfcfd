@@ -24,6 +24,7 @@
 #include "flux_residual_mod.h"
 #include "state_update_mod.h"
 #include "cuda.h"
+#include <chrono>
 #include <cuda_runtime.h>
 #include <cuda_profiler_api.h>
 #include <thrust/reduce.h>
@@ -32,6 +33,9 @@
 #include <mpi.h>
 #include <nvToolsExt.h>
 #include <nvToolsExtCuda.h>
+
+using namespace std::chrono;
+
 
 #define NCCLCHECK(cmd)                                         \
     do                                                         \
@@ -288,7 +292,6 @@ void fpi_solver_multi_nccl(splitPoints *splitPoint_d, int localRank, transferPoi
         }
     }
     ncclGroupEnd();
-    // printf("cudaProfilerStart\n");
     cudaProfilerStart();
     nvtxRangePushA("Generate Split Stencil ");
     generate_split_stencils_interior_multi_nccl<<<grid, threads>>>(splitPoint_d, interiorPointsLocalIndex_d, interiorPointsLocal, partVector_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d);
@@ -296,7 +299,10 @@ void fpi_solver_multi_nccl(splitPoints *splitPoint_d, int localRank, transferPoi
     generate_split_stencils_outer_multi_nccl<<<grid, threads>>>(splitPoint_d, outerPointsLocalIndex_d, outerPointsLocal, partVector_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d);
     nvtxRangePop();
     cudaProfilerStop();
-    // printf("cudaProfilerStop\n");
+    double totalCommTime=0.0;
+    auto startCommTime= high_resolution_clock::now();
+    auto endCommTime= high_resolution_clock::now();
+    auto start = high_resolution_clock::now();
     for (int t = 1; t <= max_iters; ++t)
     {
         cudaProfilerStart();
@@ -304,6 +310,7 @@ void fpi_solver_multi_nccl(splitPoints *splitPoint_d, int localRank, transferPoi
         eval_q_variables_multi_nccl<<<grid, threads>>>(myRank, splitPoint_d, numberOfPointsPerDevice, sendBuffer_d);
         nvtxRangePop();
         cudaProfilerStop();
+        startCommTime= high_resolution_clock::now();
         ncclGroupStart();
         for (int i = 0; i < nRanks; ++i)
         {
@@ -314,11 +321,15 @@ void fpi_solver_multi_nccl(splitPoints *splitPoint_d, int localRank, transferPoi
             }
         }
         ncclGroupEnd();
+        endCommTime= high_resolution_clock::now();
+        auto aa=duration_cast<nanoseconds>(endCommTime - startCommTime);
+        totalCommTime+=aa.count()/ 1000000000.0;
         cudaProfilerStart();
         nvtxRangePushA("q-derivatives");
         eval_q_derivatives_multi_nccl<<<grid, threads>>>(myRank, splitPoint_d, power, numberOfPointsPerDevice, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d, sendBuffer_d);
         nvtxRangePop();
         cudaProfilerStop();
+        startCommTime= high_resolution_clock::now();
         ncclGroupStart();
         for (int i = 0; i < nRanks; ++i)
         {
@@ -329,6 +340,9 @@ void fpi_solver_multi_nccl(splitPoints *splitPoint_d, int localRank, transferPoi
             }
         }
         ncclGroupEnd();
+        endCommTime= high_resolution_clock::now();
+        aa=duration_cast<nanoseconds>(endCommTime - startCommTime);
+        totalCommTime+=aa.count()/ 1000000000.0;
         nvtxRangePushA("second-order-derivatives");
         for (int r = 0; r < inner_iterations; r++)
         {
@@ -336,6 +350,7 @@ void fpi_solver_multi_nccl(splitPoints *splitPoint_d, int localRank, transferPoi
             q_inner_loop_multi_nccl<<<grid, threads>>>(myRank, splitPoint_d, power, numberOfPointsPerDevice, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d, sendBuffer_d);
             update_inner_loop_multi_nccl<<<grid, threads>>>(myRank,splitPoint_d,numberOfPointsPerDevice,sendBuffer_d);
             cudaProfilerStop();
+            startCommTime= high_resolution_clock::now();
             ncclGroupStart();
             for (int i = 0; i < nRanks; ++i)
             {
@@ -346,6 +361,9 @@ void fpi_solver_multi_nccl(splitPoints *splitPoint_d, int localRank, transferPoi
                 }
             }
             ncclGroupEnd();
+            endCommTime= high_resolution_clock::now();
+            aa=duration_cast<nanoseconds>(endCommTime - startCommTime);
+            totalCommTime+=aa.count()/ 1000000000.0;
         }
         nvtxRangePop();
         cudaProfilerStart();
@@ -380,7 +398,7 @@ void fpi_solver_multi_nccl(splitPoints *splitPoint_d, int localRank, transferPoi
         cudaDeviceSynchronize();
         sum_res_sqr = thrust::reduce(thrust::cuda::par.on(stream), sum_res_sqr_d, sum_res_sqr_d + local_points, (double)0.0, thrust::plus<double>());
         cudaProfilerStop();
-        // MPI_Barrier(MPI_COMM_WORLD);
+        startCommTime= high_resolution_clock::now();
         if (myRank == 0)
         {
             MPICHECK(MPI_Reduce(MPI_IN_PLACE, &sum_res_sqr, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD));
@@ -389,7 +407,9 @@ void fpi_solver_multi_nccl(splitPoints *splitPoint_d, int localRank, transferPoi
         {
             MPICHECK(MPI_Reduce(&sum_res_sqr, &sum_res_sqr, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD));
         }
-        // CUDACHECK(cudaMemcpy(splitPoint, splitPoint_d, numberOfPointsPerDevice * sizeof(splitPoints), cudaMemcpyDeviceToHost));
+        endCommTime= high_resolution_clock::now();
+        aa=duration_cast<nanoseconds>(endCommTime - startCommTime);
+        totalCommTime+=aa.count()/ 1000000000.0;
         if (myRank == 0)
         {
             res_new = sqrt(sum_res_sqr) / max_points;
@@ -411,12 +431,16 @@ void fpi_solver_multi_nccl(splitPoints *splitPoint_d, int localRank, transferPoi
             // fout.close();
         }
     }
+    auto stop = high_resolution_clock::now();
+
     // cudaMemcpy(&wallPointsLocalIndex, wallPointsLocalIndex_d, wall_size, cudaMemcpyDeviceToHost);
     // cudaMemcpy(&outerPointsLocalIndex, outerPointsLocalIndex_d, outer_size, cudaMemcpyDeviceToHost);
     // cudaMemcpy(&interiorPointsLocalIndex, interiorPointsLocalIndex_d, interior_size, cudaMemcpyDeviceToHost);
     // cudaMemcpy(&supersonicInletPointsLocalIndex, supersonicInletPointsLocalIndex_d, supersonic_inlet_size, cudaMemcpyDeviceToHost);
     // cudaMemcpy(&supersonicOutletPointsLocalIndex, supersonicOutletPointsLocalIndex_d, supersonic_outlet_size, cudaMemcpyDeviceToHost);
-
+    auto duration = duration_cast<microseconds>(stop - start);
+    cout << "Done with process "<<myRank<< ". Time Taken by was:" << duration.count() / 1000000.0 << endl;
+    cout << "Total Communication Time For Process "<<myRank<< " is " << totalCommTime << endl;
     cudaFree(wallPointsLocalIndex_d);
     cudaFree(outerPointsLocalIndex_d);
     cudaFree(interiorPointsLocalIndex_d);

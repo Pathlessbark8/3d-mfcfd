@@ -499,8 +499,8 @@ __global__ void wall_dGy_pos_multi_nccl(splitPoints *splitPoint, double power, d
 		temp[r] = sum_delx_sqr*(sum_dely_delf[r]*sum_delz_sqr - sum_dely_delz*sum_delz_delf[r]) 
 				- sum_delx_dely*(sum_delx_delf[r]*sum_delz_sqr - sum_delz_delx*sum_delz_delf[r]) 
 				+ sum_delz_delx*(sum_delx_delf[r]*sum_dely_delz - sum_delz_delx*sum_dely_delf[r]);  
-		if(abs(temp[r]-0.0)<1e-15)
-			temp[r]=0.0;  
+		// if(abs(temp[r]-0.0)<1e-15)
+		// 	temp[r]=0.0;  
 	}
     //
     for (int r = 0; r < 5; r++)

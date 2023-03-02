@@ -813,6 +813,17 @@ __global__ void eval_q_derivatives_multi_nccl(int myRank,splitPoints *splitPoint
 				}
 			}
 		}
+        // if(splitPoint[i].isGhost){
+		// 	for(int t=0;t<splitPoint[i].numberOfPartitionsToSendTo;++t){
+		// 		for(int r=0;r<5;++r){
+		// 			sendBuffer[splitPoint[i].partitions[t]][splitPoint[i].ghostIndex[t]].dq[0][r]=splitPoint[i].dq[0][r];
+        //             sendBuffer[splitPoint[i].partitions[t]][splitPoint[i].ghostIndex[t]].dq[1][r]=splitPoint[i].dq[1][r];
+		// 			sendBuffer[splitPoint[i].partitions[t]][splitPoint[i].ghostIndex[t]].dq[2][r]=splitPoint[i].dq[2][r];
+        //             sendBuffer[splitPoint[i].partitions[t]][splitPoint[i].ghostIndex[t]].qm[0][r]=splitPoint[i].qm[0][r];
+        //             sendBuffer[splitPoint[i].partitions[t]][splitPoint[i].ghostIndex[t]].qm[1][r]=splitPoint[i].qm[1][r];
+		// 		}
+		// 	}
+		// }
 }
 
 __global__ void q_inner_loop_multi_nccl(int myRank,splitPoints *splitPoint, double power,int max_points_on_device,int *globalToLocalIndex,int **globalToGhostIndex,transferPoints **receiveBuffer,int *partVector,transferPoints **sendBuffer)
@@ -1019,4 +1030,5 @@ __global__ void update_inner_loop_multi_nccl(int myRank,splitPoints *splitPoint,
 			}
 		}
 	}
+
 }

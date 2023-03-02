@@ -138,5 +138,14 @@ __global__ void eval_q_variables_multi_nccl(int myRank,splitPoints *splitPoint,i
 				}
 			}
 		}
+		// if(splitPoint[k].isGhost){
+		// 	for(int t=0;t<splitPoint[k].numberOfPartitionsToSendTo;++t){
+		// 		sendBuffer[splitPoint[k].partitions[t]][splitPoint[k].ghostIndex[t]].min_dist=splitPoint[k].min_dist;
+		// 		for(int r=0;r<5;++r){
+		// 			sendBuffer[splitPoint[k].partitions[t]][splitPoint[k].ghostIndex[t]].q[r]=splitPoint[k].q[r];
+		// 			sendBuffer[splitPoint[k].partitions[t]][splitPoint[k].ghostIndex[t]].prim[r]=splitPoint[k].prim[r];
+		// 		}
+		// 	}
+		// }
 	// }
 }

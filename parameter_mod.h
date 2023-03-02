@@ -19,7 +19,7 @@
 #include <nccl.h>
 
 
-		const int max_points = 1000000;
+		const int max_points = 64000000;
 		const int max_partitions=8;
 		int max_iters = 1000;//1000
 //
@@ -33,18 +33,18 @@
 		double gamma_new = 1.40;
 		double pi=4.00*atan(1.00);
 		double theta = aoa*pi/180.00;
-		double power = 0.00;
+		double power = 2.00;
 		double VL_CONST = 50.00;
 		double CFL = 0.1;
-		int inner_iterations = 3;
+		int inner_iterations = 2;
 //
 //
 //		Freestream values of the primitive variables ..
 //
 		double rho_inf = 1.00;
 		double u1_inf = Mach*cos(theta);
-		double u2_inf = Mach*sin(theta);
-		double u3_inf = 0.00;
+		double u2_inf = 0.00;
+		double u3_inf = Mach*sin(theta);
 		double pr_inf = 1.00/1.40;
 
 		
@@ -56,6 +56,5 @@
 //      Variables Required for NCCL
 
 		ncclUniqueId id;
-
 //
 //

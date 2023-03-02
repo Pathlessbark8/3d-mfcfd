@@ -166,11 +166,19 @@ int main(int argc, char* argv[])
       findNatureOfLocalPoints(splitPoint[i]);
       // printf("%d\n",i);
     }
+    if(myRank==0){
+      cout<<"Determining Nature of Points Completed\n";
+    }
     allocateSizeForNatureOfLocalPoints();
+    if(myRank==0){
+      cout<<"Allocating Size for Nature of Points Completed\n";
+    }
     for(int i=0;i<local_points;i++){
       assignNatureOfLocalPoints(splitPoint[i],i);
     }
     //Initialising the Send Buffer
+    if(myRank==0)
+      cout<<"Initialising the Send Buffer\n";
     sendBuffer=new transferPoints*[nRanks];
     int points_on_gpu_to_send_to;
     int total_points_to_send=0;
@@ -179,6 +187,7 @@ int main(int argc, char* argv[])
         total_points_to_send+=points_on_gpu_to_send_to;
         sendBuffer[i]=new transferPoints[points_on_gpu_to_send_to];
     }
+    cout<<"Send Buffer Size is "<<total_points_to_send * sizeof(transferPoints)<<endl;
     int currDevice=0;
     int *sendPoints=new int[nRanks];
     for(int i=0;i<nRanks;i++){
@@ -218,10 +227,12 @@ int main(int argc, char* argv[])
     }
 
     receiveBuffer=new transferPoints*[nRanks];
+    int pointsToReceive=0;
     for(int i=0;i<nRanks;i++){
       receiveBuffer[i]=new transferPoints[receivePoints[i]];
+      pointsToReceive+=receivePoints[i];
     }
-
+    cout<<"Receive Buffer Size is "<<pointsToReceive * sizeof(transferPoints)<<endl;
 
     //CREATE MPI STRUCTURE TO TRANSFER POINTS DATA TO OTHER PROCESSES
     // const int nitems=5;
@@ -338,16 +349,27 @@ int main(int argc, char* argv[])
       cout<<"Beginning Solver\n";
     }
 
-    auto start = high_resolution_clock::now();
+    // auto start = high_resolution_clock::now();
     // 
     fpi_solver_multi_nccl(splitPoint_d,localRank,sendBuffer_d,receiveBuffer_d,nRanks,myRank,sendPoints,receivePoints,comm,stream,sendPointer,receivePointer,globalToLocalIndex_temp,globalToGhostIndex_receive,globalToGhostIndexSendPointer,globalToGhostIndexReceivePointer,partVector_d);
     // 
-    auto stop = high_resolution_clock::now();
+    // auto stop = high_resolution_clock::now();
     if(myRank==0){
       cout<<"Copying memory back to Host\n";
     }
-    // CUDACHECK(cudaMemcpy(splitPoint, splitPoint_d, numberOfPointsPerDevice * sizeof(splitPoints), cudaMemcpyDeviceToHost));
-
+    CUDACHECK(cudaMemcpy(splitPoint, splitPoint_d, numberOfPointsPerDevice * sizeof(splitPoints), cudaMemcpyDeviceToHost));
+    // if(myRank==0){
+    //   if(restart){
+    //     cout<<"Writing Restart File\n";
+    //     fstream fout;
+    //     fout.open("output_prim"+to_string(max_points)+"_"+to_string(inner_iterations)+".dat", ios::out);
+		//     fout<<setprecision(15);
+    //     for(int i=0;i<max_points;++i){
+    //         fout<<splitPoint[i].prim[0]<<" "<<splitPoint[i].prim[0]<<" "<<splitPoint[i].prim[0]<<" "<<splitPoint[i].prim[0]<<" "<<splitPoint[i].prim[0]<<endl;
+    //     }
+    //     fout.close();
+    //   }
+    // }
     
     // TO COPY BACK THE SEND BUFFER TO HOST (POINTER TO POINTER METHOD)
     // transferPoints *darray;
@@ -373,6 +395,6 @@ int main(int argc, char* argv[])
     NCCLCHECK(ncclCommDestroy(comm));
     MPI_Finalize();
     //
-    auto duration = duration_cast<microseconds>(stop - start);
-    cout << "Done with process "<<myRank<< ". Time Taken by was:" << duration.count() / 1000000.0 << endl;
+    // auto duration = duration_cast<microseconds>(stop - start);
+    // cout << "Done with process "<<myRank<< ". Time Taken by was:" << duration.count() / 1000000.0 << endl;
 }
