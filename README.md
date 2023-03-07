@@ -22,8 +22,40 @@ must be changed to where the **Input Grid Files** are stored
 ``` 
 must be changed to where the **Partitioned Grid Files** are stored
 
-## Compilation
+3. In **parameter_mod.h** , 2 variables need to be set (on lines 22 and 23), which are :
+```
+  a) max_points=128000000;
+  b) max_partitions=64;
+```
 
+**Note that these parameters remain fixed for both the benchmarks**
+## Benchmarks Required
+
+We require the benchmark for 2 cases :
+
+1) In **parameter_mod.h** , on line 38, set  
+``` 
+CFL=0.2
+```
+and on line 39 ,set
+``` 
+inner_iterations=0 
+```
+
+**Execute the code and save the outputs for this case**
+
+2) In **parameter_mod.h** , on line 38, set  
+``` 
+CFL=0.1
+```
+and on line 39 ,set
+``` 
+inner_iterations=2 
+```
+
+**Execute the code and save the outputs for this case**
+
+## Compilation
 Now we are ready to compile the code. To compile the code, run the following command
 ``` 
 cd install/
