@@ -19,7 +19,7 @@
 #include <nccl.h>
 
 
-		const int max_points = 64000000;
+		const int max_points = 256000000;
 		const int max_partitions=8;
 		int max_iters = 1000;//1000
 //
@@ -35,8 +35,8 @@
 		double theta = aoa*pi/180.00;
 		double power = 2.00;
 		double VL_CONST = 50.00;
-		double CFL = 0.1;
-		int inner_iterations = 2;
+		double CFL = 0.2;
+		int inner_iterations = 0;
 //
 //
 //		Freestream values of the primitive variables ..

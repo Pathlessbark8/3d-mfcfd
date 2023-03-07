@@ -49,4 +49,31 @@ void initial_conditions()
 	//
 }
 //
+void initial_conditions_multi()
+//
+{
+	//
+	int k;
+	double x1, y1, z1;
+	//
+	// fstream fin;
+	// fin.open("primal-solution.dat", ios::in);
+	//
+	for (k = 0; k < local_points; k++)
+	{
+		splitPoint[k].prim[0] = rho_inf;
+		splitPoint[k].prim[1] = u1_inf;
+		splitPoint[k].prim[2] = u2_inf;
+		splitPoint[k].prim[3] = u3_inf;
+		splitPoint[k].prim[4] = pr_inf;
+		// for (int r = 0; r < 5; r++)
+		// {
+		// 	point.delUp[r][k] = 0.00;
+		// 	point.delUn[r][k] = 0.00;
+		// }
+		// fin >> x1 >> y1 >> z1 >> point.prim[0][k] >> point.prim[1][k] >> point.prim[2][k] >> point.prim[3][k] >> point.prim[4][k];
+	}
+	// fin.close();
+	//
+}
 //

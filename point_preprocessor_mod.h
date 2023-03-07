@@ -159,5 +159,158 @@ void read_input_point_data()
     //
     //
 }
+
+void read_input_point_data_multi()
+//
+//
+{
+    //		
+    std::fstream fin;
+    fin.open("/home/nsm/3d-mfcfd/inputFiles/"+to_string(max_points)+"/partGrid-"+to_string(max_points)+".dat", std::ios::in);
+    cout<<"/home/nsm/3d-mfcfd/inputFiles/"+to_string(max_points)+"/partGrid-"+to_string(max_points)+".dat"<<endl;
+    //
+    int r,k,i=0;
+    double x,y,z,min_dist,tan1[3],tan2[3],nor[3];
+    int counter,status,nbhs,conn[27];
+    for (k = 0; k < max_points && i<local_points; k++)
+    {
+        fin>> counter >> x >> y >> z >> status >> min_dist;
+        fin >> tan1[0] >> tan1[1] >> tan1[2];
+        fin >> tan2[0] >> tan2[1] >> tan2[2];
+        fin >> nor[0] >> nor[1] >> nor[2];
+        fin >> nbhs;
+        for (r = 0; r < nbhs; r++)
+        {
+            fin >> conn[r];
+            conn[r]-=1;
+        }
+        if(localToGlobalIndex[i]==k){
+            splitPoint[i].globalIndex=k;
+            splitPoint[i].x = x;
+            splitPoint[i].y = y;
+            splitPoint[i].z = z;
+            splitPoint[i].status = status;
+            splitPoint[i].min_dist = min_dist;
+            for(int r=0;r<3;r++){
+                splitPoint[i].tan1[r]=tan1[r];
+                splitPoint[i].tan2[r]=tan2[r];
+                splitPoint[i].nor[r]=nor[r];
+            }
+            splitPoint[i].nbhs=nbhs;
+            for(int r=0;r<nbhs;r++){
+                splitPoint[i].conn[r]=conn[r];
+            }
+
+
+            splitPoint[i].numberOfGhostNbhs=0;
+            for(int j=0;j<splitPoint[i].nbhs;j++){
+                if(partVector[splitPoint[i].conn[j]]!=partVector[k]){
+                    splitPoint[i].numberOfGhostNbhs++;
+                }
+            }
+            splitPoint[i].numberOfLocalNbhs=splitPoint[i].nbhs-splitPoint[i].numberOfGhostNbhs;
+            if(splitPoint[i].numberOfGhostNbhs!=0){
+                splitPoint[i].numberOfGhostNbhs=0;
+            }
+
+            splitPoint[i].numberOfLocalNbhs=0;
+            for(int j=0;j<splitPoint[i].nbhs;j++){
+                if(partVector[splitPoint[i].conn[j]]!=partVector[k]){
+                    splitPoint[i].ghostNbhs[splitPoint[i].numberOfGhostNbhs++]=splitPoint[i].conn[j];
+                }
+                else{
+                    splitPoint[i].localNbhs[splitPoint[i].numberOfLocalNbhs++]=splitPoint[i].conn[j];
+                }
+            }
+            // splitPoint[i].delt=point.delt[i];
+            splitPoint[i].isGhost=false;
+            splitPoint[i].numberOfPartitionsToSendTo=0;
+            i++;
+        }
+    }
+    fin.close();
+    //
+    //		Finding the number of interior, wall, outer and other boundary points ..
+    //
+    //
+    interiorPointsLocal=0;
+    wallPointsLocal=0;
+    outerPointsLocal=0;
+    symmetryPointsLocal=0;
+    supersonicInletPointsLocal=0;
+    supersonicOutletPointsLocal=0;
+
+    //
+    for (k = 0; k < local_points; k++)
+    {
+        if (splitPoint[k].status == 0)
+            interiorPointsLocal = interiorPointsLocal + 1;
+        else if (splitPoint[k].status == 1)
+            wallPointsLocal = wallPointsLocal + 1;
+        else if (splitPoint[k].status == 2)
+            outerPointsLocal = outerPointsLocal + 1;
+        else if (splitPoint[k].status == 3)
+            symmetryPointsLocal = symmetryPointsLocal + 1;
+        else if (splitPoint[k].status== 6)
+        {
+            supersonicOutletPointsLocal = supersonicOutletPointsLocal + 1;
+        }
+        else if (splitPoint[k].status== 5)
+        {
+            supersonicInletPointsLocal = supersonicInletPointsLocal + 1;
+        }
+
+    }
+    //
+    interiorPointsLocalIndex=new int[interiorPointsLocal];
+    wallPointsLocalIndex=new int[wallPointsLocal];
+    outerPointsLocalIndex=new int[outerPointsLocal];
+    supersonicOutletPointsLocalIndex=new int[supersonicOutletPointsLocal];
+    supersonicInletPointsLocalIndex=new int[supersonicInletPointsLocal];
+    symmetryPointsLocalIndex=new int[symmetryPointsLocal];
+    interiorPointsLocal=0;
+    wallPointsLocal=0;
+    outerPointsLocal=0;
+    supersonicOutletPointsLocal=0;
+    supersonicInletPointsLocal=0;
+    symmetryPointsLocal=0;
+    //
+    for (k = 0; k < local_points; k++)
+    {
+        if (splitPoint[k].status == 0)
+        {
+            interiorPointsLocalIndex[interiorPointsLocal] = k;
+            // cout<<"Verify "<<k<<endl;
+            interiorPointsLocal = interiorPointsLocal + 1;
+        }
+        else if (splitPoint[k].status == 1)
+        { 
+            wallPointsLocalIndex[wallPointsLocal] = k;
+            wallPointsLocal = wallPointsLocal + 1;
+        }
+        else if (splitPoint[k].status == 2)
+        {
+            outerPointsLocalIndex[outerPointsLocal] = k;
+            outerPointsLocal = outerPointsLocal + 1;
+        }
+        else if (splitPoint[k].status == 3)
+        {
+            symmetryPointsLocalIndex[symmetryPointsLocal] = k;
+            symmetryPointsLocal = symmetryPointsLocal + 1;
+        }
+        else if (splitPoint[k].status == 6)
+        {
+            supersonicOutletPointsLocalIndex[supersonicOutletPointsLocal] = k;
+            supersonicOutletPointsLocal = supersonicOutletPointsLocal + 1;
+        }
+        else if (splitPoint[k].status == 5)
+        {
+            supersonicInletPointsLocalIndex[supersonicInletPointsLocal] = k;
+            supersonicInletPointsLocal = supersonicInletPointsLocal + 1;
+        }
+    }
+    
+    
+}
 //
 //

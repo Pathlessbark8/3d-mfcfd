@@ -80,7 +80,7 @@ struct splitPoints{
     double delUp[5];
     double delUn[5];
     double prim[5];
-    double flux_res[5];
+    double flux_res[5]={0};
     double q[5];
     double qm[2][5];
     double dq[3][5];

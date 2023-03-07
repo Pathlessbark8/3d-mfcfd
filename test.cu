@@ -79,9 +79,9 @@ int main(int argc, char* argv[])
     //MAIN CODE BEGINS
     cout<<setprecision(13)<<scientific;
 
-    read_input_point_data();
-    initial_conditions();
-    generate_split_stencils();
+    // read_input_point_data();
+    // initial_conditions();
+    // generate_split_stencils();
     //
     int myRank, nRanks, localRank = 0;
   
@@ -158,24 +158,31 @@ int main(int argc, char* argv[])
     splitPoint=new splitPoints[numberOfPointsPerDevice];
 
     if(myRank==0){
-      cout<<"Determining Nature of Points\n";
+      cout<<"Reading File and Setting Initial conditions\n";
+    }
+
+    read_input_point_data_multi();
+    initial_conditions_multi();
+
+    if(myRank==0){
+      cout<<"File Read and initial conditions Set \n";
     }
     //ASSIGNING POINTS FOR EACH DEVICE AND CALCULATING NATURE OF POINTS ON EACH PARTITION
-    for(int i=0;i<local_points;i++){
-      assign(splitPoint[i],localToGlobalIndex[i],myRank);
-      findNatureOfLocalPoints(splitPoint[i]);
-      // printf("%d\n",i);
-    }
-    if(myRank==0){
-      cout<<"Determining Nature of Points Completed\n";
-    }
-    allocateSizeForNatureOfLocalPoints();
-    if(myRank==0){
-      cout<<"Allocating Size for Nature of Points Completed\n";
-    }
-    for(int i=0;i<local_points;i++){
-      assignNatureOfLocalPoints(splitPoint[i],i);
-    }
+    // for(int i=0;i<local_points;i++){
+    //   assign(splitPoint[i],localToGlobalIndex[i],myRank);
+    //   findNatureOfLocalPoints(splitPoint[i]);
+    //   // printf("%d\n",i);
+    // }
+    // if(myRank==0){
+    //   cout<<"Determining Nature of Points Completed\n";
+    // }
+    // allocateSizeForNatureOfLocalPoints();
+    // if(myRank==0){
+    //   cout<<"Allocating Size for Nature of Points Completed\n";
+    // }
+    // for(int i=0;i<local_points;i++){
+    //   assignNatureOfLocalPoints(splitPoint[i],i);
+    // }
     //Initialising the Send Buffer
     if(myRank==0)
       cout<<"Initialising the Send Buffer\n";

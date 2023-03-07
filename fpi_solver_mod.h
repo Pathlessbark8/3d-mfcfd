@@ -223,6 +223,7 @@ void fpi_solver_multi_nccl(splitPoints *splitPoint_d, int localRank, transferPoi
 
     dim3 threads(threads_per_block, 1, 1);
     dim3 grid(ceil((numberOfPointsPerDevice / threads.x) + 1), 1, 1);
+    // dim3 gridNew(ceil(((numberOfPointsPerDevice / threads.x) + 1)/6), 1, 1);
 
     int *wallPointsLocalIndex_d;
     unsigned long long wall_size = wallPointsLocal * sizeof(int);
@@ -303,6 +304,10 @@ void fpi_solver_multi_nccl(splitPoints *splitPoint_d, int localRank, transferPoi
     auto startCommTime= high_resolution_clock::now();
     auto endCommTime= high_resolution_clock::now();
     auto start = high_resolution_clock::now();
+    // cudaStream_t stream_new[6];
+    // for(int r=0;r<6;r++){
+    //     CUDACHECK(cudaStreamCreate(&stream_new[r]));
+    // }
     for (int t = 1; t <= max_iters; ++t)
     {
         cudaProfilerStart();
@@ -388,8 +393,75 @@ void fpi_solver_multi_nccl(splitPoints *splitPoint_d, int localRank, transferPoi
         outer_dGy_pos_multi_nccl<<<grid, threads>>>(splitPoint_d, power, VL_CONST, pi, outerPointsLocal, outerPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
         outer_dGy_neg_multi_nccl<<<grid, threads>>>(myRank,splitPoint_d, power, VL_CONST, pi, outerPointsLocal, outerPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
         outer_dGz_pos_multi_nccl<<<grid, threads>>>(splitPoint_d, power, VL_CONST, pi, outerPointsLocal, outerPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
+        
+        ///////////////////
+        // interior_dGx_pos_multi_nccl<<<grid, threads>>>(myRank, splitPoint_d, power, VL_CONST, pi, interiorPointsLocal, interiorPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
+        // wall_dGx_pos_multi_nccl<<<grid, threads,0,stream_new[1] >>>(myRank, splitPoint_d, power, VL_CONST, pi, wallPointsLocal, wallPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
+        // outer_dGx_pos_multi_nccl<<<grid, threads,0, stream_new[2]>>>(myRank, splitPoint_d, power, VL_CONST, pi, outerPointsLocal, outerPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
+
+        // wall_dGx_neg_multi_nccl<<<grid, threads,0,stream_new[1]>>>(myRank, splitPoint_d, power, VL_CONST, pi, wallPointsLocal, wallPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
+        // outer_dGx_neg_multi_nccl<<<grid, threads,0, stream_new[2]>>>(splitPoint_d, power, VL_CONST, pi, outerPointsLocal, outerPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
+        
+        // wall_dGy_pos_multi_nccl<<<grid, threads,0,stream_new[1]>>>(splitPoint_d, power, VL_CONST, pi, wallPointsLocal, wallPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
+        // outer_dGy_pos_multi_nccl<<<grid, threads,0, stream_new[2]>>>(splitPoint_d, power, VL_CONST, pi, outerPointsLocal, outerPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
+        
+        // interior_dGx_neg_multi_nccl<<<grid, threads >>>(splitPoint_d, power, VL_CONST, pi, interiorPointsLocal, interiorPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
+        
+
+        // interior_dGy_pos_multi_nccl<<<grid, threads>>>(splitPoint_d, power, VL_CONST, pi, interiorPointsLocal, interiorPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
+        // wall_dGy_neg_multi_nccl<<<grid, threads,0,stream_new[1]>>>(myRank,splitPoint_d, power, VL_CONST, pi, wallPointsLocal, wallPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
+        // outer_dGy_neg_multi_nccl<<<grid, threads,0, stream_new[2]>>>(myRank,splitPoint_d, power, VL_CONST, pi, outerPointsLocal, outerPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
+        
+        // wall_dGz_neg_multi_nccl<<<grid, threads,0,stream_new[1]>>>(splitPoint_d, power, VL_CONST, pi, wallPointsLocal, wallPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
+        // outer_dGz_pos_multi_nccl<<<grid, threads,0, stream_new[2]>>>(splitPoint_d, power, VL_CONST, pi, outerPointsLocal, outerPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
+        // interior_dGy_neg_multi_nccl<<<grid, threads>>>(splitPoint_d, power, VL_CONST, pi, interiorPointsLocal, interiorPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
+        
+        
+        // interior_dGz_pos_multi_nccl<<<grid, threads>>>(splitPoint_d, power, VL_CONST, pi, interiorPointsLocal, interiorPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
+        
+
+        // interior_dGz_neg_multi_nccl<<<grid, threads>>>(splitPoint_d, power, VL_CONST, pi, interiorPointsLocal, interiorPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
+        /////////////////////////
+
+        // wall_dGx_pos_multi_nccl<<<grid, threads,0,stream_new[0] >>>(myRank, splitPoint_d, power, VL_CONST, pi, wallPointsLocal, wallPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
+        // wall_dGx_neg_multi_nccl<<<grid, threads,0,stream_new[0]>>>(myRank, splitPoint_d, power, VL_CONST, pi, wallPointsLocal, wallPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
+        // wall_dGy_pos_multi_nccl<<<grid, threads,0,stream_new[0]>>>(splitPoint_d, power, VL_CONST, pi, wallPointsLocal, wallPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
+        // wall_dGy_neg_multi_nccl<<<grid, threads,0,stream_new[0]>>>(myRank,splitPoint_d, power, VL_CONST, pi, wallPointsLocal, wallPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
+        // wall_dGz_neg_multi_nccl<<<grid, threads,0,stream_new[0]>>>(splitPoint_d, power, VL_CONST, pi, wallPointsLocal, wallPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
+
+
+        // interior_dGx_pos_multi_nccl<<<grid, threads,0,stream_new[1] >>>(myRank, splitPoint_d, power, VL_CONST, pi, interiorPointsLocal, interiorPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
+        // interior_dGx_neg_multi_nccl<<<grid, threads,0,stream_new[1] >>>(splitPoint_d, power, VL_CONST, pi, interiorPointsLocal, interiorPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
+        // interior_dGy_pos_multi_nccl<<<grid, threads,0,stream_new[1] >>>(splitPoint_d, power, VL_CONST, pi, interiorPointsLocal, interiorPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
+        // interior_dGy_neg_multi_nccl<<<grid, threads,0,stream_new[1] >>>(splitPoint_d, power, VL_CONST, pi, interiorPointsLocal, interiorPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
+        // interior_dGz_pos_multi_nccl<<<grid, threads,0,stream_new[1] >>>(splitPoint_d, power, VL_CONST, pi, interiorPointsLocal, interiorPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
+        // interior_dGz_neg_multi_nccl<<<grid, threads,0,stream_new[1]>>>(splitPoint_d, power, VL_CONST, pi, interiorPointsLocal, interiorPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
+        // bool ran=false;
+        // for(int i=0;i<6;i++){
+        //     interior_dGx_pos_multi_nccl1<<<gridNew, threads,0,stream_new[0]>>>(myRank, splitPoint_d, power, VL_CONST, pi, interiorPointsLocal, interiorPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d,((i)%6)+1,ran);
+        //     interior_dGx_neg_multi_nccl1<<<gridNew, threads,0,stream_new[1]>>>(splitPoint_d, power, VL_CONST, pi, interiorPointsLocal, interiorPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d,((i+1)%6)+1,ran);
+        //     interior_dGy_pos_multi_nccl1<<<gridNew, threads,0,stream_new[2]>>>(splitPoint_d, power, VL_CONST, pi, interiorPointsLocal, interiorPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d,((i+2)%6)+1,ran);
+        //     interior_dGy_neg_multi_nccl1<<<gridNew, threads,0,stream_new[3]>>>(splitPoint_d, power, VL_CONST, pi, interiorPointsLocal, interiorPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d,((i+3)%6)+1,ran);
+        //     interior_dGz_pos_multi_nccl1<<<gridNew, threads,0,stream_new[4]>>>(splitPoint_d, power, VL_CONST, pi, interiorPointsLocal, interiorPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d,((i+4)%6)+1,ran);
+        //     interior_dGz_neg_multi_nccl1<<<gridNew, threads,0,stream_new[5]>>>(splitPoint_d, power, VL_CONST, pi, interiorPointsLocal, interiorPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d,((i+5)%6)+1,ran);
+        //     ran=true;
+        //     cudaDeviceSynchronize();
+        // }
+        // outer_dGx_pos_multi_nccl<<<grid, threads,0,stream_new[2]>>>(myRank, splitPoint_d, power, VL_CONST, pi, outerPointsLocal, outerPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
+        // outer_dGx_neg_multi_nccl<<<grid, threads,0,stream_new[2]>>>(splitPoint_d, power, VL_CONST, pi, outerPointsLocal, outerPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
+        // outer_dGy_pos_multi_nccl<<<grid, threads,0,stream_new[2]>>>(splitPoint_d, power, VL_CONST, pi, outerPointsLocal, outerPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
+        // outer_dGy_neg_multi_nccl<<<grid, threads,0,stream_new[2]>>>(myRank,splitPoint_d, power, VL_CONST, pi, outerPointsLocal, outerPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
+        // outer_dGz_pos_multi_nccl<<<grid, threads,0,stream_new[2]>>>(splitPoint_d, power, VL_CONST, pi, outerPointsLocal, outerPointsLocalIndex_d, globalToLocalIndex_d, globalToGhostIndex_d, receiveBuffer_d, partVector_d);
+        
         nvtxRangePop();
         nvtxRangePushA("state-update");
+        // cudaDeviceSynchronize();
+        // CUDACHECK(cudaStreamSynchronize(stream_new[0]));
+        // CUDACHECK(cudaStreamSynchronize(stream_new[1]));
+        // CUDACHECK(cudaStreamSynchronize(stream_new[2]));
+        // CUDACHECK(cudaStreamSynchronize(stream_new[3]));
+        // CUDACHECK(cudaStreamSynchronize(stream_new[4]));
+        // CUDACHECK(cudaStreamSynchronize(stream_new[5]));
         state_update_wall_multi_nccl<<<grid, threads>>>(myRank, splitPoint_d, wallPointsLocal, wallPointsLocalIndex_d, sum_res_sqr_d);
         state_update_outer_multi_nccl<<<grid, threads>>>(myRank,splitPoint_d, outerPointsLocal, outerPointsLocalIndex_d, u1_inf, u2_inf, u3_inf, rho_inf, pi, pr_inf);
         state_update_interior_multi_nccl<<<grid, threads>>>(splitPoint_d, interiorPointsLocal, interiorPointsLocalIndex_d, sum_res_sqr_d);
